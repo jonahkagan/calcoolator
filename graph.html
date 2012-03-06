@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+    <script src="processing-1.3.6.min.js"></script>
+    <script src="draw-graph.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            var canvas = document.getElementById('graphCanvas');
+            var p = new Processing(canvas, drawGraph);
+        };
+    </script>
+</head>
+<body>
+    <canvas id="graphCanvas"></canvas>
+</body>
+</html>
+
