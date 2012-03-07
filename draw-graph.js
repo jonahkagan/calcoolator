@@ -1,19 +1,22 @@
+TEST = {};
 function drawGraph(p) {
     var UNIT = 20,
+        STEP = 2,
         START_W = 600,
         START_H = 600,
-        originX, originY;
-    
+        originX, originY,
+        currentFunction;    
 
     p.setup = function () {
         p.size(START_W, START_H);
         originX = p.width/2;
         originY = p.height/2;
+        currentFunction = makeFun("f", [0,1,1,4,2]);
+        drawGrid();
+        currentFunction.draw(); 
     };
 
     p.draw = function () {
-        drawGrid();
-         
     };
 
     function drawGrid() {
@@ -46,14 +49,33 @@ function drawGraph(p) {
         var fun = {
             name: name,
             coefs: coefs,
-            color: "#FF0000"
+            color: p.color(255,0,0)
         };
 
         fun.draw = function() {
-            for (var x = 0; x <= p.width; x += UNIT) {
+            p.stroke(fun.color);
+            var p1 = makePoint({px:0, py:0});
+            var p2;
+            p1.uy(fun.evaluate(p1.ux()));
+            
+            while(p1.px() < p.width) {
+                p2 = makePoint({px:p1.px() + STEP, py:0});
+                p2.uy(fun.evaluate(p2.ux()));
+                p.line(p1.px(), p1.py(), p2.px(), p2.py());
+                p1 = p2;
             }
-
         };
+
+        fun.evaluate = function(x) {
+            var fx = 0;
+            if (coefs) {
+                for (var i = 0; i < coefs.length; i++) {
+                    fx += coefs[i] * p.pow(x,i);
+                }
+            }
+            //console.log("f(" + x + ") = " + fx);
+            return fx;
+        }
 
         return fun;
     }
@@ -73,10 +95,10 @@ function drawGraph(p) {
             _px = spec.px,
             _py = spec.py;
 
-        if (_ux && _uy) {
+        if (_ux !== undefined && _uy !== undefined) {
             _calc('px');
             _calc('py');
-        } else if (_px && _py) {
+        } else if (_px !== undefined && _py !== undefined) {
             _calc('ux');
             _calc('uy');
         } else {
@@ -101,24 +123,45 @@ function drawGraph(p) {
             }
         }
 
-        var _calc = function (prop) {
-            calcFuns[prop]();
-        }
-
         pt.ux = function (ux) {
-            if (ux) {
+            if (ux !== undefined) {
                 _ux = ux;
                 _calc('px');
             }
             return _ux;
         };
 
+        pt.uy = function (uy) {
+            if (uy !== undefined) {
+                _uy = uy;
+                _calc('py');
+            }
+            return _uy;
+        };
 
+        pt.px = function (px) {
+            if (px !== undefined) {
+                _px = px;
+                _calc('ux');
+            }
+            return _px;
+        }
+
+        pt.py = function (py) {
+            if (py !== undefined) {
+                _py = py;
+                _calc('uy');
+            }
+            return _py;
+        }
 
         return pt;
     }
 
-    function die(msg, obj) {}
+    function die(msg, obj) { console.log(msg); }
+
+    TEST.makePoint = makePoint;
+    TEST.makeFun = makeFun;
 
 };
 
