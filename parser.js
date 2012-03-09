@@ -268,6 +268,7 @@ function makeParser() {
                             }).simp();
                         }
                         break;
+
                     case '-':
                         // Canonical form: subtraction -> addition
                         // a - b -> a + (-b)
@@ -341,6 +342,41 @@ function makeParser() {
                                     second: second.first
                                 }),
                                 second: second.second
+                            }).simp();
+                        }
+
+                        // Distribution
+                        // a*(b+c) -> a*b + a*c
+                        if (second.operator === '+') {
+                            return ast({
+                                operator: '+',
+                                first: ast({
+                                    operator: '*',
+                                    first: first,
+                                    second: second.first
+                                }),
+                                second: ast({
+                                    operator: '*',
+                                    first: first,
+                                    second: second.second
+                                })
+                            }).simp();
+                        }
+
+                        // (a+b)*c -> a*c + b*c
+                        if (first.operator === '+') {
+                            return ast({
+                                operator: '+',
+                                first: ast({
+                                    operator: '*',
+                                    first: first.first,
+                                    second: second
+                                }),
+                                second: ast({
+                                    operator: '*',
+                                    first: first.second,
+                                    second: second
+                                })
                             }).simp();
                         }
 
@@ -456,6 +492,7 @@ console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
 console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
 console.log(p.testParse('1-x^2').toString());
+console.log(p.testParse('(x+1)*(x+2)').toString());
 console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
 /*
 console.log(p.testParse('1 + 2 + 3').toString());
