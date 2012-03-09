@@ -124,6 +124,18 @@ function makeParser() {
                     };
                 }
 
+                // Special case: make ^ right-assoc
+                if (tok.value === '^') {
+                    tok.led = function (left) {
+                        return ast({
+                            operator: tok.value,
+                            first: left,
+                            second: expression(tok.lbp-1)
+                        });
+                    };
+                }
+
+                // Special case: do paren matching
                 if (tok.value === '(') {
                     tok.nud = function () {
                         var exp = expression(rbp);
@@ -181,3 +193,4 @@ console.log(p.testParse('1 + 2 + 3').toString());
 console.log(p.testParse('1 + (2 + 3').toString());
 console.log(p.testParse('1 + (2 + (3)').toString());
 console.log(p.testParse('1 + -2 + 3').toString());
+console.log(p.testParse('1 + 3^4^5 + 6').toString());
