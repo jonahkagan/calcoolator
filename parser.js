@@ -1,6 +1,13 @@
 function makeParser() {
     var me = {};
 
+    var T = {
+        OPERATOR: 'operator',
+        NUMBER: 'number',
+        ID: 'id',
+        END: 'end'
+    };
+
     function tokenize(eqnStr) {
         var i = 0;
 
@@ -15,13 +22,13 @@ function makeParser() {
                 numStr += next();
             }
             if (numStr !== '') {
-                return token('number', numStr);
+                return token(T.NUMBER, numStr);
             }
         }
 
         function scanOp() {
             if (/[\+\-\*\/\^\(\)]/.test(peek())) {
-                return token('operator', next());
+                return token(T.OPERATOR, next());
             }
         }
 
@@ -31,14 +38,14 @@ function makeParser() {
                 idStr += next();
             }
             if (idStr !== '') {
-                return token('id', idStr);
+                return token(T.ID, idStr);
             }
         }
 
         return function () {
             skipSpaces();
             if (i >= eqnStr.length) {
-                return token('end', '(end)');
+                return token(T.END, '(end)');
             }
             return scanNum() || scanOp() || scanId() ||
                 ('Bad token!' + peek());
@@ -91,17 +98,19 @@ function makeParser() {
         var tok = nextTok();
         tok.lbp = 0;
         switch (tok.type) {
-            case 'number':
-            case 'id':
+            case T.NUMBER:
                 tok.nud = function () {
-                    return ast({
-                        type: tok.type,
-                        value: tok.value
-                    });
+                    return ast({ value: tok.value });
                 };
                 break;
 
-            case 'operator':
+            case T.ID:
+                tok.nud = function () {
+                    return ast({ id: tok.value });
+                };
+                break;
+
+            case T.OPERATOR:
                 var lbp = infixOps[tok.value];
                 if (lbp !== undefined) {
                     tok.lbp = lbp; 
@@ -141,10 +150,14 @@ function makeParser() {
                         var exp = expression(rbp);
                         if (token.value === ')') {
                             next();
+                            return exp;
+                            /*
                             return ast({
+                                type: tok.type,
                                 operator: tok.value,
                                 first: exp
                             });
+                            */
                         } 
                         throw "Unmatched parens";
                     };
@@ -160,9 +173,12 @@ function makeParser() {
     }
 
     function ast(node) {
+
         node.toString = function () {
-            if (node.value !== undefined) {
+            if (node.isNum()) {
                 return node.value;
+            } else if (node.isId()) {
+                return node.id;
             } else if (node.second) {
                 return '(' + node.first.toString() + node.operator +
                     node.second.toString() + ')';
@@ -171,14 +187,168 @@ function makeParser() {
                     node.operator) + node.first.toString() + ')';
             }
         };
+
+        node.isNum = function () { return node.value !== undefined; }
+        node.isOp = function () { return node.operator !== undefined; }
+        node.isId = function () { return node.id !== undefined; }
+
+        // x -> 1*x^1
+        function addCoefs(n) {
+            if (n.isId()) {
+                return ast({
+                    operator: '*',
+                    first: ast({ value: 1 }),
+                    second: ast({
+                        operator: '^',
+                        first: ast({ id: n.id }),
+                        second: ast({ value: 1 })
+                    })
+                });
+            } 
+            if (n.first) { n.first = addCoefs(n.first); }
+            if (n.second) { n.second = addCoefs(n.second); }
+            return n;
+        }
+
+        node.simplify = function () {
+            node = addCoefs(node);
+            console.log(node.toString());
+            return node.simp();
+        }
+
+        node.simp = function () {
+            if (node.isOp()) {
+                var first = node.first.simp(),
+                    second = node.second ? node.second.simp() : null;
+                if (first.isNum()) {
+                    if (second && second.isNum()) {
+                        var num;
+                        first = parseFloat(first.value);
+                        second = parseFloat(second.value);
+                        switch (node.operator) {
+                            case '+':
+                               num = first + second; break;
+                            case '-':
+                               num = first - second; break;
+                            case '*':
+                               num = first * second; break;
+                            case '/':
+                               num = first / second; break;
+                            case '^':
+                               num = Math.pow(first, second); break;
+                        }
+                        return ast({ value: num });
+                    } else if (!second && node.operator === '-') {
+                        return ast({ value: -parseFloat(first.value) });
+                    }
+                }
+                switch (node.operator) {
+                    case '+':
+                        break;
+                    case '-':
+                        break;
+
+                    case '*':
+                        // Associativity
+                        // (a*x^b) * (c*x^d) = (a*c) * x^(b+d)
+                        if (first.operator === '*' &&
+                            second.operator === '*' &&
+                            first.second.operator === '^' &&
+                            second.second.operator === '^' &&
+                            first.second.first.isId() &&
+                            second.second.first.isId() &&
+                            first.second.first.id === second.second.first.id)
+                        {
+                            return ast({
+                                operator: '*',
+                                // (a*c)
+                                first: ast({
+                                    operator: '*',
+                                    first: first.first,
+                                    second: second.first
+                                }),
+                                // x^(b+d)
+                                second: ast({
+                                    operator: '^',
+                                    first: first.second.first,
+                                    second: ast({
+                                        operator: '+',
+                                        first: first.second.second,
+                                        second: second.second.second
+                                    })
+                                })
+                            }).simp();
+                        }
+                        // op * n -> n * op
+                        if (second.isNum()) {
+                            node.first = second;
+                            node.second = first;
+                        }
+
+                        break;
+
+                    case '/':
+                        return ast({
+                            operator: '*',
+                            first: first,
+                            second: ast({
+                                operator: '^',
+                                first: second,
+                                second: ast({ value: -1.0 })
+                            })
+                        }).simp();
+
+                    case '^':
+                        // (a*b)^c = a^c * b^c
+                        if (first.operator === '*') {
+                            return ast({
+                                operator: '*',
+                                first: ast({
+                                    operator: '^',
+                                    first: first.first,
+                                    second: second
+                                }),
+                                second: ast({
+                                    operator: '^',
+                                    first: first.second,
+                                    second: second
+                                })
+                            }).simp();
+                        }
+
+                        // (x^a)^b -> x^(a*b)
+                        if (first.operator === '^' &&
+                            first.first.isId())
+                        {
+                            return ast({
+                                operator: '^',
+                                first: first.first,
+                                second: ast({
+                                    operator: '*',
+                                    first: first.second,
+                                    second: second
+                                })
+                            }).simp();
+                        }
+                        break;
+                            
+                }
+                node.first = first;
+                if (second) { node.second = second; }
+            }
+            return node;
+        };
+
         return node;
     }
+
     
     me.testParse = function (eqnStr) {
         try {
-            return me.parse(eqnStr);
+            return me.parse(eqnStr).simplify();
         } catch (e) {
             console.error(e);
+            //throw e;
         }
         return { toString: function() {} };
     };
@@ -187,10 +357,17 @@ function makeParser() {
 }
 
 var p = makeParser();
+
 console.log(p.testParse('1 + 2').toString());
+console.log(p.testParse('x^2').toString());
+console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
+console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
+/*
 console.log(p.testParse('1 + 2 + 3').toString());
-console.log(p.testParse('1 + (2 + 3').toString());
-console.log(p.testParse('1 + (2 + (3)').toString());
+console.log(p.testParse('1 + 2 / 3').toString());
+//console.log(p.testParse('1 + (2 + 3').toString());
+//console.log(p.testParse('1 + (2 + (3)').toString());
 console.log(p.testParse('1 + -2 + 3').toString());
 console.log(p.testParse('1 + 3^4^5 + 6').toString());
+*/
