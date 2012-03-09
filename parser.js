@@ -244,12 +244,76 @@ function makeParser() {
                 }
                 switch (node.operator) {
                     case '+':
+                        // Collecting like terms
+                        // a * x^n + b * x^n -> (a+b) * x^n
+                        if (first.operator === '*' &&
+                            second.operator === '*' &&
+                            first.second.operator === '^' &&
+                            second.second.operator === '^' &&
+                            first.second.first.isId() &&
+                            second.second.first.isId() &&
+                            first.second.first.id === second.second.first.id &&
+                            first.second.second.isNum() &&
+                            second.second.second.isNum() &&
+                            first.second.second.value === second.second.second.value)
+                        {
+                            return ast({
+                                operator: '*',
+                                first: ast({
+                                    operator: '+',
+                                    first: first.first,
+                                    second: second.first
+                                }),
+                                second: first.second
+                            }).simp();
+                        }
                         break;
                     case '-':
                         break;
 
                     case '*':
-                        // Associativity
+                        // Canonical form: coef on left
+                        // o * n -> n * o
+                        if (second.isNum() && !first.isNum()) {
+                            node.first = second;
+                            node.second = first;
+                            return node;
+                        }
+
+                        // Associativity/Commutativity
+                        // (a * o) * b -> (a * b) * o
+                        if (first.operator === '*' &&
+                            first.first.isNum() &&
+                            second.isNum())
+                        {
+                            return ast({
+                                operator: '*',
+                                first: ast({
+                                    operator: '*',
+                                    first: first.first,
+                                    second: second
+                                }),
+                                second: first.second
+                            }).simp();
+                        }
+
+                        // a * (b * o) -> (a * b) * o
+                        if (second.operator === '*' &&
+                            second.first.isNum() &&
+                            first.isNum())
+                        {
+                            return ast({
+                                operator: '*',
+                                first: ast({
+                                    operator: '*',
+                                    first: first,
+                                    second: second.first
+                                }),
+                                second: second.second
+                            }).simp();
+                        }
+
+                        // Combining like terms
                         // (a*x^b) * (c*x^d) = (a*c) * x^(b+d)
                         if (first.operator === '*' &&
                             second.operator === '*' &&
@@ -279,11 +343,6 @@ function makeParser() {
                                 })
                             }).simp();
                         }
-                        // op * n -> n * op
-                        if (second.isNum()) {
-                            node.first = second;
-                            node.second = first;
-                        }
 
                         break;
 
@@ -299,7 +358,8 @@ function makeParser() {
                         }).simp();
 
                     case '^':
-                        // (a*b)^c = a^c * b^c
+                        // Distribute exponent
+                        // (a*b)^c -> a^c * b^c
                         if (first.operator === '*') {
                             return ast({
                                 operator: '*',
@@ -316,6 +376,7 @@ function makeParser() {
                             }).simp();
                         }
 
+                        // Combine exponent
                         // (x^a)^b -> x^(a*b)
                         if (first.operator === '^' &&
                             first.first.isId())
@@ -363,6 +424,7 @@ console.log(p.testParse('x^2').toString());
 console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
 console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
+console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
 /*
 console.log(p.testParse('1 + 2 + 3').toString());
 console.log(p.testParse('1 + 2 / 3').toString());
