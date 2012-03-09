@@ -269,6 +269,37 @@ function makeParser() {
                         }
                         break;
                     case '-':
+                        // Canonical form: subtraction -> addition
+                        // a - b -> a + (-b)
+                        if (second) {
+                            return ast({
+                                operator: '+',
+                                first: first,
+                                second: ast({
+                                    operator: '-',
+                                    first: second
+                                })
+                            }).simp();
+                        } else {
+                            // Double negation
+                            // -(-a) -> a
+                            if (first.operator === '-' &&
+                                !first.second)
+                            {
+                                return first.first;
+                            }
+                            // -(a*b) -> (-a) * b
+                            if (first.operator === '*') {
+                                return ast({
+                                    operator: '*',
+                                    first: ast({
+                                        operator: '-',
+                                        first: first.first
+                                    }),
+                                    second: first.second
+                                }).simp();
+                            }
+                        }
                         break;
 
                     case '*':
@@ -424,6 +455,7 @@ console.log(p.testParse('x^2').toString());
 console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
 console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
+console.log(p.testParse('1-x^2').toString());
 console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
 /*
 console.log(p.testParse('1 + 2 + 3').toString());
