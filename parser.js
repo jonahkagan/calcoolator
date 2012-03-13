@@ -100,13 +100,13 @@ function makeParser() {
         switch (tok.type) {
             case T.NUMBER:
                 tok.nud = function () {
-                    return ast({ value: tok.value });
+                    return num(tok.value);
                 };
                 break;
 
             case T.ID:
                 tok.nud = function () {
-                    return ast({ id: tok.value });
+                    return id(tok.value);
                 };
                 break;
 
@@ -115,32 +115,27 @@ function makeParser() {
                 if (lbp !== undefined) {
                     tok.lbp = lbp; 
                     tok.led = function (left) {
-                        return ast({
-                            operator: tok.value,
-                            first: left,
-                            second: expression(tok.lbp)
-                        });
+                        return op(tok.value, [
+                            left,
+                            expression(tok.lbp)
+                        ]);
                     };
                 }
 
                 var rbp = prefixOps[tok.value];
                 if (rbp !== undefined) {
                     tok.nud = function () {
-                        return ast({
-                            operator: tok.value,
-                            first: expression(rbp)
-                        });
+                        return op(tok.value, [expression(rbp)]);
                     };
                 }
 
                 // Special case: make ^ right-assoc
                 if (tok.value === '^') {
                     tok.led = function (left) {
-                        return ast({
-                            operator: tok.value,
-                            first: left,
-                            second: expression(tok.lbp-1)
-                        });
+                        return op(tok.value, [
+                            left,
+                            expression(tok.lbp-1)
+                        ]);
                     };
                 }
 
@@ -172,50 +167,283 @@ function makeParser() {
         token = tok;
     }
 
-    function ast(node) {
+    /* AST simplification */
 
-        node.toString = function () {
-            if (node.isNum()) {
-                return node.value;
-            } else if (node.isId()) {
-                return node.id;
-            } else if (node.second) {
-                return '(' + node.first.toString() + node.operator +
-                    node.second.toString() + ')';
+    function simplify(node) {
+        console.log(node.toString());
+        return simp(addCoefs(node));
+    }
+
+    // x -> 1*x^1
+    function addCoefs(node) {
+        if (node.is('id')) {
+            return op('*', [
+                num(1), 
+                op('^', [ id(node.id), num(1) ])
+            ]);
+        } else if (node.kids) {
+            node.kids = node.kids.map(addCoefs);
+        }
+        return node;
+    }
+
+    var simpFuns = [];
+
+    // Convert all subtraction and negation operations
+    simpFuns.push(function (node) {
+        if (node.op === '-') {
+            // -a -> -1 * a
+            if (node.kids.length === 1) {
+                return op('*', [num(-1), node.kids[0]]);
+            // a - b -> a + (-1 * b)
             } else {
-                return '(' + (node.operator === '(' ? '' :
-                    node.operator) + node.first.toString() + ')';
+                return op('+', node.kids.map(function(kid, i) {
+                    if (i === 0) {
+                        return kid;
+                    } else {
+                        return op('*', [num(-1), kid]);
+                    }
+                }));
+            }
+        }
+        return node;
+    });
+
+    function indexOfMatch(arr, test) {
+        for (var i = 0; i < arr.length; i++) {
+            if (test(arr[i])) {
+                return i;
+            }
+        }
+        return i;
+    }
+
+    function fold(f, res, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            res = f(res, arr[i]);
+        }
+        return res;
+    }
+
+    // Compute all operations on numbers
+    simpFuns.push(function (node) {
+        if (node.is('op')) {
+            // The kid list will be sorted such that numbers are first
+            var i = indexOfMatch(node.kids, function (n) {
+                return !n.is('num');
+            });
+            if (i > 1) { // Need two numbers to combine
+                var nums = node.kids.slice(0, i).map(function (node) {
+                        return parseFloat(node.num);
+                    }),
+                    rest = node.kids.slice(i),
+                    total;
+
+                switch (node.op) {
+                    case '+':
+                        total = fold(function (res, n) {
+                            return res += n;
+                        }, 0, nums);
+                        break;
+                    case '*':
+                        total = fold(function (res, n) {
+                            return res *= n;
+                        }, 1, nums);
+                        break;
+                    case '^':
+                        // We cheat here and assume left-associativity
+                        // since (^) nodes only ever have 2 kids
+                        total = fold(function (res, n) {
+                            return Math.pow(res, n);
+                        }, nums[0], nums.slice(1));
+                        break;
+                }
+
+                if (total !== undefined) {
+                    if (rest.length > 0) {
+                        return op(node.op, [num(total)].concat(rest));
+                    } else {
+                        return num(total);
+                    }
+                }
+            }
+        }
+        return node;
+    });
+
+    // Flatten addition and multiplication
+    simpFuns.push(function (node) {
+        if (node.op === '+' || node.op === '*') {
+            var newKids = [];
+            for (var i = 0; i < node.kids.length; i++) {
+                if (node.kids[i].op === node.op) {
+                    newKids = newKids.concat(node.kids[i].kids);
+                } else {
+                    newKids.push(node.kids[i]);
+                }
+            }
+            if (newKids.length > node.kids.length) {
+                return op(node.op, newKids);
+            }
+        }
+        return node;
+    });
+
+    // Distribute exponent
+    // (a*b)^c -> a^c * b^c
+    simpFuns.push(function (node) {
+        if (node.op === '^' &&
+            node.kids[0].op === '*')
+        {
+            return op('*', [
+                op('^', [node.kids[0].kids[0], node.kids[1]]),
+                op('^', [node.kids[0].kids[1], node.kids[1]])
+            ]);
+        }
+        return node;
+    });
+
+    // Combine exponents
+    // (x^a)^b -> x^(a*b)
+    simpFuns.push(function (node) {
+        if (node.op === '^' &&
+            node.kids[0].op === '^')
+        {
+            return op('^', [
+                node.kids[0].kids[0],
+                op('*', [node.kids[0].kids[1], node.kids[1]])
+            ]);
+        }
+        return node;
+    });
+
+    // Emulate built-in JS compare
+    function compare(v1, v2) {
+        if (v1 < v2) {
+            return -1;
+        } else if (v1 > v2) {
+            return 1;
+        } else if (v1 === v2) {
+            return 0;
+        }
+        throw 'Bad compare: ' + v1 + ', ' + v2;
+    }
+
+    function compareTerms(n1, n2) {
+        if (n1.op === '*' &&
+           n1.kids[1].op === '^' &&
+           n1.kids[1].kids[0].is('id'))
+        {
+            if (n2.op === '*' &&
+                n2.kids[1].op === '^' &&
+                n2.kids[1].kids[0].is('id'))
+            {
+                var c = compare(n1.kids[1].kids[0].id,
+                                n2.kids[1].kids[0].id);
+                if (c === 0 &&
+                    n1.kids[1].kids[1].is('num') &&
+                    n2.kids[1].kids[1].is('num'))
+                {
+                    return compare(n1.kids[1].kids[1].num,
+                                   n2.kids[1].kids[1].num);
+                } else { return c; }
+            }
+        }
+        return null;
+    }
+
+    function compareNodes(n1, n2) {
+        if (n1.is('num')) {
+            if (n2.is('num')) {
+                return compare(n1.num, n2.num);
+            } else {
+                // Nums come first
+                return -1;
+            }
+        } else if (n2.is('num')) {
+            // Nums come first
+            return 1;
+        } else {
+            var c = compareTerms(n1, n2);
+            if (c !== null) { return c; }
+        }
+        return compare(n1, n2);
+    }
+
+    function isSorted(arr, cmp) {
+        var cur = arr[0], prev;
+        for (var i = 1; i < arr.length; i++) {
+            prev = cur;
+            cur = arr[i];
+            if (cmp(prev, cur) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Collect like terms for commutative operators 
+    simpFuns.push(function (node) {
+        if (node.op === '+' || node.op === '*') {
+                //logList(node.kids);
+            if (!isSorted(node.kids, compareNodes)) {
+                node.kids.sort(compareNodes);
+                //logList(node.kids);
+                return op(node.op, node.kids);
+            }
+        }
+        return node;
+    });
+
+    var depth = 0;
+    function simp(node) {
+        //if (depth > 10) { return node; }
+        if (node.changed) {
+            node.changed = false;
+            if (node.is('op')) {
+                node.kids = node.kids.map(simp);
+                for (var i = 0; i < simpFuns.length; i++) {
+                    node = simpFuns[i](node);
+                };
+            }
+            depth += 1;
+            node = simp(node);
+        }
+        return node;
+    };
+
+    function id(id) { 
+        var node = ast({ type: 'id', id: id });
+        node.toString = function () { return node.id; }
+        return node;
+    }
+
+    function num(num) { 
+        var node = ast({ type: 'num', num: num });
+        node.toString = function () { return node.num; }
+        return node;
+    }
+
+    function op(op, kids) { 
+        var node = ast({ type: 'op', op: op, kids: kids });
+        node.toString = function () {
+            if (node.kids.length === 1) {
+                return '(' + node.op + node.kids[0] + ')';
+            } else {
+                return '(' + node.kids.join(node.op) + ')';
             }
         };
+        return node;
+    }
 
-        node.isNum = function () { return node.value !== undefined; }
-        node.isOp = function () { return node.operator !== undefined; }
-        node.isId = function () { return node.id !== undefined; }
-
-        // x -> 1*x^1
-        function addCoefs(n) {
-            if (n.isId()) {
-                return ast({
-                    operator: '*',
-                    first: ast({ value: 1 }),
-                    second: ast({
-                        operator: '^',
-                        first: ast({ id: n.id }),
-                        second: ast({ value: 1 })
-                    })
-                });
-            } 
-            if (n.first) { n.first = addCoefs(n.first); }
-            if (n.second) { n.second = addCoefs(n.second); }
-            return n;
-        }
-
-        node.simplify = function () {
-            node = addCoefs(node);
-            console.log(node.toString());
-            return node.simp();
-        }
-
+    function ast(node) {
+        node.changed = true;
+        node.is = function (type) { return node.type === type; }
+        return node;
+    }
+        
+        /*
+        // TODO convert to children list for +,* to do commutativity
         node.simp = function () {
             if (node.isOp()) {
                 var first = node.first.simp(),
@@ -466,17 +694,18 @@ function makeParser() {
             }
             return node;
         };
+        */
 
-        return node;
+    function logList(nodes) {
+        console.log(nodes.map(function(n) { return n.toString(); }).join(','));
     }
-
     
     me.testParse = function (eqnStr) {
         try {
-            return me.parse(eqnStr).simplify();
+            return simplify(me.parse(eqnStr));
         } catch (e) {
             console.error(e);
-            //throw e;
+            throw e;
         }
         return { toString: function() {} };
     };
@@ -487,18 +716,21 @@ function makeParser() {
 var p = makeParser();
 
 console.log(p.testParse('1 + 2').toString());
+console.log(p.testParse('1 + 2 + 3').toString());
+console.log(p.testParse('1 - 2').toString());
+console.log(p.testParse('1 + -2 + 3').toString());
 console.log(p.testParse('x^2').toString());
 console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
+console.log(p.testParse('1 + 3^4^5 + 6').toString());
+/*
 console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
 console.log(p.testParse('1-x^2').toString());
 console.log(p.testParse('(x+1)*(x+2)').toString());
 console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
-/*
 console.log(p.testParse('1 + 2 + 3').toString());
 console.log(p.testParse('1 + 2 / 3').toString());
 //console.log(p.testParse('1 + (2 + 3').toString());
 //console.log(p.testParse('1 + (2 + (3)').toString());
-console.log(p.testParse('1 + -2 + 3').toString());
 console.log(p.testParse('1 + 3^4^5 + 6').toString());
 */
