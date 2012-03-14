@@ -1,6 +1,11 @@
 function makeParser() {
     var me = {};
 
+    // Max exponent to expand parenthesized polynomials
+    // i.e., max val of a for which we perform the expansion:
+    // (x + ...)^a -> (x + ...)(x + ...)^(a-1)
+    var EXPANSION_LIMIT = 10;
+
     var T = {
         OPERATOR: 'operator',
         NUMBER: 'number',
@@ -244,19 +249,21 @@ function makeParser() {
                 var lastTerm = newKids.pop(),
                     curTerm = node.kids[i];
 
-                // a*(b+c) -> a*b + a*c
-                if (curTerm.op === '+') {
-                    newKids.push(op('+', [
-                        op('*', [lastTerm, curTerm.kids[0]]),
-                        op('*', [lastTerm, curTerm.kids[1]])
-                    ]));
+                // (b+...+c)*a -> b*a + ... + c*a
+                if (lastTerm.op === '+') {
+                    newKids.push(op('+',
+                        lastTerm.kids.map(function (kid) {
+                            return op('*', [kid, curTerm]);
+                        })
+                    ));
                     changed = true;
-                // (b+c)*a -> b*a + c*a
-                } else if (lastTerm.op === '+') {
-                    newKids.push(op('+', [
-                        op('*', [lastTerm.kids[0], curTerm]),
-                        op('*', [lastTerm.kids[1], curTerm])
-                    ]));
+                // a*(b+...+c) -> a*b + ... + a*c
+                } else if (curTerm.op === '+') {
+                    newKids.push(op('+',
+                        curTerm.kids.map(function (kid) {
+                            return op('*', [lastTerm, kid]);
+                        })
+                    ));
                     changed = true;
                 } else {
                     newKids.push(lastTerm);
@@ -265,7 +272,61 @@ function makeParser() {
             }
 
             if (changed) {
-                return op(node.op, newKids);
+                if (newKids.length === 1) {
+                    return newKids[0];
+                } else {
+                    return op(node.op, newKids);
+                }
+            }
+        }
+        return node;
+    });
+
+    // Convert division to multiplication
+    simpFuns.push(function (node) {
+        // a / b -> a * b^-1
+        if (node.op === '/') {
+            return op('*', [
+                node.kids[0],
+                op('^', [node.kids[1], num(-1)])
+            ]);
+        }
+        return node;
+    });
+
+    // Expand exponentiated expressions
+    simpFuns.push(function (node) {
+        if (node.op === '^') {
+            var base = node.kids[0],
+                exp = node.kids[1];
+            if (base.op === '+' && exp.is('num')) {
+                // (x + ...)^c -> (x + ...)*(x + ...)^(c-1)
+                var ex = parseFloat(exp.num);
+                if (1 < ex && ex <= EXPANSION_LIMIT) {
+                    return op('*', [
+                        base,
+                        op('^', [
+                           base,
+                           op('-', [exp, num(1)])
+                        ])
+                    ]);
+                }
+            }
+        }
+        return node;
+    });
+
+    // Exponentation by 0,1
+    simpFuns.push(function (node) {
+        if (node.op === '^' && node.kids[1].is('num')) {
+            // a^0 -> 1
+            if (node.kids[1].num === '0') {
+                return num(1);
+            // a ^ 1 -> 1
+            } else if (node.kids[1].num === '1' &&
+                !node.kids[0].is('id'))
+            {
+                return node.kids[0];
             }
         }
         return node;
@@ -309,6 +370,37 @@ function makeParser() {
                 node.kids[0].kids[0],
                 op('*', [node.kids[0].kids[1], node.kids[1]])
             ]);
+        }
+        return node;
+    });
+
+    // Collect and combine like terms for commutative operators 
+    simpFuns.push(function (node) {
+        if (node.op === '+' || node.op === '*') {
+            // Sort like terms together if we need to
+            if (!isSorted(node.kids, compareNodes)) {
+                node.kids.sort(compareNodes);
+                node = op(node.op, node.kids);
+            }
+
+            // Combine adjacent like terms
+            var newKids = [node.kids[0]];
+            for (var i = 1; i < node.kids.length; i++) {
+                var lastTerm = newKids.pop(),
+                    curTerm = node.kids[i], 
+                    newTerm = combine(node.op, lastTerm, curTerm);
+                if (newTerm) {
+                    newKids.push(newTerm);
+                } else {
+                    newKids.push(lastTerm);
+                    newKids.push(curTerm);
+                }
+            } 
+            if (newKids.length === 1) {
+                return newKids[0];
+            } else if (newKids.length < node.kids.length) {
+                return op(node.op, newKids);
+            }
         }
         return node;
     });
@@ -448,46 +540,17 @@ function makeParser() {
         return null;
     }
 
-    // Collect and combine like terms for commutative operators 
-    simpFuns.push(function (node) {
-        if (node.op === '+' || node.op === '*') {
-            // Sort like terms together if we need to
-            if (!isSorted(node.kids, compareNodes)) {
-                node.kids.sort(compareNodes);
-                node = op(node.op, node.kids);
-            }
-
-            // Combine adjacent like terms
-            var newKids = [node.kids[0]];
-            for (var i = 1; i < node.kids.length; i++) {
-                var lastTerm = newKids.pop(),
-                    curTerm = node.kids[i], 
-                    newTerm = combine(node.op, lastTerm, curTerm);
-                if (newTerm) {
-                    newKids.push(newTerm);
-                } else {
-                    newKids.push(lastTerm);
-                    newKids.push(curTerm);
-                }
-            } 
-            if (newKids.length === 1) {
-                return newKids[0];
-            } else if (newKids.length < node.kids.length) {
-                return op(node.op, newKids);
-            }
-        }
-        return node;
-    });
 
     var depth = 0;
     function simp(node) {
-        //if (depth > 10) { return node; }
+        //if (depth > 45) { return node; }
         if (!node.simplified) {
             node.simplified = true;
             if (node.is('op')) {
                 node.kids = node.kids.map(simp);
                 for (var i = 0; i < simpFuns.length; i++) {
                     node = simpFuns[i](node);
+                    //console.log(node.toString());
                 };
             }
             //console.log(node.toString());
@@ -546,23 +609,32 @@ function makeParser() {
 
 var p = makeParser();
 
-console.log(p.testParse('1 + 2').toString());
-console.log(p.testParse('1 + 2 + 3').toString());
-console.log(p.testParse('1 - 2').toString());
-console.log(p.testParse('1 + -2 + 3').toString());
-console.log(p.testParse('x^2').toString());
-console.log(p.testParse('x * x^2').toString());
-console.log(p.testParse('1 + 2*3^4*x').toString());
-console.log(p.testParse('1 + 3^4^5 + 6').toString());
-console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
-console.log(p.testParse('x^2 + x^2').toString());
-console.log(p.testParse('1-x^2').toString());
-console.log(p.testParse('(x+1)*(x+2)').toString());
-console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
+function test(eqn) { 
+    console.log(p.testParse(eqn).toString());
+    console.log('#####################');
+}
+
+test('1 * x + 2 * x^2 / (x * 3)');
+test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');
+test('3/(x+1)^3');
 /*
-console.log(p.testParse('1 + 2 + 3').toString());
-console.log(p.testParse('1 + 2 / 3').toString());
-//console.log(p.testParse('1 + (2 + 3').toString());
-//console.log(p.testParse('1 + (2 + (3)').toString());
-console.log(p.testParse('1 + 3^4^5 + 6').toString());
+test('(x + 1)^3');
+test('(x + 1)^10');
+test('(x + 1)^11');
+test('1 + 2');
+test('1 + 2 + 3');
+test('1 - 2');
+test('1 + -2 + 3');
+test('x^2');
+test('x * x^2');
+test('1 + 2*3^4*x');
+test('1 + 3^4^5 + 6');
+test('x^2 + x^2');
+test('1-x^2');
+test('(x+1)*(x+2)');
+test('1 + 2 + 3');
+test('1 + 2 / 3');
+//test('1 + (2 + 3');
+//test('1 + (2 + (3)');
+test('1 + 3^4^5 + 6');
 */
