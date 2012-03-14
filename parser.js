@@ -218,61 +218,6 @@ function makeParser() {
         return i;
     }
 
-    function fold(f, res, arr) {
-        for (var i = 0; i < arr.length; i++) {
-            res = f(res, arr[i]);
-        }
-        return res;
-    }
-
-    /*
-    // Compute all operations on numbers
-    simpFuns.push(function (node) {
-        if (node.is('op')) {
-            // The kid list will be sorted such that numbers are first
-            var i = indexOfMatch(node.kids, function (n) {
-                return !n.is('num');
-            });
-            if (i > 1) { // Need two numbers to combine
-                var nums = node.kids.slice(0, i).map(function (node) {
-                        return parseFloat(node.num);
-                    }),
-                    rest = node.kids.slice(i),
-                    total;
-
-                switch (node.op) {
-                    case '+':
-                        total = fold(function (res, n) {
-                            return res += n;
-                        }, 0, nums);
-                        break;
-                    case '*':
-                        total = fold(function (res, n) {
-                            return res *= n;
-                        }, 1, nums);
-                        break;
-                    case '^':
-                        // We cheat here and assume left-associativity
-                        // since (^) nodes only ever have 2 kids
-                        total = fold(function (res, n) {
-                            return Math.pow(res, n);
-                        }, nums[0], nums.slice(1));
-                        break;
-                }
-
-                if (total !== undefined) {
-                    if (rest.length > 0) {
-                        return op(node.op, [num(total + '')].concat(rest));
-                    } else {
-                        return num(total + '');
-                    }
-                }
-            }
-        }
-        return node;
-    });
-    */
-
     // Exponentiate numbers
     simpFuns.push(function (node) {
         if (node.op === '^' &&
@@ -471,13 +416,13 @@ function makeParser() {
     // Collect and combine like terms for commutative operators 
     simpFuns.push(function (node) {
         if (node.op === '+' || node.op === '*') {
-                //logList(node.kids);
+            // Sort like terms together if we need to
             if (!isSorted(node.kids, compareNodes)) {
                 node.kids.sort(compareNodes);
-                //logList(node.kids);
                 node = op(node.op, node.kids);
             }
 
+            // Combine adjacent like terms
             var newKids = [node.kids[0]];
             for (var i = 1; i < node.kids.length; i++) {
                 var lastTerm = newKids.pop(),
