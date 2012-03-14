@@ -218,20 +218,6 @@ function makeParser() {
         return i;
     }
 
-    // Exponentiate numbers
-    simpFuns.push(function (node) {
-        if (node.op === '^' &&
-            node.kids[0].is('num') &&
-            node.kids[1].is('num'))
-        {
-            return num(Math.pow(
-                parseFloat(node.kids[0].num),
-                parseFloat(node.kids[1].num))
-            );
-        }
-        return node;
-    });
-
     // Flatten addition and multiplication
     simpFuns.push(function (node) {
         if (node.op === '+' || node.op === '*') {
@@ -246,6 +232,55 @@ function makeParser() {
             if (newKids.length > node.kids.length) {
                 return op(node.op, newKids);
             }
+        }
+        return node;
+    });
+
+    // Distribute multiplication over addition
+    simpFuns.push(function (node) {
+        if (node.op === '*') {
+            var newKids = [node.kids[0]], changed;
+            for (var i = 1; i < node.kids.length; i++) {
+                var lastTerm = newKids.pop(),
+                    curTerm = node.kids[i];
+
+                // a*(b+c) -> a*b + a*c
+                if (curTerm.op === '+') {
+                    newKids.push(op('+', [
+                        op('*', [lastTerm, curTerm.kids[0]]),
+                        op('*', [lastTerm, curTerm.kids[1]])
+                    ]));
+                    changed = true;
+                // (b+c)*a -> b*a + c*a
+                } else if (lastTerm.op === '+') {
+                    newKids.push(op('+', [
+                        op('*', [lastTerm.kids[0], curTerm]),
+                        op('*', [lastTerm.kids[1], curTerm])
+                    ]));
+                    changed = true;
+                } else {
+                    newKids.push(lastTerm);
+                    newKids.push(curTerm);
+                }
+            }
+
+            if (changed) {
+                return op(node.op, newKids);
+            }
+        }
+        return node;
+    });
+
+    // Exponentiate numbers
+    simpFuns.push(function (node) {
+        if (node.op === '^' &&
+            node.kids[0].is('num') &&
+            node.kids[1].is('num'))
+        {
+            return num(Math.pow(
+                parseFloat(node.kids[0].num),
+                parseFloat(node.kids[1].num))
+            );
         }
         return node;
     });
