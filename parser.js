@@ -225,6 +225,7 @@ function makeParser() {
         return res;
     }
 
+    /*
     // Compute all operations on numbers
     simpFuns.push(function (node) {
         if (node.is('op')) {
@@ -261,12 +262,27 @@ function makeParser() {
 
                 if (total !== undefined) {
                     if (rest.length > 0) {
-                        return op(node.op, [num(total)].concat(rest));
+                        return op(node.op, [num(total + '')].concat(rest));
                     } else {
-                        return num(total);
+                        return num(total + '');
                     }
                 }
             }
+        }
+        return node;
+    });
+    */
+
+    // Exponentiate numbers
+    simpFuns.push(function (node) {
+        if (node.op === '^' &&
+            node.kids[0].is('num') &&
+            node.kids[1].is('num'))
+        {
+            return num(Math.pow(
+                parseFloat(node.kids[0].num),
+                parseFloat(node.kids[1].num))
+            );
         }
         return node;
     });
@@ -319,6 +335,8 @@ function makeParser() {
 
     // Emulate built-in JS compare
     function compare(v1, v2) {
+        v1 = v1 + '';
+        v2 = v2 + '';
         if (v1 < v2) {
             return -1;
         } else if (v1 > v2) {
@@ -329,27 +347,62 @@ function makeParser() {
         throw 'Bad compare: ' + v1 + ', ' + v2;
     }
 
-    function compareTerms(n1, n2) {
-        if (n1.op === '*' &&
-           n1.kids[1].op === '^' &&
-           n1.kids[1].kids[0].is('id'))
-        {
-            if (n2.op === '*' &&
-                n2.kids[1].op === '^' &&
-                n2.kids[1].kids[0].is('id'))
-            {
-                var c = compare(n1.kids[1].kids[0].id,
-                                n2.kids[1].kids[0].id);
-                if (c === 0 &&
-                    n1.kids[1].kids[1].is('num') &&
-                    n2.kids[1].kids[1].is('num'))
-                {
-                    return compare(n1.kids[1].kids[1].num,
-                                   n2.kids[1].kids[1].num);
-                } else { return c; }
-            }
+    // returns true if form is x^a
+    function isTerm(n) {
+        return n.op === '^' &&
+            n.kids[0].is('id');
+    }
+
+    // returns true if form is a*x^c
+    function isTermWithCoef(n) {
+        return n.op === '*' &&
+            n.kids[1].op === '^' &&
+            n.kids[1].kids[0].is('id');
+    }
+
+    // given x^a, y^b, returns true if x = y
+    function compareIds(n1, n2) {
+        return compare(n1.kids[0].id,
+                       n2.kids[0].id);
+    }
+
+    // given x^a, y^b, returns 0 if a === b
+    function compareExps(n1, n2) {
+        return compareNodes(n1.kids[1], n2.kids[1]);
+    }
+
+    // returns 0 if n1, n2 of the form x^a, x^b
+    function likeTerms(n1, n2) {
+        if (isTerm(n1) && isTerm(n2)) {
+            return compareIds(n1, n2);
         }
         return null;
+    }
+
+    // returns 0 if n1, n2 of the form x^a, x^a
+    function compareTerms(n1, n2) {
+        var lt = likeTerms(n1, n2);
+        if (lt === 0) {
+            return compareExps(n1, n2);
+        }
+        return lt;
+    }
+
+    // returns 0 if n1, n2 of the form a*x^c, b*x^c
+    function likeTermsWithCoefs(n1, n2) {
+        if (isTermWithCoef(n1) && isTermWithCoef(n2)) {
+            return compareTerms(n1.kids[1], n2.kids[1]);
+        }
+        return null;
+    }
+
+    // returns 0 if n1, n2 of the form a*x^c, b*x^c
+    function compareTermsWithCoefs(n1, n2) {
+        var lt = likeTermsWithCoefs(n1, n2);
+        if (lt === 0) { // Compare coefs
+            return compareNodes(n1.kids[0], n2.kids[0]);
+        }
+        return lt;
     }
 
     function compareNodes(n1, n2) {
@@ -364,7 +417,10 @@ function makeParser() {
             // Nums come first
             return 1;
         } else {
-            var c = compareTerms(n1, n2);
+            var c = compareTermsWithCoefs(n1, n2);
+            if (c === null) {
+                c = compareTerms(n1, n2);
+            }
             if (c !== null) { return c; }
         }
         return compare(n1, n2);
@@ -382,14 +438,62 @@ function makeParser() {
         return true;
     }
 
-    // Collect like terms for commutative operators 
+    function combine(oper, n1, n2) {
+        if (n1.is('num') && n2.is('num')) {
+            switch (oper) {
+                case '+':
+                    return num(parseFloat(n1.num) +
+                               parseFloat(n2.num));
+                case '*':
+                    return num(parseFloat(n1.num) *
+                               parseFloat(n2.num));
+            }
+        } else if (oper === '+' &&
+                   likeTermsWithCoefs(n1, n2) === 0)
+        {
+            // a*x^c + b*x^c -> (a+b)*x^c
+            return op('*', [
+                op('+', [n1.kids[0], n2.kids[0]]),
+                n1.kids[1]
+            ]);
+        } else if (oper === '*' &&
+                   likeTerms(n1, n2) === 0)
+        {
+            // x^a * x^b -> x^(a*b)
+            return op('^', [
+                n1.kids[0],
+                op('+', [n1.kids[1], n2.kids[1]])
+            ]);
+        }
+        return null;
+    }
+
+    // Collect and combine like terms for commutative operators 
     simpFuns.push(function (node) {
         if (node.op === '+' || node.op === '*') {
                 //logList(node.kids);
             if (!isSorted(node.kids, compareNodes)) {
                 node.kids.sort(compareNodes);
                 //logList(node.kids);
-                return op(node.op, node.kids);
+                node = op(node.op, node.kids);
+            }
+
+            var newKids = [node.kids[0]];
+            for (var i = 1; i < node.kids.length; i++) {
+                var lastTerm = newKids.pop(),
+                    curTerm = node.kids[i], 
+                    newTerm = combine(node.op, lastTerm, curTerm);
+                if (newTerm) {
+                    newKids.push(newTerm);
+                } else {
+                    newKids.push(lastTerm);
+                    newKids.push(curTerm);
+                }
+            } 
+            if (newKids.length === 1) {
+                return newKids[0];
+            } else if (newKids.length < node.kids.length) {
+                return op(node.op, newKids);
             }
         }
         return node;
@@ -398,14 +502,15 @@ function makeParser() {
     var depth = 0;
     function simp(node) {
         //if (depth > 10) { return node; }
-        if (node.changed) {
-            node.changed = false;
+        if (!node.simplified) {
+            node.simplified = true;
             if (node.is('op')) {
                 node.kids = node.kids.map(simp);
                 for (var i = 0; i < simpFuns.length; i++) {
                     node = simpFuns[i](node);
                 };
             }
+            //console.log(node.toString());
             depth += 1;
             node = simp(node);
         }
@@ -419,7 +524,7 @@ function makeParser() {
     }
 
     function num(num) { 
-        var node = ast({ type: 'num', num: num });
+        var node = ast({ type: 'num', num: num + '' });
         node.toString = function () { return node.num; }
         return node;
     }
@@ -437,264 +542,10 @@ function makeParser() {
     }
 
     function ast(node) {
-        node.changed = true;
+        node.simplified = false;
         node.is = function (type) { return node.type === type; }
         return node;
     }
-        
-        /*
-        // TODO convert to children list for +,* to do commutativity
-        node.simp = function () {
-            if (node.isOp()) {
-                var first = node.first.simp(),
-                    second = node.second ? node.second.simp() : null;
-                if (first.isNum()) {
-                    if (second && second.isNum()) {
-                        var num;
-                        first = parseFloat(first.value);
-                        second = parseFloat(second.value);
-                        switch (node.operator) {
-                            case '+':
-                               num = first + second; break;
-                            case '-':
-                               num = first - second; break;
-                            case '*':
-                               num = first * second; break;
-                            case '/':
-                               num = first / second; break;
-                            case '^':
-                               num = Math.pow(first, second); break;
-                        }
-                        return ast({ value: num });
-                    } else if (!second && node.operator === '-') {
-                        return ast({ value: -parseFloat(first.value) });
-                    }
-                }
-                switch (node.operator) {
-                    case '+':
-                        // Collecting like terms
-                        // a * x^n + b * x^n -> (a+b) * x^n
-                        if (first.operator === '*' &&
-                            second.operator === '*' &&
-                            first.second.operator === '^' &&
-                            second.second.operator === '^' &&
-                            first.second.first.isId() &&
-                            second.second.first.isId() &&
-                            first.second.first.id === second.second.first.id &&
-                            first.second.second.isNum() &&
-                            second.second.second.isNum() &&
-                            first.second.second.value === second.second.second.value)
-                        {
-                            return ast({
-                                operator: '*',
-                                first: ast({
-                                    operator: '+',
-                                    first: first.first,
-                                    second: second.first
-                                }),
-                                second: first.second
-                            }).simp();
-                        }
-                        break;
-
-                    case '-':
-                        // Canonical form: subtraction -> addition
-                        // a - b -> a + (-b)
-                        if (second) {
-                            return ast({
-                                operator: '+',
-                                first: first,
-                                second: ast({
-                                    operator: '-',
-                                    first: second
-                                })
-                            }).simp();
-                        } else {
-                            // Double negation
-                            // -(-a) -> a
-                            if (first.operator === '-' &&
-                                !first.second)
-                            {
-                                return first.first;
-                            }
-                            // -(a*b) -> (-a) * b
-                            if (first.operator === '*') {
-                                return ast({
-                                    operator: '*',
-                                    first: ast({
-                                        operator: '-',
-                                        first: first.first
-                                    }),
-                                    second: first.second
-                                }).simp();
-                            }
-                        }
-                        break;
-
-                    case '*':
-                        // Canonical form: coef on left
-                        // o * n -> n * o
-                        if (second.isNum() && !first.isNum()) {
-                            node.first = second;
-                            node.second = first;
-                            return node;
-                        }
-
-                        // Associativity/Commutativity
-                        // (a * o) * b -> (a * b) * o
-                        if (first.operator === '*' &&
-                            first.first.isNum() &&
-                            second.isNum())
-                        {
-                            return ast({
-                                operator: '*',
-                                first: ast({
-                                    operator: '*',
-                                    first: first.first,
-                                    second: second
-                                }),
-                                second: first.second
-                            }).simp();
-                        }
-
-                        // a * (b * o) -> (a * b) * o
-                        if (second.operator === '*' &&
-                            second.first.isNum() &&
-                            first.isNum())
-                        {
-                            return ast({
-                                operator: '*',
-                                first: ast({
-                                    operator: '*',
-                                    first: first,
-                                    second: second.first
-                                }),
-                                second: second.second
-                            }).simp();
-                        }
-
-                        // Distribution
-                        // a*(b+c) -> a*b + a*c
-                        if (second.operator === '+') {
-                            return ast({
-                                operator: '+',
-                                first: ast({
-                                    operator: '*',
-                                    first: first,
-                                    second: second.first
-                                }),
-                                second: ast({
-                                    operator: '*',
-                                    first: first,
-                                    second: second.second
-                                })
-                            }).simp();
-                        }
-
-                        // (a+b)*c -> a*c + b*c
-                        if (first.operator === '+') {
-                            return ast({
-                                operator: '+',
-                                first: ast({
-                                    operator: '*',
-                                    first: first.first,
-                                    second: second
-                                }),
-                                second: ast({
-                                    operator: '*',
-                                    first: first.second,
-                                    second: second
-                                })
-                            }).simp();
-                        }
-
-                        // Combining like terms
-                        // (a*x^b) * (c*x^d) = (a*c) * x^(b+d)
-                        if (first.operator === '*' &&
-                            second.operator === '*' &&
-                            first.second.operator === '^' &&
-                            second.second.operator === '^' &&
-                            first.second.first.isId() &&
-                            second.second.first.isId() &&
-                            first.second.first.id === second.second.first.id)
-                        {
-                            return ast({
-                                operator: '*',
-                                // (a*c)
-                                first: ast({
-                                    operator: '*',
-                                    first: first.first,
-                                    second: second.first
-                                }),
-                                // x^(b+d)
-                                second: ast({
-                                    operator: '^',
-                                    first: first.second.first,
-                                    second: ast({
-                                        operator: '+',
-                                        first: first.second.second,
-                                        second: second.second.second
-                                    })
-                                })
-                            }).simp();
-                        }
-
-                        break;
-
-                    case '/':
-                        return ast({
-                            operator: '*',
-                            first: first,
-                            second: ast({
-                                operator: '^',
-                                first: second,
-                                second: ast({ value: -1.0 })
-                            })
-                        }).simp();
-
-                    case '^':
-                        // Distribute exponent
-                        // (a*b)^c -> a^c * b^c
-                        if (first.operator === '*') {
-                            return ast({
-                                operator: '*',
-                                first: ast({
-                                    operator: '^',
-                                    first: first.first,
-                                    second: second
-                                }),
-                                second: ast({
-                                    operator: '^',
-                                    first: first.second,
-                                    second: second
-                                })
-                            }).simp();
-                        }
-
-                        // Combine exponent
-                        // (x^a)^b -> x^(a*b)
-                        if (first.operator === '^' &&
-                            first.first.isId())
-                        {
-                            return ast({
-                                operator: '^',
-                                first: first.first,
-                                second: ast({
-                                    operator: '*',
-                                    first: first.second,
-                                    second: second
-                                })
-                            }).simp();
-                        }
-                        break;
-                            
-                }
-                node.first = first;
-                if (second) { node.second = second; }
-            }
-            return node;
-        };
-        */
 
     function logList(nodes) {
         console.log(nodes.map(function(n) { return n.toString(); }).join(','));
@@ -723,11 +574,12 @@ console.log(p.testParse('x^2').toString());
 console.log(p.testParse('x * x^2').toString());
 console.log(p.testParse('1 + 2*3^4*x').toString());
 console.log(p.testParse('1 + 3^4^5 + 6').toString());
-/*
 console.log(p.testParse('1 * x + 2 * x^2 / (x * 3)').toString());
+console.log(p.testParse('x^2 + x^2').toString());
 console.log(p.testParse('1-x^2').toString());
 console.log(p.testParse('(x+1)*(x+2)').toString());
 console.log(p.testParse('x^(1+1)^2 + 3*x^3*(x+5*x^2)').toString());
+/*
 console.log(p.testParse('1 + 2 + 3').toString());
 console.log(p.testParse('1 + 2 / 3').toString());
 //console.log(p.testParse('1 + (2 + 3').toString());
