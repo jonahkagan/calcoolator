@@ -114,7 +114,7 @@ function drawGraph(p) {
             color: getNextFunctionColor()
         };
 
-        fun.degree = 0;
+        fun.degree = 1;
         for (var i = 0; i < coefs.length; i++) {
             if (coefs[i] != 0)
                 fun.degree = i;
@@ -301,9 +301,9 @@ function drawGraph(p) {
         
         anchor.draw = function() {
             p.stroke(anchor.fun.color);
+            p.fill(anchor.fun.color);
             p.ellipseMode(p.CENTER);
             p.ellipse(anchor.px(), anchor.py(), ANCHOR_SIZE, ANCHOR_SIZE);
-            p.fill(anchor.fun.color);
         }
         
         anchor.isPressed = function() {
