@@ -166,9 +166,35 @@ function drawGraph(p) {
         }
 
         if (fun.degree === 1) {
-            fun.anchors.translate = makeTranslateAnchor(fun, {ux:0, uy:fun.evaluate(0)});
+            fun.anchors.translate = makeTranslateYAnchor(fun, {ux:0, uy:fun.evaluate(0)});
             fun.anchors.rotate = makeRotateAnchor(fun, {px: originX + p.width * .1, py: 0});
             fun.anchors.rotate.uy(fun.evaluate(fun.anchors.rotate.ux()));
+        }
+
+        if (fun.degree == 2) {
+            var center = -1 * coefs[1] / (2*coefs[2]);
+            fun.anchors.translate = makeTranslateXYAnchor(fun, {ux:center, uy:fun.evaluate(center)});
+            fun.anchors.bend = makeBendAnchor(fun, {px: fun.anchors.translate.px() + p.width * .1, py: 0});
+            fun.anchors.bend.uy(fun.evaluate(fun.anchors.bend.ux()));
+            
+            fun.fitToAnchors = function() {
+                var p1 = fun.anchors.translate;
+                var p2 = fun.anchors.bend;
+                var dx = p2.ux() - p1.ux();
+                var p3 = makePoint({ux: p1.ux() - dx, uy: fun.anchors.bend.uy()});
+                var M = $M([
+                    [p1.ux()*p1.ux(), p1.ux(), 1],
+                    [p2.ux()*p2.ux(), p2.ux(), 1],
+                    [p3.ux()*p3.ux(), p3.ux(), 1]
+                ])
+                var V = $V([p1.uy(), p2.uy(), p3.uy()])
+                M = M.inv();
+                var cfs = M.multiply(V).elements;
+                fun.coefs[0] = cfs[2];
+                fun.coefs[1] = cfs[1];
+                fun.coefs[2] = cfs[0];
+                writeTemporaryInput();
+            }
         }
 
         fun.mousePressed = function() {
@@ -289,7 +315,10 @@ function drawGraph(p) {
         return anchor
     }
     
-    function makeTranslateAnchor(fun, spec) {
+    function makeTranslateYAnchor(fun, spec) {
+        if (fun.degree != 1) {
+            die("cannot make translateY anchor for degree not equal to one", fun);
+        }
         var anchor = makeAnchor(fun, spec);
         anchor.onDrag = function() {
             var dy = p.mouseY - anchor.py();
@@ -304,7 +333,7 @@ function drawGraph(p) {
     
     function makeRotateAnchor(fun, spec) {
         if (fun.degree != 1) {
-            die("cannot make rotate anchor for degree not equal to one", fun)
+            die("cannot make rotate anchor for degree not equal to one", fun);
         }
         var rotate = makeAnchor(fun, spec);
         rotate.onDrag = function() {
@@ -316,6 +345,36 @@ function drawGraph(p) {
             writeTemporaryInput();
         }
         return rotate;
+    }
+    
+    function makeTranslateXYAnchor(fun, spec) {
+        if (fun.degree != 2) {
+            die("cannot make translateXY anchor for degree not equal to one", fun);
+        }
+        var anchor = makeAnchor(fun, spec);
+        anchor.onDrag = function() {
+            var dy = p.mouseY - anchor.py();
+            var dx = p.mouseX - anchor.px();
+            for (a in anchor.fun.anchors) {
+                anchor.fun.anchors[a].py(anchor.fun.anchors[a].py() + dy);
+                anchor.fun.anchors[a].px(anchor.fun.anchors[a].px() + dx);
+            }
+            fun.fitToAnchors();
+        }
+        return anchor;
+    }
+    
+    function makeBendAnchor(fun, spec) {
+        if (fun.degree != 2) {
+            die("cannot make bend anchor for degree not equal to 2", fun);
+        }
+        var bend = makeAnchor(fun, spec);
+        bend.onDrag = function() {
+            bend.py(p.mouseY);
+            bend.px(p.mouseX);
+            fun.fitToAnchors();
+        }
+        return bend;
     }
 
     function die(msg, obj) { console.log(msg); }
