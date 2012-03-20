@@ -42,17 +42,21 @@ function makeParser() {
     function ast2coefs(origAst) {
         // If simplification yields canonical form,
         // convert to coef list
-        var ast = simplify(origAst);
+        var ast = simplify(origAst), coefs = [];
         // a
         if (ast.is('num')) {
             return [ parseFloat(ast.num) ];
         // a*x^n
         } else if (isTermWithCoef(ast)) {
-            return [ parseFloat(ast.kids[0].num) ];
+            for (var i = 0; i < ast.kids[1].kids[1].num; i++) {
+                coefs.push(0);
+            }
+            coefs.push(parseFloat(ast.kids[0].num));
+            return coefs;
         // a + b*x + c*x^2 + ...
         } else if (ast.op === '+') {
             // check for constant term
-            var coefs = [], i;
+            var i;
             if (ast.kids[0].is('num')) {
                 coefs.push(parseFloat(ast.kids[0].num));
                 i = 1;
@@ -60,10 +64,17 @@ function makeParser() {
                 coefs.push(0);
                 i = 0;
             }
+            console.log(ast.toString());
             // check higher order terms
+            var exp = i+1; // exponent of cur term
             for (; i < ast.kids.length; i++) {
                 if (isTermWithCoef(ast.kids[i])) {
+                    // insert 0s for missing terms
+                    for (; exp < ast.kids[i].kids[1].kids[1].num; exp++) {
+                        coefs.push(0);
+                    }
                     coefs.push(parseFloat(ast.kids[i].kids[0].num));
+                    exp++;
                 } else {
                     return null;
                 }
@@ -407,8 +418,6 @@ function makeParser() {
 
     // Emulate built-in JS compare
     function compare(v1, v2) {
-        v1 = v1 + '';
-        v2 = v2 + '';
         if (v1 < v2) {
             return -1;
         } else if (v1 > v2) {
@@ -480,7 +489,8 @@ function makeParser() {
     function compareNodes(n1, n2) {
         if (n1.is('num')) {
             if (n2.is('num')) {
-                return compare(n1.num, n2.num);
+                return compare(parseFloat(n1.num),
+                               parseFloat(n2.num));
             } else {
                 // Nums come first
                 return -1;
