@@ -3,7 +3,7 @@ function makeParser() {
 
     // Max exponent to expand parenthesized polynomials
     // i.e., max val of a for which we perform the expansion:
-    // (x + ...)^a -> (x + ...)(x + ...)^(a-1)
+    // (x + ...)^a -> (x + ...)*(x + ...)^(a-1)
     var EXPANSION_LIMIT = 10;
 
     // Token types
@@ -29,8 +29,16 @@ function makeParser() {
         ')': 0
     };
 
-    // External interface
+    // Takes an equation string using the above operators
+    // and tries to simplify it to canonical polynomial form.
+    // If successful, returns a list of the coefficients.
+    // Otherwise, returns a parse tree.
+    // (Unless everything goes wrong, in which case returns 
+    // undefined)
     me.parseAndSimplify = function (eqnStr) {
+        if (eqnStr === '') {
+            return [];
+        }
         try {
             var ast = parse(eqnStr);
             return ast2coefs(ast) || ast;
@@ -177,7 +185,7 @@ function makeParser() {
                             
                 break;
 
-            case 'end':
+            case T.END:
                 tok.lbp = 0;
                 break;
         }
@@ -674,6 +682,7 @@ function test(eqn) {
     console.log('#####################');
 }
 
+/*
 test('1 * x + 2 * x^2 / (x * 3)');
 test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');
 test('3/(x+1)^3');
@@ -697,5 +706,4 @@ test('1 + 2 / 3');
 //test('1 + (2 + 3');
 //test('1 + (2 + (3)');
 test('1 + 3^4^5 + 6');
-/*
 */

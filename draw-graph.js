@@ -11,18 +11,24 @@ function drawGraph(p) {
         selectedFunction,
         funAnchors,
         currAnchor,
-        i0, i1, i2;    
+        parser = makeParser(),
+        eqnInput;
 
     p.setup = function () {
         p.size(START_W, START_H);
         originX = p.width/2;
         originY = p.height/2;
+        eqnInput = document.getElementById('eqn');
+        console.log(eqnInput);
+        eqnInput.onchange = readTemporaryInput;
+        /*
         i0 = document.getElementById("zero");
         i1 = document.getElementById("one");
         i2 = document.getElementById("two");
         i0.onchange = readTemporaryInput;
         i1.onchange = readTemporaryInput;
         i2.onchange = readTemporaryInput;
+        */
         readTemporaryInput();
         p.smooth();
         drawStuff();
@@ -54,15 +60,22 @@ function drawGraph(p) {
     }
     
     function readTemporaryInput() {
-        selectedFunction = makeFun("f", [i0.value, i1.value, i2.value]);
-        functions.push(selectedFunction);
-        drawStuff();
+        //selectedFunction = makeFun("f", [i0.value, i1.value, i2.value]);
+        var coefs = parser.parseAndSimplify(eqnInput.value);
+        if (coefs && coefs.length) { // TODO find better way to check for array
+            selectedFunction = makeFun('f', coefs);
+            functions.push(selectedFunction);
+            drawStuff();
+        }
     }
     
     function writeTemporaryInput() {
+        /*
         i0.value = selectedFunction.coefs[0];
         i1.value = selectedFunction.coefs[1];
         i2.value = selectedFunction.coefs[2];
+        */
+        eqnInput.value = selectedFunction.toEqnString();
     }
 
     function drawGrid() {
@@ -130,6 +143,19 @@ function drawGraph(p) {
             //console.log("f(" + x + ") = " + fx);
             return fx;
         }
+
+        fun.toEqnString = function () {
+            var eqnStr = ''
+            if (coefs) {
+                for (var i = 0; i < coefs.length; i++) {
+                    if (coefs[i] !== 0) {
+                        eqnStr += coefs[i] + '*x^' + i +
+                           (i < coefs.length-1 ? ' + ' : '');
+                    }
+                }
+            }
+            return eqnStr;
+        };
 
         fun.draw = function() {
             p.stroke(fun.color);
