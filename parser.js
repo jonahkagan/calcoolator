@@ -6,6 +6,7 @@ function makeParser() {
     // (x + ...)^a -> (x + ...)(x + ...)^(a-1)
     var EXPANSION_LIMIT = 10;
 
+    // Token types
     var T = {
         OPERATOR: 'operator',
         NUMBER: 'number',
@@ -13,50 +14,7 @@ function makeParser() {
         END: 'end'
     };
 
-    function tokenize(eqnStr) {
-        var i = 0;
-
-        function peek() { return eqnStr.charAt(i); }
-        function next() { var c = peek(i); i++; return c; }
-        function token(t, v) { return { type: t, value: v }; }
-        function skipSpaces() { while (/\s/.test(peek())) { next(); } }
-
-        function scanNum() {
-            var numStr = '';
-            while (/[0-9]/.test(peek())) {
-                numStr += next();
-            }
-            if (numStr !== '') {
-                return token(T.NUMBER, numStr);
-            }
-        }
-
-        function scanOp() {
-            if (/[\+\-\*\/\^\(\)]/.test(peek())) {
-                return token(T.OPERATOR, next());
-            }
-        }
-
-        function scanId() {
-            var idStr = '';
-            while (/\w/.test(peek())) {
-                idStr += next();
-            }
-            if (idStr !== '') {
-                return token(T.ID, idStr);
-            }
-        }
-
-        return function () {
-            skipSpaces();
-            if (i >= eqnStr.length) {
-                return token(T.END, '(end)');
-            }
-            return scanNum() || scanOp() || scanId() ||
-                ('Bad token!' + peek());
-        };
-    }
-
+    // Operator precedence values for parsing
     var infixOps = {
         '+': 10,
         '-': 10,
@@ -71,9 +29,52 @@ function makeParser() {
         ')': 0
     };
 
-    var token, nextTok;
+    // External interface
+    me.parseAndSimplify = function (eqnStr) {
+        try {
+            var ast = parse(eqnStr);
+            return ast2coefs(ast) || ast;
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
-    me.parse = function (eqnStr) {
+    function ast2coefs(origAst) {
+        // If simplification yields canonical form,
+        // convert to coef list
+        var ast = simplify(origAst);
+        // a
+        if (ast.is('num')) {
+            return [ parseFloat(ast.num) ];
+        // a*x^n
+        } else if (isTermWithCoef(ast)) {
+            return [ parseFloat(ast.kids[0].num) ];
+        // a + b*x + c*x^2 + ...
+        } else if (ast.op === '+') {
+            // check for constant term
+            var coefs = [], i;
+            if (ast.kids[0].is('num')) {
+                coefs.push(parseFloat(ast.kids[0].num));
+                i = 1;
+            } else {
+                coefs.push(0);
+                i = 0;
+            }
+            // check higher order terms
+            for (; i < ast.kids.length; i++) {
+                if (isTermWithCoef(ast.kids[i])) {
+                    coefs.push(parseFloat(ast.kids[i].kids[0].num));
+                } else {
+                    return null;
+                }
+            }
+            return coefs;
+        }
+        return null;
+    }
+
+    var token, nextTok;
+    function parse (eqnStr) {
         console.log('parsing ' + eqnStr);
         nextTok = tokenize(eqnStr);
         next();
@@ -175,7 +176,6 @@ function makeParser() {
     /* AST simplification */
 
     function simplify(node) {
-        console.log(node.toString());
         return simp(addCoefs(node));
     }
 
@@ -541,7 +541,7 @@ function makeParser() {
     }
 
 
-    var depth = 0;
+    //var depth = 0;
     function simp(node) {
         //if (depth > 45) { return node; }
         if (!node.simplified) {
@@ -554,7 +554,7 @@ function makeParser() {
                 };
             }
             //console.log(node.toString());
-            depth += 1;
+            //depth += 1;
             node = simp(node);
         }
         return node;
@@ -590,10 +590,54 @@ function makeParser() {
         return node;
     }
 
+    function tokenize(eqnStr) {
+        var i = 0;
+
+        function peek() { return eqnStr.charAt(i); }
+        function next() { var c = peek(i); i++; return c; }
+        function token(t, v) { return { type: t, value: v }; }
+        function skipSpaces() { while (/\s/.test(peek())) { next(); } }
+
+        function scanNum() {
+            var numStr = '';
+            while (/[0-9]/.test(peek())) {
+                numStr += next();
+            }
+            if (numStr !== '') {
+                return token(T.NUMBER, numStr);
+            }
+        }
+
+        function scanOp() {
+            if (/[\+\-\*\/\^\(\)]/.test(peek())) {
+                return token(T.OPERATOR, next());
+            }
+        }
+
+        function scanId() {
+            var idStr = '';
+            while (/\w/.test(peek())) {
+                idStr += next();
+            }
+            if (idStr !== '') {
+                return token(T.ID, idStr);
+            }
+        }
+
+        return function () {
+            skipSpaces();
+            if (i >= eqnStr.length) {
+                return token(T.END, '(end)');
+            }
+            return scanNum() || scanOp() || scanId() ||
+                ('Bad token!' + peek());
+        };
+    }
+
     function logList(nodes) {
         console.log(nodes.map(function(n) { return n.toString(); }).join(','));
     }
-    
+
     me.testParse = function (eqnStr) {
         try {
             return simplify(me.parse(eqnStr));
@@ -610,14 +654,19 @@ function makeParser() {
 var p = makeParser();
 
 function test(eqn) { 
-    console.log(p.testParse(eqn).toString());
+    //console.log(p.testParse(eqn).toString());
+    var res = p.parseAndSimplify(eqn);
+    if (res.type) {
+        console.log(res.toString());
+    } else {
+        console.log(res);
+    }
     console.log('#####################');
 }
 
 test('1 * x + 2 * x^2 / (x * 3)');
 test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');
 test('3/(x+1)^3');
-/*
 test('(x + 1)^3');
 test('(x + 1)^10');
 test('(x + 1)^11');
@@ -632,9 +681,11 @@ test('1 + 3^4^5 + 6');
 test('x^2 + x^2');
 test('1-x^2');
 test('(x+1)*(x+2)');
+test('(x+1)*(x+2)*(x+1)');
 test('1 + 2 + 3');
 test('1 + 2 / 3');
 //test('1 + (2 + 3');
 //test('1 + (2 + (3)');
 test('1 + 3^4^5 + 6');
+/*
 */
