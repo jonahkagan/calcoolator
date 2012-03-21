@@ -74,7 +74,7 @@ function makeParser() {
             }
             console.log(ast.toString());
             // check higher order terms
-            var exp = i+1; // exponent of cur term
+            var exp = i; // exponent of cur term
             for (; i < ast.kids.length; i++) {
                 if (isTermWithCoef(ast.kids[i])) {
                     // insert 0s for missing terms
@@ -689,6 +689,7 @@ function test(eqn) {
     console.log('#####################');
 }
 
+test('x^2 + 1');
 /*
 test('1 * x + 2 * x^2 / (x * 3)');
 test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');

@@ -128,6 +128,7 @@ function drawGraph(p) {
             color: getNextFunctionColor()
         };
 
+        console.log(coefs);
         fun.degree = 1;
         for (var i = 0; i < coefs.length; i++) {
             if (coefs[i] != 0)
