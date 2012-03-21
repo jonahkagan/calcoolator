@@ -108,6 +108,7 @@ function drawGraph(p) {
         for (f in functions) {
             if (functions[f].isClicked()) {
                 selectedFunction = functions[f];
+                writeTemporaryInput();
             }
         }
         drawStuff();

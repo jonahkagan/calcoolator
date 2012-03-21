@@ -617,9 +617,16 @@ function makeParser() {
         function skipSpaces() { while (/\s/.test(peek())) { next(); } }
 
         function scanNum() {
-            var numStr = '';
-            while (/[0-9]/.test(peek())) {
+            var numStr = '', seenDecimal = false;
+            while (/[0-9\.]/.test(peek())) {
                 numStr += next();
+                if (peek() === '.') {
+                    if (seenDecimal) {
+                        break;
+                    } else {
+                        seenDecimal = true;
+                    }
+                }
             }
             if (numStr !== '') {
                 return token(T.NUMBER, numStr);
