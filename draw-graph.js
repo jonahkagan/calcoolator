@@ -146,13 +146,11 @@ function drawGraph(p) {
         }
 
         function round(num, places) {
-            var rounded = num.toFixed(places),
-                dot = rounded.indexOf('.'),
-                zeros = rounded.indexOf('0', dot);
-                result = zeros > 0 
-                    ? rounded.substr(0, zeros)
-                    : rounded;
-            return parseFloat(result);
+            var digits = num.toFixed(places).split();
+            while (digits[digits.length] === '0') {
+                digits.pop();
+            }
+            return parseFloat(digits.join());
         }
 
         fun.toEqnString = function () {
