@@ -145,14 +145,30 @@ function drawGraph(p) {
             return fx;
         }
 
+        function round(num, places) {
+            var rounded = num.toFixed(places),
+                dot = rounded.indexOf('.'),
+                zeros = rounded.indexOf('0', dot);
+                result = zeros > 0 
+                    ? rounded.substr(0, zeros)
+                    : rounded;
+            return parseFloat(result);
+        }
+
         fun.toEqnString = function () {
-            var eqnStr = ''
+            var eqnStr = '';
             if (coefs) {
-                for (var i = 0; i < coefs.length; i++) {
-                    if (coefs[i] !== 0) {
-                        eqnStr += coefs[i] + '*x^' + i +
-                           (i < coefs.length-1 ? ' + ' : '');
+                for (var i = coefs.length-1; i >= 0; i--) {
+                    var coef = round(coefs[i], 2);
+                    if (coef !== 0) {
+                        eqnStr += coef;
+                        if (i > 0) {
+                            eqnStr += '*x^' + i + ' + ';
+                        }
                     }
+                }
+                if (eqnStr.charAt(eqnStr.length - 2) === '+') {
+                    eqnStr = eqnStr.substring(0, eqnStr.length - 3);
                 }
             }
             return eqnStr;
