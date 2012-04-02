@@ -1,4 +1,4 @@
-function makeParser() {
+G.makeParser = function() {
     var me = {};
 
     // Max exponent to expand parenthesized polynomials
@@ -676,7 +676,7 @@ function makeParser() {
     return me;
 }
 
-var p = makeParser();
+var p = G.makeParser();
 
 function test(eqn) { 
     //console.log(p.testParse(eqn).toString());
