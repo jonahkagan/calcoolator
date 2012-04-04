@@ -11,8 +11,10 @@ function makeParser() {
         OPERATOR: 'operator',
         NUMBER: 'number',
         ID: 'id',
-        END: 'end'
+        END: 'end',
+        BAD: 'bad'
     };
+    me.T = T;
 
     // Operator precedence values for parsing
     var infixOps = {
@@ -45,6 +47,17 @@ function makeParser() {
         } catch (e) {
             console.log(e);
         }
+    };
+
+    // Takes an eqn str and returns a list of its tokens
+    me.tokens = function (eqnStr) {
+        var nextTok = tokenize(eqnStr),
+            tokens = [], tok = nextTok();
+        while (tok.type !== T.END) {
+            tokens.push(tok);
+            tok = nextTok();
+        }
+        return tokens;
     };
 
     function ast2coefs(origAst) {
@@ -655,7 +668,7 @@ function makeParser() {
                 return token(T.END, '(end)');
             }
             return scanNum() || scanOp() || scanId() ||
-                ('Bad token!' + peek());
+                { type: T.BAD, value: next() };
         };
     }
 
@@ -676,11 +689,11 @@ function makeParser() {
     return me;
 }
 
-var p = makeParser();
+var parser = makeParser();
 
 function test(eqn) { 
     //console.log(p.testParse(eqn).toString());
-    var res = p.parseAndSimplify(eqn);
+    var res = parser.parseAndSimplify(eqn);
     if (res.type) {
         console.log(res.toString());
     } else {
