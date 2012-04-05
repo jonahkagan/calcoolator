@@ -1,21 +1,22 @@
 <!doctype html>
 <html>
 <head>
-    <script src="processing-1.3.6.min.js"></script>
-    <script src="sylvester.js"></script>
-    <script src="eventmanager.js"></script>
-    <script src="function.js"></script>
+    <script src="js/processing-1.3.6.min.js"></script>
+    <script src="js/sylvester.js"></script>
+    <script src="js/eventmanager.js"></script>
+    
+    <script src="js/models/functionrep.js"></script>
+    <script src="js/models/function.js"></script>
+    <script src="js/models/model.js"></script>
 
-    <script src="model.js"></script>
-
-    <script src="controller.js"></script>
-    <script src="graphcontroller.js"></script>
-    <script src="view.js"></script>
-    <script src="graphviews.js"></script>
+    <script src="js/controllers/controller.js"></script>
+    <script src="js/controllers/graphcontroller.js"></script>
+    <script src="js/views/view.js"></script>
+    <script src="js/views/graphviews.js"></script>
 
 
-    <script src="main.js"></script>
-    <script src="parser.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/parser.js"></script>
     <script type="text/javascript">
         window.onload = function() {
             var canvas = document.getElementById('graphCanvas');
@@ -25,6 +26,7 @@
 </head>
 <body>
     <input type="button" value="+" id="graphPlus"></input>
+    <p>
     <canvas id="graphCanvas"></canvas>
     <div>
         f(x) = <input type="text" id="eqn"/>

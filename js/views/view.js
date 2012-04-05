@@ -10,7 +10,7 @@ G.makeDudeView = function() {
     dudeView.display = function(functions) {
         throw "display not implemented!!";
     };
-    
+        
     dudeView.onUpdate = function(data) {
         throw "onUpdate not implemented!!";
     };
@@ -23,8 +23,12 @@ G.makeDudeView = function() {
     return dudeView;
 };
 
-G.makeRepView = function() {
-    var rep = {};
+G.makeRepView = function(fun) {
+    var rep = {
+        fun: fun
+    };
+    // so dudes know not to make new rep
+    fun.rep = rep;
     
     rep.eventManager = G.makeEventManager();
     rep.subscribe = rep.eventManager.subscribe;
