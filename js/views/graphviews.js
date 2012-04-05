@@ -1,12 +1,34 @@
+G.graphGlobals = {
+    SCALE: 20,
+    PIXEL_STEP: 1,
+    START_W: 600,
+    START_H: 600,
+    ANCHOR_SIZE: 10,
+    EPSILON: 10,
+    ORIGIN_X: 0,
+    ORIGIN_Y: 0,
+    
+    pixelToUnit: function(pt) {
+        var ux = (pt.x() - G.graphGlobals.ORIGIN_X) / G.graphGlobals.SCALE;
+        var uy = -1 * (pt.y() - G.graphGlobals.ORIGIN_Y) / G.graphGlobals.SCALE;
+        return G.makePoint(ux, uy);
+    },
+    
+    unitToPixel: function(pt) {
+        var px = (pt.x() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_X;
+        var py = -1 * (pt.y() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_Y;
+        return G.makePoint(px, py);
+    }
+};
+
 // graph
 G.makeGraphDude = function(p) {
-    var UNIT = 20,
-    STEP = 1,
+    // TODO: refactor references to these local constants:
+    var SCALE = 20,
     START_W = 600,
     START_H = 600,
     ANCHOR_SIZE = 10,
-    EPSILON = 10,
-    originX, originY;
+    EPSILON = 10;
     
     var graphDude = G.makeDudeView();
     var graphReps = [];
@@ -22,36 +44,31 @@ G.makeGraphDude = function(p) {
         // Gridlines
         p.stroke(230);
         p.strokeWeight(1);
-        for (x = 0; x <= originX; x += UNIT) {
-            p.line(originX + x, 0, originX + x, p.height);
-            p.line(originX - x, 0, originX - x, p.height);
+        for (x = 0; x <= G.graphGlobals.ORIGIN_X; x += SCALE) {
+            p.line(G.graphGlobals.ORIGIN_X + x, 0, G.graphGlobals.ORIGIN_X + x, p.height);
+            p.line(G.graphGlobals.ORIGIN_X - x, 0, G.graphGlobals.ORIGIN_X - x, p.height);
         }
-        for (y = 0; y <= originY; y += UNIT) {
-            p.line(0, originY + y, p.width, originY + y);
-            p.line(0, originY - y, p.width, originY - y);
+        for (y = 0; y <= G.graphGlobals.ORIGIN_Y; y += SCALE) {
+            p.line(0, G.graphGlobals.ORIGIN_Y + y, p.width, G.graphGlobals.ORIGIN_Y + y);
+            p.line(0, G.graphGlobals.ORIGIN_Y - y, p.width, G.graphGlobals.ORIGIN_Y - y);
         }
 
         // Axes
         p.stroke(0);
-        p.line(originX, 0, originX, p.height);
-        p.line(0, originY, p.width, originY);
+        p.line(G.graphGlobals.ORIGIN_X, 0, G.graphGlobals.ORIGIN_X, p.height);
+        p.line(0, G.graphGlobals.ORIGIN_Y, p.width, G.graphGlobals.ORIGIN_Y);
     }
     
     graphDude.display = function(functions) {
         drawGrid();
     };
     
-    graphDude.onUpdate = function(data) {
-        if (data && data.functions) {
-            graphDude.display(data.functions);
-        }
-    }
     
     // SET UP PROCESSING
     p.setup = function () {
         p.size(START_W, START_H);
-        originX = p.width/2;
-        originY = p.height/2;
+        G.graphGlobals.ORIGIN_X = p.width/2;
+        G.graphGlobals.ORIGIN_Y = p.height/2;
         p.smooth();
         drawGrid();
     };
@@ -71,36 +88,70 @@ G.makeGraphDude = function(p) {
     p.mouseReleased = function() {
         m.selectedFunction.mouseReleased();
     }
-    
-    graphDude.endSuper();
-    
+        
     return graphDude;
 };
 
 // graph anchors
-G.makeGraphRep = function(fun) {
-    var graphRep = G.makeRepView();
+G.makeGraphRep = function(fun, p) {
+    var rep = G.makeRepView(fun);
     
-    graphRep.display = function() {
-        p.stroke(fun.color);
-        p.strokeWeight(fun == m.selectedFunction ? 2 : 1);
-        var p1 = G.makePoint({px:0, py:0});
+    var repData = fun.getRepData("graph");
+    
+    rep.display = function() {
+        p.stroke(fun.color.r, fun.color.g, fun.color.b);
+        p.strokeWeight(fun.isSelected ? 2 : 1);
+        var p1 = G.makePoint(0,0);
         var p2;
-        p1.uy(fun.evaluate(p1.ux()));
+        p1.y(fun.evaluate(p1.x()));
         
-        while(p1.px() < p.width) {
-            p2 = makePoint({px:p1.px() + STEP, py:0});
-            p2.uy(fun.evaluate(p2.ux()));
-            p.line(p1.px(), p1.py(), p2.px(), p2.py());
-            p1 = p2;
+        var pixel1 = G.makePoint(0,0);
+        var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+        unit1.y(fun.evaluate(unit1.x()));
+        pixel1 = G.graphGlobals.unitToPixel(unit1);
+        
+        var unit2, pixel2;
+        
+        while(pixel1.x() < p.width) {
+            pixel2 = G.makePoint(pixel1.x() + G.graphGlobals.PIXEL_STEP, 0);
+            unit2 = G.graphGlobals.pixelToUnit(pixel2);
+            unit2.y(fun.evaluate(unit2.x()));
+            pixel2 = G.graphGlobals.unitToPixel(unit2);
+            
+            p.line(pixel1.x(), pixel1.y(), pixel2.x(), pixel2.y());
+            pixel1 = pixel2;
         }
 
-        if (fun == m.selectedFunction) {
-            for (var a in fun.anchors) {
-                fun.anchors[a].draw();
+        if (fun.isSelected) {
+            switch(fun.degree) {
+                case 1:
+                    drawLineAnchors();
+                    break;
+                case 2:
+                    drawParabolaAnchors();
+                    break;
             }
         }
+        
     };
     
-    return graphRep;
+    function drawLineAnchors() {
+        drawAnchor(repData.translate);
+        drawAnchor(repData.rotate);
+    }
+    
+    function drawParabolaAnchors() {
+        drawAnchor(repData.translate);
+        drawAnchor(repData.bend);
+    }
+    
+    function drawAnchor(pt) {
+        console.log('drawing anchor');
+        p.stroke(fun.color.r, fun.color.g, fun.color.b);
+        p.fill(fun.color.r, fun.color.g, fun.color.b);
+        p.ellipseMode(p.CENTER);
+        p.ellipse(pt.x(), pt.y(), G.graphGlobals.ANCHOR_SIZE, G.graphGlobals.ANCHOR_SIZE);
+    }
+    
+    return rep;
 };

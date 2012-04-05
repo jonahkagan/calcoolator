@@ -4,9 +4,17 @@ G.makeGraphController = function(model, p) {
     
     dude.subscribe("newFunction", controller.onNewFunction);
     
-    controller.onRepChanged = function() {
-        // TODO
+    controller.onUpdate = function(data) {
+        if (data && data.functions) {
+            dude.display();
+            for (f in data.functions) {
+                var repView = G.makeGraphRep(data.functions[f], p);
+                repView.display();
+            }
+        }
     }
+    
+    controller.endSuper();
 
     return controller;
 };

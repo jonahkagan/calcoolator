@@ -1,13 +1,10 @@
 G.makeFun = function(name, coefs) {
     var fun = {
         name: name,
-        color: null // fix this
+        color: G.color(255, 0, 0), // fix this
+        isSelected: false
     };
     
-    fun.reps = [];
-    var graphRep = makeFunGraphRep();
-    fun.reps.push(graphRep);
-
     fun.degree = 1;
     for (var i = 0; i < coefs.length; i++) {
         if (coefs[i] != 0)
@@ -25,6 +22,21 @@ G.makeFun = function(name, coefs) {
         return fx;
     }
     
+    fun.reps = [];
+    var graphRep = G.makeFunGraphRep(fun);
+    fun.reps.push(graphRep);
+
+    fun.getRepData = function(rep) {
+        console.log("getRepData called");
+        for (r in fun.reps) {
+            if (fun.reps[r].name === rep) {
+                var data = fun.reps[r].data;
+                return data;
+            }
+        }
+        return null;
+    };
+    
     fun.repChanged = function(rep, spec) {
         var coefs;
         for (r in fun.reps) {
@@ -41,55 +53,18 @@ G.makeFun = function(name, coefs) {
             }
         }
     }
-    
-    function makeFunRep(name) {
-        var rep = {
-            name: name
-        }
-        
-        rep.setRepFromCoefs = function(coefs) {
-            throw "setRepFromCoefs not implemented!!";
-        };
-        
-        // MUST RETURN NEW COEFS
-        rep.getNewCoefsFromRep = function(spec) {
-            throw "getNewCoefs not implemented!!";
-        }
-        
-        return rep;
-    }
-    
-    function makeFunGraphRep() {
-        var rep = makeFunRep("graph");
-        
-        rep.setRepFromCoefs = function(coefs) {
-            throw "setRepFromCoefs not implemented!!";
-        };
-        
-        rep.getNewCoefsFromRep = function(spec) {
-            var p1 = spec.translate;
-            var p2 = spec.bend;
-            var dx = p2.x() - p1.x();
-            var p3 = makePoint({x: p1.x() - dx, y: spec.bend.y()});
-            var M = $M([
-                [p1.x()*p1.x(), p1.x(), 1],
-                [p2.x()*p2.x(), p2.x(), 1],
-                [p3.x()*p3.x(), p3.x(), 1]
-            ])
-            var V = $V([p1.y(), p2.y(), p3.y()])
-            M = M.inv();
-            var cfs = M.multiply(V).elements;
-            return [cfs[2], cfs[1], cfs[0]];
-        };
-        
-        return rep
-    }
 
     return fun;
 }
 
-G.makePoint = function(x,y) {
-    var pt = {_x: x, _y: y};
+G.makePoint = function(x, y) {
+    if (x === undefined || y === undefined) {
+        throw "cannot make point with undefined x,y";
+    }
+    
+    var pt = {};
+    var _x = x;
+    var _y = y;
     
     pt.x = function(x) {
         if (x !== undefined) {

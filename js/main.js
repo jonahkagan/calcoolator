@@ -7,4 +7,12 @@ G.init = function(p) {
 
 };
 
+G.color = function(r, g, b) {
+    return {
+        r: r,
+        g: g,
+        b: b
+    }
+};
+
 G.die = function(msg, obj) { console.log(msg); }

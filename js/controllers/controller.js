@@ -13,9 +13,14 @@ G.makeController = function(model) {
         }
     }
 
-    controller.onRepChanged = function() {
-        throw "onRepChanged not implemented!!!";
+    controller.onUpdate = function() {
+        throw "onUpdate not implemented!!!";
     }
+    
+    // CALL THIS AT THE END OF SUBCLASS CONSTRUCTOR
+    controller.endSuper = function() {
+        G.eventManager.subscribe("updateViews", controller.onUpdate);
+    };
     
     return controller;
 };

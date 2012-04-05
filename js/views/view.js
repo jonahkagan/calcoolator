@@ -10,25 +10,14 @@ G.makeDudeView = function() {
     dudeView.display = function(functions) {
         throw "display not implemented!!";
     };
-        
-    dudeView.onUpdate = function(data) {
-        throw "onUpdate not implemented!!";
-    };
-    
-    // CALL THIS AT THE END OF SUBCLASS CONSTRUCTOR
-    dudeView.endSuper = function() {
-        G.eventManager.subscribe("updateViews", dudeView.onUpdate);
-    };
 
     return dudeView;
 };
 
 G.makeRepView = function(fun) {
     var rep = {
-        fun: fun
+        fun: fun // need this?
     };
-    // so dudes know not to make new rep
-    fun.rep = rep;
     
     rep.eventManager = G.makeEventManager();
     rep.subscribe = rep.eventManager.subscribe;
