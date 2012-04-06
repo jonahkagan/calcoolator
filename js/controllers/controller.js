@@ -5,17 +5,23 @@ G.makeController = function(model) {
     
     controller.onNewFunction = function() {
         model.newFunction();
-    }
+    };
     
     controller.onRemoveFunction = function(data) {
         if (data && data.fun) {
            model.removeFunction(data.fun);
         }
-    }
+    };
+    
+    controller.onSelectFunction = function(data) {
+        if (data && data.fun) {
+           model.selectFunction(data.fun);
+        }
+    };
 
     controller.onUpdate = function() {
         throw "onUpdate not implemented!!!";
-    }
+    };
     
     // CALL THIS AT THE END OF SUBCLASS CONSTRUCTOR
     controller.endSuper = function() {

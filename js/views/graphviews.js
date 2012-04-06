@@ -31,7 +31,6 @@ G.makeGraphDude = function(p) {
     EPSILON = 10;
     
     var graphDude = G.makeDudeView();
-    var graphReps = [];
     
     var newGraph = document.getElementById("graphPlus");
     newGraph.onclick = function() {
@@ -74,19 +73,31 @@ G.makeGraphDude = function(p) {
     };
     
     p.mouseClicked = function() {
-        selectFunction();
+        graphDude.broadcast("mouseClicked", {
+            mouseX: p.mouseX,
+            mouseY: p.mouseY
+        });
     }
 
     p.mousePressed = function() {
-        m.selectedFunction.mousePressed();
+        graphDude.broadcast("mousePressed", {
+            mouseX: p.mouseX,
+            mouseY: p.mouseY
+        });
     }
 
     p.mouseDragged = function() {
-        m.selectedFunction.mouseDragged();
+        graphDude.broadcast("mouseDragged", {
+            mouseX: p.mouseX,
+            mouseY: p.mouseY
+        });
     }
 
     p.mouseReleased = function() {
-        m.selectedFunction.mouseReleased();
+        graphDude.broadcast("mouseReleased", {
+            mouseX: p.mouseX,
+            mouseY: p.mouseY
+        });
     }
         
     return graphDude;
@@ -101,10 +112,7 @@ G.makeGraphRep = function(fun, p) {
     rep.display = function() {
         p.stroke(fun.color.r, fun.color.g, fun.color.b);
         p.strokeWeight(fun.isSelected ? 2 : 1);
-        var p1 = G.makePoint(0,0);
-        var p2;
-        p1.y(fun.evaluate(p1.x()));
-        
+
         var pixel1 = G.makePoint(0,0);
         var unit1 = G.graphGlobals.pixelToUnit(pixel1);
         unit1.y(fun.evaluate(unit1.x()));
@@ -132,7 +140,34 @@ G.makeGraphRep = function(fun, p) {
                     break;
             }
         }
-        
+    };
+    
+    rep.select = function(mouseX, mouseY) {
+        // select function
+        var pixel1 = G.makePoint(0,0);
+        var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+        unit1.y(fun.evaluate(unit1.x()));
+        pixel1 = G.graphGlobals.unitToPixel(unit1);
+                
+        while(pixel1.x() < p.width) {
+            if (p.dist(pixel1.x(), pixel1.y(), mouseX, mouseY) < G.graphGlobals.EPSILON) {
+                rep.broadcast("selectFunction", {fun: rep.fun});
+                return;
+            }
+            
+            pixel1.x(pixel1.x() + G.graphGlobals.PIXEL_STEP);
+            var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+            unit1.y(fun.evaluate(unit1.x()));
+            pixel1 = G.graphGlobals.unitToPixel(unit1);
+        }
+    };
+    
+    rep.press = function(mouseX, mouseY) {
+        // press anchor
+    };
+    
+    rep.drag = function(mouseX, mouseY) {
+        // drag anchor
     };
     
     function drawLineAnchors() {
@@ -146,7 +181,6 @@ G.makeGraphRep = function(fun, p) {
     }
     
     function drawAnchor(pt) {
-        console.log('drawing anchor');
         p.stroke(fun.color.r, fun.color.g, fun.color.b);
         p.fill(fun.color.r, fun.color.g, fun.color.b);
         p.ellipseMode(p.CENTER);

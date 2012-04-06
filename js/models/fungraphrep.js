@@ -3,7 +3,8 @@ G.makeFunGraphRep = function(fun) {
 
     if (fun.degree === 1) {
         rep.data.translate = G.makePoint(G.graphGlobals.ORIGIN_X,G.graphGlobals.ORIGIN_Y);
-        rep.data.rotate = G.makePoint(300, 0);
+        rep.data.rotate = G.makePoint(G.graphGlobals.ORIGIN_X + G.graphGlobals.SCALE * 5,
+                                      G.graphGlobals.ORIGIN_X - G.graphGlobals.SCALE * 5);
 //        rep.repData.rotate = G.makePoint(originX + p.width * .1, 0);
     }
 

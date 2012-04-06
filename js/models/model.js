@@ -9,6 +9,7 @@ G.makeModel = function() {
         functions.push(fun);
         if (selectedFunction) selectedFunction.isSelected = false;
         fun.isSelected = true;
+        selectedFunction = fun;
         G.eventManager.broadcast("updateViews", {functions: functions});
     }
     
@@ -18,6 +19,17 @@ G.makeModel = function() {
     
     model.getFunctions = function() {
         
+    };
+    
+    model.selectFunction = function(fun) {
+        if (selectedFunction) {
+            selectedFunction.isSelected = false;
+        }
+        if (fun) {
+            fun.isSelected = true;
+            selectedFunction = fun;
+        }
+        G.eventManager.broadcast("updateViews", {functions: functions});
     };
     
     model.changeFunction = function(fun) {

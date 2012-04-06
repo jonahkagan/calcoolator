@@ -6,7 +6,7 @@ G.makeEventManager = function() {
     var events = [];
 
     eventManager.subscribe = function(event, callback) {
-        console.log("subscribing to event: " + event);
+        //console.log("subscribing to event: " + event);
         if (callback === undefined) {
             throw "cannot subscribe to event with undefined callback! event: " + event;
         }
@@ -26,7 +26,7 @@ G.makeEventManager = function() {
     };
 
     eventManager.broadcast = function(event, data) {
-        console.log("broadcasting event: " + event);
+        //console.log("broadcasting event: " + event);
         for (e in events) {
             if (events[e].name === event) {
                 events[e].fire(data);

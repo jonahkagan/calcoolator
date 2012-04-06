@@ -1,7 +1,7 @@
 G.makeFun = function(name, coefs) {
     var fun = {
         name: name,
-        color: G.color(255, 0, 0), // fix this
+        color: G.color(Math.random()*255, Math.random()*255, Math.random()*255), // fix this
         isSelected: false
     };
     
