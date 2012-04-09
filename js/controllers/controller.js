@@ -2,7 +2,8 @@
 
 G.makeController = function(model) {
     var controller = {};
-    
+    G.eventManager.subscribe("updateViews", function(data) {controller.onUpdate(data);});
+
     controller.onNewFunction = function() {
         model.newFunction();
     };
@@ -19,13 +20,12 @@ G.makeController = function(model) {
         }
     };
 
-    controller.onUpdate = function() {
+    controller.onUpdate = function(data) {
         throw "onUpdate not implemented!!!";
     };
     
-    // CALL THIS AT THE END OF SUBCLASS CONSTRUCTOR
-    controller.endSuper = function() {
-        G.eventManager.subscribe("updateViews", controller.onUpdate);
+    controller.onRepChanged = function(data) {
+        throw "onRepChanged not implemented!!!";
     };
     
     return controller;

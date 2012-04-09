@@ -1,54 +1,50 @@
 G.makeFun = function(name, coefs) {
     var fun = {
         name: name,
+        coefs: coefs,
         color: G.color(Math.random()*255, Math.random()*255, Math.random()*255), // fix this
         isSelected: false
     };
     
     fun.degree = 1;
     for (var i = 0; i < coefs.length; i++) {
-        if (coefs[i] != 0)
+        if (fun.coefs[i] != 0)
             fun.degree = i;
     }
 
     fun.evaluate = function(x) {
         var fx = 0;
-        if (coefs) {
-            for (var i = 0; i < coefs.length; i++) {
-                fx += coefs[i] * Math.pow(x,i);
+        if (fun.coefs) {
+            for (var i = 0; i < fun.coefs.length; i++) {
+                fx += fun.coefs[i] * Math.pow(x,i);
             }
         }
         //console.log("f(" + x + ") = " + fx);
         return fx;
     }
     
-    fun.reps = [];
+    var reps = {};
     var graphRep = G.makeFunGraphRep(fun);
-    fun.reps.push(graphRep);
+    reps[graphRep.name] = graphRep;
+    
+    
+    
+    
 
     fun.getRepData = function(rep) {
-        console.log("getRepData called");
-        for (r in fun.reps) {
-            if (fun.reps[r].name === rep) {
-                var data = fun.reps[r].data;
-                return data;
-            }
-        }
-        return null;
+        console.log(reps[rep]);
+        return reps[rep].data;
+
     };
     
-    fun.repChanged = function(rep, spec) {
-        var coefs;
-        for (r in fun.reps) {
-            if (fun.reps[r].name === rep) {
-                coefs = fun.reps[r].getNewCoefsFromSpec();
-            }
-        }
+    fun.repChanged = function(whichRep, repData) {
+        fun.coefs = reps[whichRep].getNewCoefsFromRep(repData);
+
         // change all other reps
-        if (coefs) {
-            for (r in fun.reps) {
-                if (fun.reps[r].name !== rep) {
-                    fun.reps[r].setRepFromCoefs(coefs);
+        if (fun.coefs) {
+            for (r in reps) {
+                if (reps[r].name !== whichRep) {
+                    reps[r].setRepFromCoefs(coefs);
                 }
             }
         }

@@ -69,6 +69,7 @@ G.makeGraphDude = function(p) {
         G.graphGlobals.ORIGIN_X = p.width/2;
         G.graphGlobals.ORIGIN_Y = p.height/2;
         p.smooth();
+        p.noLoop();
         drawGrid();
     };
     
@@ -108,6 +109,7 @@ G.makeGraphRep = function(fun, p) {
     var rep = G.makeRepView(fun);
     
     var repData = fun.getRepData("graph");
+    var selectedAnchor = null;
     
     rep.display = function() {
         p.stroke(fun.color.r, fun.color.g, fun.color.b);
@@ -164,10 +166,36 @@ G.makeGraphRep = function(fun, p) {
     
     rep.press = function(mouseX, mouseY) {
         // press anchor
+        for (a in repData) {
+            var anchor = repData[a];
+            if (p.dist(anchor.x(), anchor.y(), mouseX, mouseY) < G.graphGlobals.EPSILON) {
+                repData[a].isSelected = true;
+                return;
+            }
+        }
     };
     
+    rep.release = function() {
+        console.log('released');
+        selectedAnchor = null;
+        for (a in repData) {
+            repData[a].isSelected = false;
+        }
+    }
+    
     rep.drag = function(mouseX, mouseY) {
+        console.log(mouseX + ',' + mouseY);
         // drag anchor
+        //console.log("before" + repData.rotate.x() + ", " + repData.rotate.y());
+        for (a in repData) {
+            if (repData[a].isSelected) {
+                repData[a].x(mouseX);
+                repData[a].y(mouseY);
+                rep.broadcast("repChanged", {fun: fun, repData: repData});
+                return;
+            }
+        }
+        console.log("after" + repData.rotate.x() + ", " + repData.rotate.y());
     };
     
     function drawLineAnchors() {

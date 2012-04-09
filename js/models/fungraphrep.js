@@ -19,9 +19,31 @@ G.makeFunGraphRep = function(fun) {
         throw "setRepFromCoefs not implemented!!";
     };
     
-    rep.getNewCoefsFromRep = function(spec) {
-        var p1 = spec.translate;
-        var p2 = spec.bend;
+    rep.getNewCoefsFromRep = function(repData) {
+        switch (fun.degree) {
+            case 1:
+                return fitLine(repData)
+                break;
+            case 2:
+                return fitParabola(repData);
+                break;
+        }
+        return fun.coefs;
+    };
+    
+    function fitLine(repData) {
+        var unitRot = G.graphGlobals.pixelToUnit(repData.rotate);
+        var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
+        var coefs = [];
+        var slope = (unitRot.y() - unitTrans.y())/(unitRot.x() - unitTrans.x());
+        coefs[0] = unitTrans.y();
+        coefs[1] = slope;
+        return coefs;
+    }
+    
+    function fitParabola(repData) {
+        var p1 = repData.translate;
+        var p2 = repData.bend;
         var dx = p2.x() - p1.x();
         var p3 = makePoint({x: p1.x() - dx, y: spec.bend.y()});
         var M = $M([
@@ -33,7 +55,7 @@ G.makeFunGraphRep = function(fun) {
         M = M.inv();
         var cfs = M.multiply(V).elements;
         return [cfs[2], cfs[1], cfs[0]];
-    };
+    }
     
     return rep
 }

@@ -5,14 +5,19 @@ G.makeGraphController = function(model, p) {
     
     dude.subscribe("newFunction", controller.onNewFunction);
     
+    controller.onRepChanged = function(data) {
+        model.changeFunction(data.fun, "graph", data.repData);
+    }
+    
     controller.onUpdate = function(data) {
-        console.log("updating views!");
+        //console.log("updating views!");
         if (data && data.functions) {
             reps = [];
             dude.display();
             for (f in data.functions) {
                 var repView = G.makeGraphRep(data.functions[f], p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
+                repView.subscribe("repChanged", controller.onRepChanged);
                 repView.display();
                 reps.push(repView);
             }
@@ -33,7 +38,7 @@ G.makeGraphController = function(model, p) {
         //move anchor
         if (data.mouseX && data.mouseY) {
             for (r in reps) {
-                if (reps[r].drag(data.mouseX, data.mouseY)) return;
+                reps[r].drag(data.mouseX, data.mouseY);
             }
         }
     }
@@ -42,16 +47,22 @@ G.makeGraphController = function(model, p) {
         //select anchor
         if (data.mouseX && data.mouseY) {
             for (r in reps) {
-                if (reps[r].press(data.mouseX, data.mouseY)) return;
+                reps[r].press(data.mouseX, data.mouseY);
             }
+        }
+    }
+    
+    controller.onRelease = function(data) {
+        console.log('controller release');
+        for (r in reps) {
+            reps[r].release();
         }
     }
     
     dude.subscribe("mouseClicked", controller.onClick);
     dude.subscribe("mouseDragged", controller.onDrag);
     dude.subscribe("mousePressed", controller.onPress);
-    
-    controller.endSuper();
+    dude.subscribe("mouseReleased", controller.onRelease);
 
     return controller;
 };
