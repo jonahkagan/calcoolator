@@ -61,9 +61,11 @@ G.makeParser = function() {
     };
 
     function ast2coefs(origAst) {
+        console.log(origAst.toString());
         // If simplification yields canonical form,
         // convert to coef list
         var ast = simplify(origAst), coefs = [];
+        console.log(ast.toString());
         // a
         if (ast.is('num')) {
             return [ parseFloat(ast.num) ];
@@ -85,7 +87,7 @@ G.makeParser = function() {
                 coefs.push(0);
                 i = 0;
             }
-            console.log(ast.toString());
+            //console.log(ast.toString());
             // check higher order terms
             var exp = i; // exponent of cur term
             for (; i < ast.kids.length; i++) {
@@ -108,7 +110,7 @@ G.makeParser = function() {
     var token, nextTok;
     function parse (eqnStr) {
         console.log('parsing ' + eqnStr);
-        nextTok = tokenize(eqnStr);
+        nextTok = insertImplicit(tokenize(eqnStr));
         next();
         return expression();
     };
@@ -203,6 +205,62 @@ G.makeParser = function() {
                 break;
         }
         token = tok;
+    }
+
+    // Inserts implicit multiplication operators into the token
+    // stream.
+    function insertImplicit(nextFun) {
+        var lastTok, nextTok;
+
+        function isLeft(t) {
+            return t.type === T.OPERATOR && t.value === '(';
+        }
+        function isRight(t) {
+            return t.type === T.OPERATOR && t.value === ')';
+        }
+
+        return function () {
+            // If we have delayed a token
+            if (nextTok) {
+                var toReturn = nextTok;
+                nextTok = null;
+                return toReturn;
+            }
+
+            var curTok = nextFun();
+
+            // Handle start of token stream
+            if (!lastTok) {
+                lastTok = curTok;
+                return curTok;
+            }
+
+            var cur = curTok.type,
+                last = lastTok.type;
+
+                // 2x -> 2*x
+            if ((last === T.NUMBER && cur === T.ID) ||
+                // x2 -> x*2
+                (last === T.ID && cur === T.NUMBER) ||
+                // (2)x -> (2)*x
+                // (2)3 -> (2)*3
+                (isRight(lastTok) &&
+                    (cur === T.NUMBER || cur === T.ID)) ||
+                // x(2) -> x*(2)
+                // 2(3) -> 2*(3)
+                ((last === T.ID || last === T.NUMBER)
+                    && isLeft(curTok)) ||
+                // (2)(3) -> (2)*(3)
+                (isRight(lastTok) && isLeft(curTok)))
+            {
+                nextTok = curTok;
+                lastTok = curTok;
+                return { type: T.OPERATOR, value: '*' };
+            }
+
+            lastTok = curTok;
+            return curTok;
+        };
     }
 
     /* AST simplification */
@@ -704,6 +762,8 @@ function test(eqn) {
 }
 
 test('x^2 + 1');
+test('2x+5');
+test("1(x)+5(x+1)(x+1)3");
 /*
 test('1 * x + 2 * x^2 / (x * 3)');
 test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');
