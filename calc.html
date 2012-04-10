@@ -1,9 +1,15 @@
 <!doctype html>
 <html>
 <head>
-    <script src="js/processing-1.3.6.min.js"></script>
-    <script src="js/sylvester.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="lib/processing-1.3.6.min.js"></script>
+    <script src="lib/sylvester.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/mathquill/mathquill.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="lib/mathquill/mathquill.css">`
+
     <script src="js/eventmanager.js"></script>
+    <script src="js/util.js"></script>
     
     <script src="js/models/funrep.js"></script>
     <script src="js/models/fungraphrep.js"></script>
@@ -12,9 +18,11 @@
 
     <script src="js/controllers/controller.js"></script>
     <script src="js/controllers/graphcontroller.js"></script>
+    <script src="js/controllers/eqn-controller.js"></script>
     <script src="js/views/view.js"></script>
     <script src="js/views/graphviews.js"></script>
-
+    <script src="js/views/eqn-dude-view.js"></script>
+    <script src="js/views/eqn-view.js"></script>
 
     <script src="js/main.js"></script>
     <script src="js/parser.js"></script>
@@ -32,6 +40,8 @@
     <div>
         f(x) = <input type="text" id="eqn"/>
     </div>
+
+    <div id="eqns"></div>
 
 </body>
 </html>

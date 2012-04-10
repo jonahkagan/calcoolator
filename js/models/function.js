@@ -31,7 +31,6 @@ G.makeFun = function(name, coefs) {
 
     fun.getRepData = function(rep) {
         return reps[rep].data;
-
     };
     
     fun.repChanged = function(whichRep, repData) {

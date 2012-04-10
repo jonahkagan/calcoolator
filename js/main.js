@@ -4,6 +4,7 @@ G.init = function(p) {
     var model = G.makeModel();
 
     var graphController = G.makeGraphController(model, p);
+    var eqnController = G.makeEqnController(model);
 
 };
 
