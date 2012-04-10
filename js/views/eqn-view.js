@@ -1,5 +1,5 @@
 function makeEqnEditor() {
-    var me = {};
+    var me = G.makeRepView();
 
     // Displays a text field with a function name f(x)
     // As the user types an equation, parses the equation
@@ -65,8 +65,3 @@ function makeEqnEditor() {
 
     return me;
 }
-
-$(document).ready(function () {
-    var ed = makeEqnEditor();
-    $('body').append(ed.getContent());
-});
