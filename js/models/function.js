@@ -32,7 +32,7 @@ G.makeFun = function(name, coefs) {
     
 
     fun.getRepData = function(rep) {
-        console.log(reps[rep]);
+        //console.log(reps[rep]);
         return reps[rep].data;
 
     };

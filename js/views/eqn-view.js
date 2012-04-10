@@ -1,4 +1,4 @@
-function makeEqnView() {
+G.makeEqnView = function () {
     var me = G.makeRepView();
 
     // Displays a text field with a function name f(x)
@@ -8,24 +8,62 @@ function makeEqnView() {
     //
     // Number coefficients in the equation are scrubbable
 
-    me.display = function (fun, $parent) {
+    var $content, lastLatexStr, fun;
 
-         
+    me.display = function (afun, $parent) {
+        //console.log(
+        //    afun,
+        //     afun.coefs,
+        //     toEqnString(fun.coefs) 
+        //);
+        fun = afun;
+        $content = $("<span>" + toEqnString(fun.coefs) + "</span>")
+            .appendTo($parent)
+            .keyup(handleKey)
+            .mathquill("editable");
+        lastLatexStr = $content.mathquill("latex");
     }
 
-    var $ed, $text, $display, eqnStr;
     function handleKey(e) {
         console.log("key");
-        eqnStr = $text.val();
-        $display.html(eqnToHTML(eqnStr));
-        var coefs = parser.parseAndSimplify(eqnStr);
-        $("#out").html(coefs ? coefs.toString() : "parse error");
+        var newLatexStr = $content.mathquill("latex");
+        if (newLatexStr !== lastLatexStr) {
+            console.log('new latex', newLatexStr);
+            var coefs = parser.parseAndSimplify(
+                    latexToEqn(newLatexStr));
+            if (coefs) {
+                //me.broadcast("repChanged", { fun: fun, coefs: coefs });
+                console.log("new coefs", coefs);
+            } else {
+                console.log("no parse for " + latexToEqn(newLatexStr));
+            }
+        }
+        lastLatexStr = newLatexStr;
+        //$display.html(eqnToHTML(eqnStr));
+        //$("#out").html(coefs ? coefs.toString() : "parse error");
     }
 
     function toEqnString(coefs) {
-        _.reduceRight(coefs, function (coef) {
-        }, "");
+        return _.chain(coefs)
+            .map(G.u.roundTo(2))
+            .map(function (coef, i) {
+                var xterm = (i === 0) ? "" :
+                            (i === 1) ? "x" :
+                                        "x^" + i;
+                return  (coef === 0) ? "" :
+                        (coef === 1) ? xterm :
+                                       coef + xterm ;
+            })
+            .compact().value()
+            .join("+");
     }
 
+    function latexToEqn(latexStr) {
+        return latexStr.replace(/\\cdot/g, "*");
+    }
+
+    //console.log(toEqnString([0,1,2,0]));
+    //console.log(toEqnString([0]));
+
     return me;
-}
+};

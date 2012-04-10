@@ -45,7 +45,7 @@ G.makeParser = function() {
             var ast = parse(eqnStr);
             return ast2coefs(ast) || ast;
         } catch (e) {
-            console.log(e);
+            console.log('parse error', e);
         }
     };
 
@@ -761,10 +761,10 @@ function test(eqn) {
     console.log('#####################');
 }
 
+/*
 test('x^2 + 1');
 test('2x+5');
 test("1(x)+5(x+1)(x+1)3");
-/*
 test('1 * x + 2 * x^2 / (x * 3)');
 test('x^(1+1)^2 + 3*x^3*(x+5*x^2)');
 test('3/(x+1)^3');
