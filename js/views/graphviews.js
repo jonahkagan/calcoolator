@@ -1,6 +1,6 @@
 G.graphGlobals = {
     SCALE: 20,
-    PIXEL_STEP: 1,
+    PIXEL_STEP: 1   ,
     START_W: 600,
     START_H: 600,
     ANCHOR_SIZE: 10,
@@ -13,7 +13,7 @@ G.graphGlobals = {
         var uy = -1 * (pt.y() - G.graphGlobals.ORIGIN_Y) / G.graphGlobals.SCALE;
         return G.makePoint(ux, uy);
     },
-    
+
     unitToPixel: function(pt) {
         var px = (pt.x() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_X;
         var py = -1 * (pt.y() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_Y;
@@ -121,25 +121,20 @@ G.makeGraphRep = function(fun, p) {
         pixel1 = G.graphGlobals.unitToPixel(unit1);
         
         var unit2, pixel2;
-        
+        p.beginShape();
         while(pixel1.x() < p.width) {
             pixel2 = G.makePoint(pixel1.x() + G.graphGlobals.PIXEL_STEP, 0);
             unit2 = G.graphGlobals.pixelToUnit(pixel2);
             unit2.y(fun.evaluate(unit2.x()));
             pixel2 = G.graphGlobals.unitToPixel(unit2);
             
-            p.line(pixel1.x(), pixel1.y(), pixel2.x(), pixel2.y());
+            p.vertex(pixel1.x(), pixel1.y());
             pixel1 = pixel2;
         }
-
+        p.endShape();
         if (fun.isSelected) {
-            switch(fun.degree) {
-                case 1:
-                    drawLineAnchors();
-                    break;
-                case 2:
-                    drawParabolaAnchors();
-                    break;
+            for (a in repData) {
+                repData[a].x && drawAnchor(repData[a]);
             }
         }
     };
@@ -166,17 +161,18 @@ G.makeGraphRep = function(fun, p) {
     
     rep.press = function(mouseX, mouseY) {
         // press anchor
-        for (a in repData) {
-            var anchor = repData[a];
-            if (p.dist(anchor.x(), anchor.y(), mouseX, mouseY) < G.graphGlobals.EPSILON) {
-                repData[a].isSelected = true;
-                return;
+        if (fun.isSelected) {
+            for (a in repData) {
+                var anchor = repData[a];
+                if (anchor.x && p.dist(anchor.x(), anchor.y(), mouseX, mouseY) < G.graphGlobals.EPSILON) {
+                    repData[a].isSelected = true;
+                    return;
+                }
             }
         }
     };
     
     rep.release = function() {
-        console.log('released');
         selectedAnchor = null;
         for (a in repData) {
             repData[a].isSelected = false;
@@ -184,29 +180,18 @@ G.makeGraphRep = function(fun, p) {
     }
     
     rep.drag = function(mouseX, mouseY) {
-        console.log(mouseX + ',' + mouseY);
         // drag anchor
         //console.log("before" + repData.rotate.x() + ", " + repData.rotate.y());
         for (a in repData) {
             if (repData[a].isSelected) {
                 repData[a].x(mouseX);
                 repData[a].y(mouseY);
+                repData.changed = repData[a].name;
                 rep.broadcast("repChanged", {fun: fun, repData: repData});
                 return;
             }
         }
-        console.log("after" + repData.rotate.x() + ", " + repData.rotate.y());
     };
-    
-    function drawLineAnchors() {
-        drawAnchor(repData.translate);
-        drawAnchor(repData.rotate);
-    }
-    
-    function drawParabolaAnchors() {
-        drawAnchor(repData.translate);
-        drawAnchor(repData.bend);
-    }
     
     function drawAnchor(pt) {
         p.stroke(fun.color.r, fun.color.g, fun.color.b);

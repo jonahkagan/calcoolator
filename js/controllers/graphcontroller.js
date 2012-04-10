@@ -53,7 +53,6 @@ G.makeGraphController = function(model, p) {
     }
     
     controller.onRelease = function(data) {
-        console.log('controller release');
         for (r in reps) {
             reps[r].release();
         }

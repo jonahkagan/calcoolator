@@ -28,18 +28,14 @@ G.makeFun = function(name, coefs) {
     reps[graphRep.name] = graphRep;
     
     
-    
-    
 
     fun.getRepData = function(rep) {
-        console.log(reps[rep]);
         return reps[rep].data;
 
     };
     
     fun.repChanged = function(whichRep, repData) {
         fun.coefs = reps[whichRep].getNewCoefsFromRep(repData);
-
         // change all other reps
         if (fun.coefs) {
             for (r in reps) {

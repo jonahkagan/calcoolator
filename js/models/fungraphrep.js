@@ -1,11 +1,8 @@
 G.makeFunGraphRep = function(fun) {
-    var rep = G.makeFunRep("graph", fun);
+    var rep;
 
     if (fun.degree === 1) {
-        rep.data.translate = G.makePoint(G.graphGlobals.ORIGIN_X,G.graphGlobals.ORIGIN_Y);
-        rep.data.rotate = G.makePoint(G.graphGlobals.ORIGIN_X + G.graphGlobals.SCALE * 5,
-                                      G.graphGlobals.ORIGIN_X - G.graphGlobals.SCALE * 5);
-//        rep.repData.rotate = G.makePoint(originX + p.width * .1, 0);
+        rep = G.makeFunGraphRepD1(fun);
     }
 
     if (fun.degree === 2) {
@@ -18,29 +15,8 @@ G.makeFunGraphRep = function(fun) {
     rep.setRepFromCoefs = function(coefs) {
         throw "setRepFromCoefs not implemented!!";
     };
-    
-    rep.getNewCoefsFromRep = function(repData) {
-        switch (fun.degree) {
-            case 1:
-                return fitLine(repData)
-                break;
-            case 2:
-                return fitParabola(repData);
-                break;
-        }
-        return fun.coefs;
-    };
-    
-    function fitLine(repData) {
-        var unitRot = G.graphGlobals.pixelToUnit(repData.rotate);
-        var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
-        var coefs = [];
-        var slope = (unitRot.y() - unitTrans.y())/(unitRot.x() - unitTrans.x());
-        coefs[0] = unitTrans.y();
-        coefs[1] = slope;
-        return coefs;
-    }
-    
+
+    // TODO: move to parabola rep
     function fitParabola(repData) {
         var p1 = repData.translate;
         var p2 = repData.bend;
@@ -58,4 +34,72 @@ G.makeFunGraphRep = function(fun) {
     }
     
     return rep
+}
+
+G.makeFunGraphRepD1 = function(fun) {
+    var rep = G.makeFunRep("graph", fun);
+    
+    rep.data.translate = (G.makeAnchor(G.graphGlobals.ORIGIN_X,G.graphGlobals.ORIGIN_Y,"translateY"));
+    rep.data.rotate = (G.makeAnchor(G.graphGlobals.ORIGIN_X + G.graphGlobals.SCALE * 5,
+                                      G.graphGlobals.ORIGIN_X - G.graphGlobals.SCALE * 5, "rotate"));
+    
+    rep.getNewCoefsFromRep = function(repData) {
+        var coefs = [];
+
+        if (repData.changed == 'rotate') {
+            var unitRot = G.graphGlobals.pixelToUnit(repData.rotate);
+            var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
+            var slope = (unitRot.y() - unitTrans.y())/(unitRot.x() - unitTrans.x());
+            coefs[0] = unitTrans.y();
+            coefs[1] = slope;
+        }
+        
+        if (repData.changed == 'translateY') {
+            repData.translate.x(G.graphGlobals.ORIGIN_X); // fix to y-axis
+            var dy = repData.translate.dy(); // dy in pixels
+            repData.rotate.y(repData.rotate.y() + dy);
+            var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
+            coefs[0] = unitTrans.y();
+            coefs[1] = fun.coefs[1];
+        }
+        
+        return coefs;
+
+    }
+    return rep;
+}
+
+G.makeAnchor = function(x, y, name) {
+    var _pt = G.makePoint(x, y);
+    var _dx, _dy;
+    
+    var anchor = {
+        name: name,
+        x: _pt.x,
+        y: _pt.y
+    };
+    
+    anchor.x = function(x) {        
+        if (x !== undefined) {
+            _dx = x - anchor.x();
+        }
+        return _pt.x(x);
+    };
+    
+    anchor.y = function(y) {
+        if (y !== undefined) {
+            _dy = y - anchor.y();
+        }
+        return _pt.y(y);
+    };
+    
+    anchor.dx = function() {
+        return _dx;
+    };
+    
+    anchor.dy = function() {
+        return _dy;
+    };
+    
+    return anchor;
 }
