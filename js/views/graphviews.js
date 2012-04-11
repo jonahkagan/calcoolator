@@ -108,7 +108,7 @@ G.makeGraphDude = function(p) {
 G.makeGraphRep = function(fun, p) {
     var rep = G.makeRepView(fun);
     
-    var repData = fun.getRepData("graph");
+    var repData = fun.repData("graph");
     var selectedAnchor = null;
     
     rep.display = function() {

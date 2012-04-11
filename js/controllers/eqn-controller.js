@@ -1,5 +1,5 @@
 G.makeEqnController = function (model) {
-    var me = G.makeController(model);
+    var me = G.makeController(model, "eqn");
 
     var eqnDude = G.makeEqnDudeView();
 
@@ -9,18 +9,36 @@ G.makeEqnController = function (model) {
     eqnDude.display();
 
     me.onUpdate = function (data) {
-        if (data.src === "eqn") {
-            // Find the eqn that changed and update it with the
-            // results of the parse TODO
+        var changedFun = _.find(data.functions, function (fun) {
+            return fun === data.changedFun;
+        }); // might be undefined
+
+        // Only redisplay eqns if another representation
+        // submitted the change
+        if (data.src === me.name && changedFun) {
+            // Update the changed eqn with the results of the parse
+            eqnDude.updateEqn(changedFun);
         } else {
-            // Only display new eqns if another representation
-            // submitted the change
+            // Remove the old eqn string from the changed function so
+            // the view can make a new one.
+            if (changedFun) { changedFun.setRepData(null); }
+
             eqnDude.display(data.functions);
         }
     };
 
     function onEqnChange(data) {
-        model.changeFunction(data.fun, "eqn", data.eqnStr);
+        // Update the fun based on the new eqnStr
+        data.fun.repData("eqn", data.eqnStr);
+        var coefs = parser.parseAndSimplify(data.eqnStr);
+        if (coefs) {
+            console.log("new coefs", coefs);
+            data.fun.coefs(coefs);
+        } else {
+            console.log("no parse for " + data.eqnStr);
+            data.fun.coefs(null);
+        }
+        model.changeFunction(data.fun, "eqn");
     }
 
     return me;

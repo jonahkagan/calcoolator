@@ -11,19 +11,14 @@ G.makeEqnView = function () {
     var $content, lastLatexStr, fun;
 
     me.display = function (afun, $parent) {
-        //console.log(
-        //    afun,
-        //     afun.coefs,
-        //     toEqnString(fun.coefs) 
-        //);
         fun = afun;
         // If the function is storing an old eqnStr, then we should
         // display that, because that was what the user last typed.
         // If not, then it got new coefs from another rep, so we
         // should get our eqnStr from them.
-        var displayEqn = fun.getRepData("eqn").eqnStr ?
-             fun.getRepData("eqn").eqnStr :
-             toEqnString(fun.coefs);
+        var displayEqn = fun.repData("eqn") ?
+             fun.repData("eqn") :
+             toEqnString(fun.coefs());
             //console.log(fun.coefs, displayEqn,toEqnString(fun.coefs) );
         console.log('"' + displayEqn + '"');
 
@@ -31,11 +26,21 @@ G.makeEqnView = function () {
             .appendTo($parent)
             .keyup(handleKey)
             .mathquill("editable")
-            .toggleClass("parse-error", fun.coefs ? false : true)
-            .focus();
+
+        updateParseStatus();
 
         lastLatexStr = $content.mathquill("latex");
     };
+    
+    me.update = function (newFun) {
+        fun = newFun;
+        updateParseStatus();
+    };
+
+    function updateParseStatus() {
+        console.log("toggle", fun.coefs());
+        $content.toggleClass("parse-error", fun.coefs() ? false : true);
+    }
 
     function handleKey(e) {
         console.log("key");
@@ -48,8 +53,6 @@ G.makeEqnView = function () {
             });
         }
         lastLatexStr = newLatexStr;
-        //$display.html(eqnToHTML(eqnStr));
-        //$("#out").html(coefs ? coefs.toString() : "parse error");
     }
 
     function toEqnString(coefs) {
@@ -74,6 +77,8 @@ G.makeEqnView = function () {
     }
     //console.log(toEqnString([0,1,2,0]));
     //console.log(toEqnString([0]));
+    
+    me.fun = function () { return fun; };
 
     return me;
 };
