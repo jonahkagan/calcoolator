@@ -26,10 +26,21 @@ G.makeEqnView = function () {
             .appendTo($parent)
             .keyup(handleKey)
             .mathquill("editable")
-            .toggleClass("parse-error", fun.coefs() ? false : true);
+
+        updateParseStatus();
 
         lastLatexStr = $content.mathquill("latex");
     };
+    
+    me.update = function (newFun) {
+        fun = newFun;
+        updateParseStatus();
+    };
+
+    function updateParseStatus() {
+        console.log("toggle", fun.coefs());
+        $content.toggleClass("parse-error", fun.coefs() ? false : true);
+    }
 
     function handleKey(e) {
         console.log("key");
@@ -66,6 +77,8 @@ G.makeEqnView = function () {
     }
     //console.log(toEqnString([0,1,2,0]));
     //console.log(toEqnString([0]));
+    
+    me.fun = function () { return fun; };
 
     return me;
 };

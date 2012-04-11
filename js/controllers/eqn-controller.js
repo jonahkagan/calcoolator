@@ -9,21 +9,19 @@ G.makeEqnController = function (model) {
     eqnDude.display();
 
     me.onUpdate = function (data) {
-        // TODO handle new, remove, select
-        if (data.src === me.name && data.changedFun) {
-            // Find the eqn that changed and update it with the
-            // results of the parse TODO
+        var changedFun = _.find(data.functions, function (fun) {
+            return fun === data.changedFun;
+        }); // might be undefined
+
+        // Only redisplay eqns if another representation
+        // submitted the change
+        if (data.src === me.name && changedFun) {
+            // Update the changed eqn with the results of the parse
+            eqnDude.updateEqn(changedFun);
         } else {
-            // Only display new eqns if another representation
-            // submitted the change
-            
             // Remove the old eqn string from the changed function so
             // the view can make a new one.
-            if (data.changedFun) {
-                _.find(data.functions, function (fun) {
-                    return fun === data.changedFun;
-                }).setRepData(null);
-            }
+            if (changedFun) { changedFun.setRepData(null); }
 
             eqnDude.display(data.functions);
         }
