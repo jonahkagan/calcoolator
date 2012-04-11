@@ -33,7 +33,6 @@ G.makeFun = function(name, initCoefs) {
         }
         return coefs;
     };
-    fun.coefs(initCoefs);
     
     var reps = {};
     fun.repData = function (rep, data) {
@@ -42,6 +41,7 @@ G.makeFun = function(name, initCoefs) {
         }
         return reps[rep];
     };
+    fun.coefs(initCoefs);
 
     fun.fitToPoints = function(pts) {
         var degree = pts.length - 1;
