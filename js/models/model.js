@@ -33,7 +33,7 @@ G.makeModel = function() {
     
     model.changeFunction = function(fun, whichRep, repData) {
         fun.repChanged(whichRep, repData);
-        G.eventManager.broadcast("updateViews", {functions: functions});
+        G.eventManager.broadcast("updateViews", {functions: functions, src: whichRep });
     };
     
     return model;
