@@ -16,4 +16,4 @@ G.color = function(r, g, b) {
     }
 };
 
-G.die = function(msg, obj) { console.log(msg); }
+G.die = function(msg, obj) { console.error(msg); }

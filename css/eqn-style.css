@@ -1,3 +1,26 @@
-.parse-error {
+#eqns {
+    width: 150px;
+    border: 1px solid darkGray;
+}
+
+#eqns .eqn {
+    width: 140px;
+    border: 1px solid darkGray;
+    padding: 5px;
+}
+
+#eqns .new-eqn {
+    background: lightGray;
+    color: gray;
+    text-align: center;
+    padding-top: 10px;
+}
+
+#eqns .new-eqn,
+#eqns .eqn {
+    height: 40px;
+}
+
+#eqns .eqn.parse-error {
     color: red;
 }

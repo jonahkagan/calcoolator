@@ -25,8 +25,9 @@ G.makeEqnView = function () {
              fun.getRepData("eqn").eqnStr :
              toEqnString(fun.coefs);
             //console.log(fun.coefs, displayEqn,toEqnString(fun.coefs) );
+        console.log('"' + displayEqn + '"');
 
-        $content = $("<span>" + displayEqn + "</span>")
+        $content = $("<span class=\"eqn\">" + displayEqn + "</span>")
             .appendTo($parent)
             .keyup(handleKey)
             .mathquill("editable")
@@ -68,7 +69,8 @@ G.makeEqnView = function () {
     }
 
     function latexToEqn(latexStr) {
-        return latexStr.replace(/\\cdot/g, "*");
+        return latexStr.replace(/\\cdot/g, "*")
+            .replace(/\\\:/g, " ");
     }
     //console.log(toEqnString([0,1,2,0]));
     //console.log(toEqnString([0]));
