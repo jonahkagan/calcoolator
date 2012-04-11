@@ -9,7 +9,14 @@ G.makeEqnController = function (model) {
     eqnDude.display();
 
     me.onUpdate = function (data) {
-        eqnDude.display(data.functions);
+        if (data.src === "eqn") {
+            // Find the eqn that changed and update it with the
+            // results of the parse TODO
+        } else {
+            // Only display new eqns if another representation
+            // submitted the change
+            eqnDude.display(data.functions);
+        }
     };
 
     function onEqnChange(data) {
