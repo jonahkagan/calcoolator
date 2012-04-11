@@ -3,6 +3,8 @@ G.makeGraphController = function(model, p) {
     var dude = G.makeGraphDude(p);
     var reps = [];
     var repHandler = G.makeRepHandler();
+    var functions;
+    var anchorSelected = false;
     
     dude.subscribe("newFunction", controller.onNewFunction);
     
@@ -14,17 +16,40 @@ G.makeGraphController = function(model, p) {
         data.fun.repData("graph", data.repData);
         data.fun.coefs(coefs);
         model.changeFunction(data.fun, "graph");
-    }
+    };
+    
+    controller.onDudeChange = function(event) {
+        dude.display();
+        if (functions) {
+            reps = [];
+            dude.display();
+            for (f in functions) {
+                var fun = functions[f];
+                if (!fun.repData("graph") || fun.repData("graph").degree != fun.degree) {
+                    // make new rep data
+                    fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
+                }
+                var repView = G.makeGraphRep(fun, p);
+                repView.subscribe("selectFunction", controller.onSelectFunction);
+                repView.subscribe("repChanged", controller.onRepChanged);
+                repView.display();
+                reps.push(repView);
+            }
+        }
+    };
     
     controller.onUpdate = function(data) {
         // Update whichever function changed if the event src wasn't
         // "graph" TODO
         //console.log("updating views!");
         if (data && data.functions) {
+            functions = data.functions;
+        }
+        if (functions) {
             reps = [];
             dude.display();
-            for (f in data.functions) {
-                var fun = data.functions[f];
+            for (f in functions) {
+                var fun = functions[f];
                 if (!fun.repData("graph") || fun.repData("graph").degree != fun.degree) {
                     // make new rep data
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
@@ -50,7 +75,13 @@ G.makeGraphController = function(model, p) {
     
     controller.onDrag = function(data) {
         //move anchor
-        if (data.mouseX && data.mouseY) {
+        if (!anchorSelected) {
+            console.log(data);
+            G.graphGlobals.ORIGIN_X += data.dx;
+            G.graphGlobals.ORIGIN_Y += data.dy;
+            controller.onDudeChange();
+        }
+        else if (data.mouseX && data.mouseY) {
             for (r in reps) {
                 reps[r].drag(data.mouseX, data.mouseY);
             }
@@ -61,9 +92,13 @@ G.makeGraphController = function(model, p) {
         //select anchor
         if (data.mouseX && data.mouseY) {
             for (r in reps) {
-                reps[r].press(data.mouseX, data.mouseY);
+                if (reps[r].press(data.mouseX, data.mouseY)) {
+                    anchorSelected = true;
+                    return;
+                }
             }
         }
+        anchorSelected = false;
     }
     
     controller.onRelease = function(data) {
@@ -76,7 +111,8 @@ G.makeGraphController = function(model, p) {
     dude.subscribe("mouseDragged", controller.onDrag);
     dude.subscribe("mousePressed", controller.onPress);
     dude.subscribe("mouseReleased", controller.onRelease);
-
+    dude.subscribe("dudeChanged", controller.onDudeChange);
+    
     return controller;
 };
 

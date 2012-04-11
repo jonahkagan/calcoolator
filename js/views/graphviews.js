@@ -1,6 +1,6 @@
 G.graphGlobals = {
-    SCALE: 20,
-    PIXEL_STEP: 1   ,
+    SCALE: 40,
+    PIXEL_STEP: 1,
     START_W: 600,
     START_H: 600,
     ANCHOR_SIZE: 10,
@@ -19,6 +19,7 @@ G.graphGlobals = {
         var py = -1 * (pt.y() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_Y;
         return G.makePoint(px, py);
     }
+    
 };
 
 // graph
@@ -43,14 +44,27 @@ G.makeGraphDude = function(p) {
         // Gridlines
         p.stroke(230);
         p.strokeWeight(1);
-        for (x = 0; x <= G.graphGlobals.ORIGIN_X; x += SCALE) {
-            p.line(G.graphGlobals.ORIGIN_X + x, 0, G.graphGlobals.ORIGIN_X + x, p.height);
-            p.line(G.graphGlobals.ORIGIN_X - x, 0, G.graphGlobals.ORIGIN_X - x, p.height);
+        var x = G.graphGlobals.ORIGIN_X;
+        while (x >= 0) {
+            p.line(x, 0, x, p.height);
+            x -= G.graphGlobals.SCALE;
         }
-        for (y = 0; y <= G.graphGlobals.ORIGIN_Y; y += SCALE) {
-            p.line(0, G.graphGlobals.ORIGIN_Y + y, p.width, G.graphGlobals.ORIGIN_Y + y);
-            p.line(0, G.graphGlobals.ORIGIN_Y - y, p.width, G.graphGlobals.ORIGIN_Y - y);
+        x = G.graphGlobals.ORIGIN_X;
+        while (x <= p.width) {
+            p.line(x, 0, x, p.height);
+            x += G.graphGlobals.SCALE;
         }
+        var y = G.graphGlobals.ORIGIN_Y;
+        while (y >= 0) {
+            p.line(0, y, p.width, y);
+            y -= G.graphGlobals.SCALE;
+        }
+        y = G.graphGlobals.ORIGIN_Y;
+        while (y <= p.height) {
+            p.line(0, y, p.width, y);
+            y += G.graphGlobals.SCALE;
+        }
+
 
         // Axes
         p.stroke(0);
@@ -90,7 +104,9 @@ G.makeGraphDude = function(p) {
     p.mouseDragged = function() {
         graphDude.broadcast("mouseDragged", {
             mouseX: p.mouseX,
-            mouseY: p.mouseY
+            mouseY: p.mouseY,
+            dx: p.mouseX - p.pmouseX,
+            dy: p.mouseY - p.pmouseY
         });
     }
 
@@ -100,7 +116,14 @@ G.makeGraphDude = function(p) {
             mouseY: p.mouseY
         });
     }
-        
+    
+    window.onmousewheel = function(event) {
+        if (event.target.id === "graphCanvas") {
+            G.graphGlobals.SCALE = Math.max(G.graphGlobals.SCALE + event.wheelDeltaY/5, 20);
+            graphDude.broadcast("dudeChanged");
+            event.preventDefault();
+        }
+    }
     return graphDude;
 };
 
@@ -167,10 +190,11 @@ G.makeGraphRep = function(fun, p) {
                 var anchor = repData[a];
                 if (anchor.x && p.dist(anchor.x(), anchor.y(), mouseX, mouseY) < G.graphGlobals.EPSILON) {
                     repData[a].isSelected = true;
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
     };
     
     rep.release = function() {
@@ -189,9 +213,10 @@ G.makeGraphRep = function(fun, p) {
                 repData[a].y(mouseY);
                 repData.changed = repData[a].name;
                 rep.broadcast("repChanged", {fun: fun, repData: repData});
-                return;
+                return true;
             }
         }
+        return false;
     };
     
     function drawAnchor(pt) {
