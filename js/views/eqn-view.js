@@ -17,6 +17,10 @@ G.makeEqnView = function () {
         //     toEqnString(fun.coefs) 
         //);
         fun = afun;
+        // If the function is storing an old eqnStr, then we should
+        // display that, because that was what the user last typed.
+        // If not, then it got new coefs from another rep, so we
+        // should get our eqnStr from them.
         var displayEqn = fun.getRepData("eqn").eqnStr ?
              fun.getRepData("eqn").eqnStr :
              toEqnString(fun.coefs);
