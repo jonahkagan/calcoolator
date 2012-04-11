@@ -1,3 +1,10 @@
+#eqns {
+    display: inline-block;
+    vertical-align: top;
+}
+
 #graphCanvas {
+    display: inline-block;
+    vertical-align: top;
     outline: none;
 }

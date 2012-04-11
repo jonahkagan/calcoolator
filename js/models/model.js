@@ -4,7 +4,7 @@ G.makeModel = function() {
     var selectedFunction = null;
         
     model.newFunction = function (srcRep) {
-        var fun = G.makeFun('f', [0, 0, 1]);
+        var fun = G.makeFun('f', [0, 1]);
         functions.push(fun);
         if (selectedFunction) selectedFunction.isSelected = false;
         fun.isSelected = true;
