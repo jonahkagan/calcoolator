@@ -112,6 +112,7 @@ G.makeGraphRep = function(fun, p) {
     var selectedAnchor = null;
     
     rep.display = function() {
+        console.log('displaying repview: ' + JSON.stringify(repData));
         p.stroke(fun.color.r, fun.color.g, fun.color.b);
         p.strokeWeight(fun.isSelected ? 2 : 1);
 

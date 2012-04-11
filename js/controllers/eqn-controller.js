@@ -21,7 +21,7 @@ G.makeEqnController = function (model) {
         } else {
             // Remove the old eqn string from the changed function so
             // the view can make a new one.
-            if (changedFun) { changedFun.setRepData(null); }
+            if (changedFun) { changedFun.repData(null); }
 
             eqnDude.display(data.functions);
         }
