@@ -127,7 +127,7 @@ G.makeRepHandlerD1 = function() {
             repData.rotate.y(repData.rotate.y() + dy);
             var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
             coefs[0] = unitTrans.y();
-            coefs[1] = fun.coefs[1];
+            coefs[1] = fun.coefs()[1];
         }
         
         return coefs;
@@ -139,7 +139,8 @@ G.makeRepHandlerD1 = function() {
         var pixelTrans = G.graphGlobals.unitToPixel(unitTrans);
         repData.translate = G.makeAnchor(pixelTrans.x(), pixelTrans.y(), 'translate');
         var unitRot = G.makePoint(2, fun.evaluate(2));
-        repData.rotate = G.graphGlobals.unitToPixel(unitRot);
+        var pixelRot = G.graphGlobals.unitToPixel(unitRot);
+        repData.rotate = G.makeAnchor(pixelRot.x(), pixelRot.y(), 'rotate');
         return repData;
     };
     
