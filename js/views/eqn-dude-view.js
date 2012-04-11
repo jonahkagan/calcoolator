@@ -16,7 +16,7 @@ G.makeEqnDudeView = function () {
         $("<div class=\"new-eqn\">Add new equation...</div>")
             .appendTo($content)
             .click(function () {
-                me.broadcast("newFunction")
+                me.broadcast("newFunction");
             });
     };
 

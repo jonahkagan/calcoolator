@@ -1,50 +1,47 @@
-G.makeFun = function(name, coefs) {
+G.makeFun = function(name, initCoefs) {
     var fun = {
         name: name,
-        coefs: coefs,
         color: G.color(Math.random()*255, Math.random()*255, Math.random()*255), // fix this
         isSelected: false
     };
+    var coefs;
     
-    fun.degree = 1;
-    for (var i = 0; i < coefs.length; i++) {
-        if (fun.coefs[i] != 0)
-            fun.degree = i;
-    }
-
     fun.evaluate = function(x) {
-        var fx = 0;
-        if (fun.coefs) {
-            for (var i = 0; i < fun.coefs.length; i++) {
-                fx += fun.coefs[i] * Math.pow(x,i);
+        if (coefs) {
+            var fx = 0;
+            for (var i = 0; i < coefs.length; i++) {
+                fx += coefs[i] * Math.pow(x,i);
             }
+            return fx;
         }
         //console.log("f(" + x + ") = " + fx);
-        return fx;
-    }
-    
-    var reps = {};
-    function addRep(rep) {
-        reps[rep.name] = rep;
-    }
-    addRep(G.makeFunGraphRep(fun));
-    addRep(G.makeFunEqnRep(fun));
-
-    fun.getRepData = function(rep) {
-        return reps[rep].data;
+        return null;
     };
-    
-    fun.repChanged = function(whichRep, repData) {
-        fun.coefs = reps[whichRep].getNewCoefsFromRep(repData);
-        // change all other reps
-        if (fun.coefs) {
-            for (r in reps) {
-                if (reps[r].name !== whichRep) {
-                    reps[r].setRepFromCoefs(coefs);
+
+    fun.coefs = function (newCoefs) {
+        if (newCoefs !== undefined) {
+            coefs = _.clone(newCoefs);
+            if (coefs) {
+                fun.degree = 1;
+                for (var i = 0; i < coefs.length; i++) {
+                    if (coefs[i] != 0)
+                        fun.degree = i;
                 }
+            } else {
+                fun.degree = null;
             }
         }
-    }
+        return coefs;
+    };
+    fun.coefs(initCoefs);
+    
+    var reps = {};
+    fun.repData = function (rep, data) {
+        if (data !== undefined) {
+            reps[rep] = data;
+        }
+        return reps[rep];
+    };
 
     return fun;
 }

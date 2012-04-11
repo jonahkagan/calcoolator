@@ -3,14 +3,17 @@ G.makeModel = function() {
     var functions = [];
     var selectedFunction = null;
         
-    model.newFunction = function() {
+    model.newFunction = function (srcRep) {
         console.log("model is making new function!");
         var fun = G.makeFun('f', [0, 1]);
         functions.push(fun);
         if (selectedFunction) selectedFunction.isSelected = false;
         fun.isSelected = true;
         selectedFunction = fun;
-        G.eventManager.broadcast("updateViews", {functions: functions});
+        G.eventManager.broadcast("modelChanged", {
+            functions: functions,
+            src: srcRep
+        });
     }
     
     model.removeFunction = function(fun) {
@@ -29,12 +32,15 @@ G.makeModel = function() {
             fun.isSelected = true;
             selectedFunction = fun;
         }
-        G.eventManager.broadcast("updateViews", {functions: functions});
+        G.eventManager.broadcast("modelChanged", {functions: functions});
     };
     
-    model.changeFunction = function(fun, whichRep, repData) {
-        fun.repChanged(whichRep, repData);
-        G.eventManager.broadcast("updateViews", {functions: functions, src: whichRep });
+    model.changeFunction = function (updatedFun, srcRep) {
+        G.eventManager.broadcast("modelChanged", {
+            functions: functions,
+            changedFun: updatedFun,
+            src: srcRep
+        });
     };
     
     return model;

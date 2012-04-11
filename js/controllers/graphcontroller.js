@@ -6,10 +6,13 @@ G.makeGraphController = function(model, p) {
     dude.subscribe("newFunction", controller.onNewFunction);
     
     controller.onRepChanged = function(data) {
+        // Update the function coefs here TODO
         model.changeFunction(data.fun, "graph", data.repData);
     }
     
     controller.onUpdate = function(data) {
+        // Update whichever function changed if the event src wasn't
+        // "graph" TODO
         //console.log("updating views!");
         if (data && data.functions) {
             reps = [];

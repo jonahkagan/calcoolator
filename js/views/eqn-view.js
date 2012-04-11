@@ -11,19 +11,14 @@ G.makeEqnView = function () {
     var $content, lastLatexStr, fun;
 
     me.display = function (afun, $parent) {
-        //console.log(
-        //    afun,
-        //     afun.coefs,
-        //     toEqnString(fun.coefs) 
-        //);
         fun = afun;
         // If the function is storing an old eqnStr, then we should
         // display that, because that was what the user last typed.
         // If not, then it got new coefs from another rep, so we
         // should get our eqnStr from them.
-        var displayEqn = fun.getRepData("eqn").eqnStr ?
-             fun.getRepData("eqn").eqnStr :
-             toEqnString(fun.coefs);
+        var displayEqn = fun.repData("eqn") ?
+             fun.repData("eqn") :
+             toEqnString(fun.coefs());
             //console.log(fun.coefs, displayEqn,toEqnString(fun.coefs) );
         console.log('"' + displayEqn + '"');
 
@@ -31,8 +26,7 @@ G.makeEqnView = function () {
             .appendTo($parent)
             .keyup(handleKey)
             .mathquill("editable")
-            .toggleClass("parse-error", fun.coefs ? false : true)
-            .focus();
+            .toggleClass("parse-error", fun.coefs() ? false : true);
 
         lastLatexStr = $content.mathquill("latex");
     };
@@ -48,8 +42,6 @@ G.makeEqnView = function () {
             });
         }
         lastLatexStr = newLatexStr;
-        //$display.html(eqnToHTML(eqnStr));
-        //$("#out").html(coefs ? coefs.toString() : "parse error");
     }
 
     function toEqnString(coefs) {
