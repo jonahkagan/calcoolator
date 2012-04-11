@@ -13,7 +13,8 @@ G.makeFunGraphRep = function(fun) {
     }
     
     rep.setRepFromCoefs = function(coefs) {
-        throw "setRepFromCoefs not implemented!!";
+        console.error("graph rep setRepFromCoefs not implemented!!");
+        //throw "setRepFromCoefs not implemented!!";
     };
 
     // TODO: move to parabola rep

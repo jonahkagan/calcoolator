@@ -6,9 +6,16 @@ G.makeEqnDudeView = function () {
     me.display = function (funs) {
         $content.empty();
         _.each(funs, function (fun) {
-            G.makeEqnView().display(fun, $content);
+            var eqv = G.makeEqnView();
+            eqv.display(fun, $content);
+            eqv.subscribe("eqnChanged", onEqnChange);
         });
     };
+
+    function onEqnChange(data) {
+        me.broadcast("eqnChanged", data);
+    }
+
 
     return me;
 };

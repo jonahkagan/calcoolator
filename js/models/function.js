@@ -24,10 +24,11 @@ G.makeFun = function(name, coefs) {
     }
     
     var reps = {};
-    var graphRep = G.makeFunGraphRep(fun);
-    reps[graphRep.name] = graphRep;
-    
-    
+    function addRep(rep) {
+        reps[rep.name] = rep;
+    }
+    addRep(G.makeFunGraphRep(fun));
+    addRep(G.makeFunEqnRep(fun));
 
     fun.getRepData = function(rep) {
         return reps[rep].data;
