@@ -5,33 +5,17 @@ G.makeFunGraphRep = function(fun) {
         rep = G.makeFunGraphRepD1(fun);
     }
 
-    if (fun.degree === 2) {
-        //var center = -1 * coefs[1] / (2*coefs[2]);
-        //fun.anchors.translate = makeTranslateXYAnchor(fun, {ux:center, uy:fun.evaluate(center)});
-        //fun.anchors.bend = makeBendAnchor(fun, {px: fun.anchors.translate.px() + p.width * .1, py: 0});
-        //fun.anchors.bend.uy(fun.evaluate(fun.anchors.bend.ux()));
+    else if (fun.degree === 2) {
+        rep = G.makeFunGraphRepD2(fun);
+    }
+    
+    else {
+        rep = G.makeFunRep("graph", fun);
     }
     
     rep.setRepFromCoefs = function(coefs) {
         throw "setRepFromCoefs not implemented!!";
     };
-
-    // TODO: move to parabola rep
-    function fitParabola(repData) {
-        var p1 = repData.translate;
-        var p2 = repData.bend;
-        var dx = p2.x() - p1.x();
-        var p3 = makePoint({x: p1.x() - dx, y: spec.bend.y()});
-        var M = $M([
-            [p1.x()*p1.x(), p1.x(), 1],
-            [p2.x()*p2.x(), p2.x(), 1],
-            [p3.x()*p3.x(), p3.x(), 1]
-        ])
-        var V = $V([p1.y(), p2.y(), p3.y()])
-        M = M.inv();
-        var cfs = M.multiply(V).elements;
-        return [cfs[2], cfs[1], cfs[0]];
-    }
     
     return rep
 }
@@ -39,9 +23,9 @@ G.makeFunGraphRep = function(fun) {
 G.makeFunGraphRepD1 = function(fun) {
     var rep = G.makeFunRep("graph", fun);
     
-    rep.data.translate = (G.makeAnchor(G.graphGlobals.ORIGIN_X,G.graphGlobals.ORIGIN_Y,"translateY"));
-    rep.data.rotate = (G.makeAnchor(G.graphGlobals.ORIGIN_X + G.graphGlobals.SCALE * 5,
-                                      G.graphGlobals.ORIGIN_X - G.graphGlobals.SCALE * 5, "rotate"));
+    rep.data.translate = G.makeAnchor(G.graphGlobals.ORIGIN_X,G.graphGlobals.ORIGIN_Y,"translate");
+    rep.data.rotate = G.makeAnchor(G.graphGlobals.ORIGIN_X + G.graphGlobals.SCALE * 5,
+                                      G.graphGlobals.ORIGIN_X - G.graphGlobals.SCALE * 5, "rotate");
     
     rep.getNewCoefsFromRep = function(repData) {
         var coefs = [];
@@ -54,7 +38,7 @@ G.makeFunGraphRepD1 = function(fun) {
             coefs[1] = slope;
         }
         
-        if (repData.changed == 'translateY') {
+        if (repData.changed == 'translate') {
             repData.translate.x(G.graphGlobals.ORIGIN_X); // fix to y-axis
             var dy = repData.translate.dy(); // dy in pixels
             repData.rotate.y(repData.rotate.y() + dy);
@@ -64,8 +48,54 @@ G.makeFunGraphRepD1 = function(fun) {
         }
         
         return coefs;
-
     }
+    
+    rep.setRepFromCoefs = function(coefs) {
+        throw "setRepFromCoefs not implemented!!";
+    };
+    
+    return rep;
+}
+
+G.makeFunGraphRepD2 = function(fun) {
+    var rep = G.makeFunRep("graph", fun);
+
+    rep.getNewCoefsFromRep = function(repData) {
+        var coefs = [];
+
+        if (repData.changed == 'translate') {
+            var dx = repData.translate.dx();
+            var dy = repData.translate.dy(); // dy in pixels
+            repData.bend.x(repData.bend.x() + dx);
+            repData.bend.y(repData.bend.y() + dy);
+        }
+        
+        if (repData.changed == 'bend') {
+            // nothing?
+        }
+        
+        var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);
+        var unitBend = G.graphGlobals.pixelToUnit(repData.bend);
+        var dx = unitBend.x() - unitTrans.x();
+        var mirroredBend = G.makePoint(unitTrans.x() - dx, unitBend.y());
+        
+        return fun.fitToPoints([unitTrans, unitBend, mirroredBend]);
+    }
+    
+    rep.setRepFromCoefs = function(coefs) {
+        console.log('setting coefs');
+        var center = -1 * coefs[1] / (2*coefs[2]);
+        var unitTrans = G.makePoint(center, fun.evaluate(center));
+        var pixelTrans = G.graphGlobals.unitToPixel(unitTrans);
+        var unitBend = G.makePoint(center + 2, fun.evaluate(center + 2));
+    
+        var pixelBend = G.graphGlobals.unitToPixel(unitBend);
+        rep.data.translate = G.makeAnchor(pixelTrans.x(), pixelTrans.y(), "translate");
+        rep.data.bend = G.makeAnchor(pixelBend.x(), pixelBend.y(), "bend");
+    };
+    
+    rep.setRepFromCoefs(fun.coefs);
+    
     return rep;
 }
 

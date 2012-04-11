@@ -4,7 +4,6 @@ G.makeModel = function() {
     var selectedFunction = null;
         
     model.newFunction = function() {
-        console.log("model is making new function!");
         var fun = G.makeFun('f', [0, 1]);
         functions.push(fun);
         if (selectedFunction) selectedFunction.isSelected = false;

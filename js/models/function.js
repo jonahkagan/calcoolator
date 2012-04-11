@@ -26,8 +26,6 @@ G.makeFun = function(name, coefs) {
     var reps = {};
     var graphRep = G.makeFunGraphRep(fun);
     reps[graphRep.name] = graphRep;
-    
-    
 
     fun.getRepData = function(rep) {
         return reps[rep].data;
@@ -43,6 +41,26 @@ G.makeFun = function(name, coefs) {
                 }
             }
         }
+    }
+
+    fun.fitToPoints = function(pts) {
+        var degree = pts.length - 1;
+        var matrix = [];
+        var vector = [];
+        for (p in pts) {
+            var point = pts[p];
+            var row = [];
+            for (var power = degree; power >= 0; power--) {
+                row.push(Math.pow(point.x(), power));
+            }
+            vector.push(point.y());
+            matrix.push(row);
+        }
+        var M = $M(matrix);
+        var V = $V(vector);
+        M = M.inv();
+        var cfs = M.multiply(V).elements;
+        return cfs.reverse();
     }
 
     return fun;

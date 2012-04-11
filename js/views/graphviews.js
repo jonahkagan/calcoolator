@@ -121,6 +121,7 @@ G.makeGraphRep = function(fun, p) {
         pixel1 = G.graphGlobals.unitToPixel(unit1);
         
         var unit2, pixel2;
+        p.noFill();
         p.beginShape();
         while(pixel1.x() < p.width) {
             pixel2 = G.makePoint(pixel1.x() + G.graphGlobals.PIXEL_STEP, 0);
