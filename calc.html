@@ -6,13 +6,14 @@
     <script src="lib/sylvester.js"></script>
     <script src="lib/underscore-min.js"></script>
     <script src="lib/mathquill/mathquill.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="lib/mathquill/mathquill.css">`
+    <link rel="stylesheet" type="text/css" href="lib/mathquill/mathquill.css">
 
     <script src="js/eventmanager.js"></script>
     <script src="js/util.js"></script>
     
     <script src="js/models/funrep.js"></script>
     <script src="js/models/fungraphrep.js"></script>
+    <script src="js/models/fun-eqn-rep.js"></script>
     <script src="js/models/function.js"></script>
     <script src="js/models/model.js"></script>
 
@@ -34,15 +35,14 @@
     </script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
     
 </head>
 <body>
-    <input type="button" value="+" id="graphPlus"></input>
+    <input type="button" value="+" id="graphPlus"/>
     <p>
     <canvas id="graphCanvas"></canvas>
-    <div>
-        f(x) = <input type="text" id="eqn"/>
-    </div>
+    </p>
 
     <div id="eqns"></div>
 

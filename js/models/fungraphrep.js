@@ -14,7 +14,8 @@ G.makeFunGraphRep = function(fun) {
     }
     
     rep.setRepFromCoefs = function(coefs) {
-        throw "setRepFromCoefs not implemented!!";
+        console.error("graph rep setRepFromCoefs not implemented!!");
+        //throw "setRepFromCoefs not implemented!!";
     };
     
     return rep
@@ -51,7 +52,13 @@ G.makeFunGraphRepD1 = function(fun) {
     }
     
     rep.setRepFromCoefs = function(coefs) {
-        throw "setRepFromCoefs not implemented!!";
+        var unitTrans = G.makePoint(0, coefs[0]);
+        var pixelTrans = G.graphGlobals.unitToPixel(unitTrans);
+        repData.translate = G.makeAnchor(pixelTrans.x(), pixelTrans.y(), 'translate');
+        var unitRot = G.makePoint(2, fun.evaluate(2));
+        var slope = (unitRot.y() - unitTrans.y())/(unitRot.x() - unitTrans.x());
+        coefs[0] = unitTrans.y();
+        coefs[1] = slope;
     };
     
     return rep;
