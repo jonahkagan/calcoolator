@@ -9,7 +9,6 @@ G.makeGraphController = function(model, p) {
     controller.onRepChanged = function(data) {
         // Update the function coefs here TODO
         // data.repData
-        console.log(data);
         var coefs = repHandler.getNewCoefsFromRep(data.fun, data.repData);
         // fix anchors and stuff
         data.fun.repData("graph", data.repData);
@@ -26,7 +25,7 @@ G.makeGraphController = function(model, p) {
             dude.display();
             for (f in data.functions) {
                 var fun = data.functions[f];
-                if (!fun.repData()) {
+                if (!fun.repData("graph")) {
                     // make new rep data
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
                 }
