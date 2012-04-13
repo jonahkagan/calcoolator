@@ -42,17 +42,18 @@ G.makeEqnView = function () {
 
         $content.find(".eqn-remove").click(handleRemove);
 
-        updateParseStatus();
-        me.updateSelectedStatus();
-        resizeFont();
+        refresh();
 
         lastLatexStr = $editor.mathquill("latex");
     };
 
     me.update = function (newFun) {
-        fun = newFun;
-        updateParseStatus();
-        me.updateSelectedStatus();
+        if (isDragging) {
+            $editor.html(toEqnString(newFun.coefs())).mathquill("editable");
+        } else {
+            fun = newFun;
+            refresh();
+        }
     };
 
     function updateParseStatus() {
@@ -75,6 +76,7 @@ G.makeEqnView = function () {
         }
         lastLatexStr = newLatexStr;
 
+        createScrubbers();
         resizeFont();
     }
 
@@ -86,6 +88,112 @@ G.makeEqnView = function () {
     function handleRemove(e) {
         me.broadcast("eqnRemoved", { fun: fun });
         return false;
+    }
+
+    // Create scrubbable numbers in the editor
+    function createScrubbers() {
+        // We have to work around mathquill here.
+        // First, find sequences of spans that represent numbers
+        // (i.e., neighboring spans with digits or decimal points).
+        var coefs = fun.coefs(); if (!coefs) { return; }
+
+        var seqs = _.reduce($editor.children(), function (seqs, span) {
+            // Find the next non-zero coef
+            if (/[0-9\.]/.test($(span).text())) { // If num or dot
+                var lastSeq = _.last(seqs);
+                if (lastSeq.type === "num") { // If last span was a num
+                    lastSeq.spans.push(span); // then add span to seq
+                } else { // Else make new seq
+                    seqs.push({
+                        type: "num",
+                        spans: [span]
+                    });
+                }
+            } else if (!$(span).hasClass("cursor")) {
+                seqs.push({ type: "non-num", spans: [span] });
+            }
+            return seqs;
+        }, []);
+
+        var coefPos = 0;
+
+        $editor.off("mousedown");
+        _.chain(seqs)
+            .filter(function (s) {
+                return s.type === "num";
+            })
+            .reverse()
+            .each(function (seq) {
+                while (coefPos < coefs.length &&
+                       coefs[coefPos] === 0)
+                { 
+                    coefPos += 1;
+                }
+                addDragHandler(seq.spans, coefPos);
+                coefPos += 1;
+            });
+    }
+
+    var isDragging;
+    function addDragHandler(spans, coefPos) {
+        var val = parseFloat(
+            _.map(spans, function (span) {
+                return $(span).text();
+            }).join('')),
+            orig, cur;
+
+        $(spans)
+            .addClass("scrubbable")
+            .mousedown(function (e) {
+                cur = e.pageX;
+                if (isDragging) {
+                    return false;
+                }
+                isDragging = true;
+                $(document).mousemove(function (e) {
+                    if (isDragging) {
+                        orig = cur;
+                        cur = e.pageX;
+                        var delta = (cur - orig) * 0.1;
+                        val += delta ? delta : 0;
+                        fun.coefs()[coefPos] = val;
+                        me.broadcast("eqnChanged", {
+                            fun: fun,
+                            eqnStr: toEqnString(fun.coefs())
+                        });
+                    } else {
+                        $(document).off("mousemove");
+                    }
+                    return false;
+                });
+            });
+        // TODO remove this handler when done
+        $(document).mouseup(function (e) {
+            isDragging = false;
+            $(document).off("mousemove");
+            $(document).off("mouseup");
+            refresh();
+        });
+    }
+
+    function newSpan(val) {
+        return "<span class=\"dragging\">" + G.u.round(2, val) + "</span>";
+    }
+
+    function splitSpan($span) {
+        return _.map(
+            $span.text().split(""),
+            function (char) {
+                return "<span class=\"post-drag\">" + char + "</span>";
+            }
+        ).join("");
+    }
+
+    function refresh() {
+        createScrubbers();
+        updateParseStatus();
+        me.updateSelectedStatus();
+        resizeFont();
     }
 
     // Dynamically resize equation text to fit the editor
@@ -111,7 +219,7 @@ G.makeEqnView = function () {
                             (i === 1) ? "x" :
                                         "x^" + i;
                 return  (coef === 0)          ? "" :
-                        (coef === 1 && i > 0) ? xterm :
+                        //(coef === 1 && i > 0) ? xterm :
                                                 coef + xterm ;
             })
             .compact().value()

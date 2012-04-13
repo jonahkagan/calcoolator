@@ -48,6 +48,10 @@
     resize: none;
 }
 
+#eqns .eqn .eqn-editor .scrubbable {
+    color: blue;
+}
+
 /* Remove button */
 #eqns .eqn .eqn-remove {
     position: absolute;

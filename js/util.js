@@ -21,5 +21,14 @@ G.u = {
     roundTo: function (places) {
         return G.u.partial(G.u.round, places);
     },
+
+    // Finds the index of the first element in the list which passes
+    // the test.
+    indexOfWithTest: function (list, test) {
+        for (var i = 0; i < list.length; i++) {
+            if (test(list[i])) { return i; }
+        } 
+        return -1;
+    },
     
 };
