@@ -1,6 +1,9 @@
 G.makeEqnView = function () {
     var me = G.makeRepView();
 
+    var MIN_FONT_SIZE = 10,
+        MAX_FONT_SIZE = 16,
+        FONT_RESIZE_PCT = 0.75;
     // Displays a text field with a function name f(x)
     // As the user types an equation, parses the equation
     // Also tries to simplify the equation if possible, and shows a
@@ -30,16 +33,18 @@ G.makeEqnView = function () {
             )
             .appendTo($parent)
             .keyup(handleKey)
+            .click(function () { $editor.focus(); });
 
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor").mathquill("editable");
 
         updateParseStatus();
+        resizeFont();
 
         lastLatexStr = $editor.mathquill("latex");
     };
-    
+
     me.update = function (newFun) {
         fun = newFun;
         updateParseStatus();
@@ -50,16 +55,32 @@ G.makeEqnView = function () {
     }
 
     function handleKey(e) {
-        console.log("key");
         var newLatexStr = $editor.mathquill("latex");
         if (newLatexStr !== lastLatexStr) {
-            console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
+            //console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
             me.broadcast("eqnChanged", {
                 fun: fun,
                 eqnStr: latexToEqn(newLatexStr)
             });
         }
         lastLatexStr = newLatexStr;
+
+        resizeFont();
+    }
+
+    // Dynamically resize equation text to fit the editor
+    function resizeFont() {
+        var edWidth = $editor.width(),
+            maxWidth = $content.width() - $editor.position().left,
+            size = parseFloat($content.css("font-size"));
+
+        if (edWidth > maxWidth && size > MIN_FONT_SIZE) {
+            $content.css("font-size", "-=" + 1);
+        } else if (edWidth < maxWidth * FONT_RESIZE_PCT &&
+                   size < MAX_FONT_SIZE)
+        {
+            $content.css("font-size", "+=" + 1);
+        }
     }
 
     function toEqnString(coefs) {

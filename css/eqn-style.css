@@ -4,9 +4,11 @@
 }
 
 #eqns .eqn {
-    width: 230px;
     border-bottom: 1px solid darkGray;
     padding: 10px 10px;
+    width: 230px;
+    white-space: nowrap;
+    overflow-x: scroll;
 }
 
 #eqns .new-eqn {
@@ -31,7 +33,7 @@
 
 /* Equation Editor */
 #eqns .eqn .eqn-editor {
-    width: 160px;
+    /*width: 160px;*/
 }
 
 #eqns .eqn .eqn-editor,
@@ -44,6 +46,6 @@
     resize: none;
 }
 
-#eqns .eqn.parse-error {
+#eqns .eqn .parse-error.eqn-editor {
     color: red;
 }
