@@ -5,7 +5,7 @@ G.makeEqnController = function (model) {
 
     eqnDude.subscribe("eqnChanged", onEqnChange);
     eqnDude.subscribe("newFunction", me.onNewFunction);
-    eqnDude.subscribe("selectFunction", me.onSelectFunction);
+    eqnDude.subscribe("eqnSelected", me.onSelectFunction);
     eqnDude.display();
 
     // TODO handle select, remove
@@ -16,6 +16,8 @@ G.makeEqnController = function (model) {
         if (event.src === me.name && event.changedFun) {
             // Update the changed eqn with the results of the parse
             eqnDude.updateEqn(event.changedFun);
+        } else if (event.selectedFun) {
+            eqnDude.updateEqn(event.selectedFun);
         } else {
             // Remove the old eqn string from the changed function so
             // the view can make a new one.

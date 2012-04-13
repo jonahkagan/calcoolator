@@ -50,3 +50,8 @@
 #eqns .eqn .parse-error.eqn-editor {
     color: red;
 }
+
+#eqns .selected.eqn {
+    border: 1px solid black;
+}
+

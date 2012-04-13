@@ -11,6 +11,7 @@ G.makeEqnDudeView = function () {
             var eqv = G.makeEqnView();
             eqv.display(fun, $content);
             eqv.subscribe("eqnChanged", onEqnChange);
+            eqv.subscribe("eqnSelected", onEqnSelect);
             eqvs.push(eqv);
         });
 
@@ -26,10 +27,18 @@ G.makeEqnDudeView = function () {
         _.find(eqvs, function (eqv) {
             return eqv.fun() === changedFun;
         }).update(changedFun);
+
+        _.each(eqvs, function (eqv) {
+            eqv.updateSelectedStatus();
+        });
     };
 
-    function onEqnChange(data) {
-        me.broadcast("eqnChanged", data);
+    function onEqnChange(event) {
+        me.broadcast("eqnChanged", event);
+    }
+
+    function onEqnSelect(event) {
+        me.broadcast("eqnSelected", event);
     }
 
     return me;

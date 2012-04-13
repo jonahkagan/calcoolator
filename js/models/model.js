@@ -6,9 +6,7 @@ G.makeModel = function() {
     model.newFunction = function (srcRep) {
         var fun = G.makeFun(newName(), [0, 1]);
         functions.push(fun);
-        if (selectedFunction) selectedFunction.isSelected = false;
-        fun.isSelected = true;
-        selectedFunction = fun;
+        selectFun(fun);
         G.eventManager.broadcast("modelChanged", {
             functions: functions,
             src: srcRep
@@ -32,16 +30,25 @@ G.makeModel = function() {
         
     };
     
-    model.selectFunction = function(fun) {
+    model.selectFunction = function(fun, srcRep) {
+        if (fun) {
+            selectFun(fun);
+        }
+        G.eventManager.broadcast("modelChanged", {
+            functions: functions,
+            selectedFun: fun,
+            src: srcRep
+        });
+    };
+
+    function selectFun(fun) {
+        console.log("selecting", fun);
         if (selectedFunction) {
             selectedFunction.isSelected = false;
         }
-        if (fun) {
-            fun.isSelected = true;
-            selectedFunction = fun;
-        }
-        G.eventManager.broadcast("modelChanged", {functions: functions});
-    };
+        fun.isSelected = true;
+        selectedFunction = fun;
+    }
     
     model.changeFunction = function (updatedFun, srcRep) {
         G.eventManager.broadcast("modelChanged", {

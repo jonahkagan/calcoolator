@@ -33,13 +33,14 @@ G.makeEqnView = function () {
             )
             .appendTo($parent)
             .keyup(handleKey)
-            .click(function () { $editor.focus(); });
+            .click(handleClick);
 
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor").mathquill("editable");
 
         updateParseStatus();
+        me.updateSelectedStatus();
         resizeFont();
 
         lastLatexStr = $editor.mathquill("latex");
@@ -48,10 +49,16 @@ G.makeEqnView = function () {
     me.update = function (newFun) {
         fun = newFun;
         updateParseStatus();
+        me.updateSelectedStatus();
     };
 
     function updateParseStatus() {
         $editor.toggleClass("parse-error", fun.coefs() ? false : true);
+    }
+
+    me.updateSelectedStatus = function() {
+        $content.toggleClass("selected", fun.isSelected);
+        if (fun.isSelected) { $editor.focus(); }
     }
 
     function handleKey(e) {
@@ -66,6 +73,11 @@ G.makeEqnView = function () {
         lastLatexStr = newLatexStr;
 
         resizeFont();
+    }
+
+    function handleClick(e) {
+        me.updateSelectedStatus();
+        me.broadcast("eqnSelected", { fun: fun });
     }
 
     // Dynamically resize equation text to fit the editor
