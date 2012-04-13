@@ -21,6 +21,12 @@
     height: 40px;
 }
 
+#eqns .eqn .eqn-editor,
+#eqns .eqn .eqn-editor:focus {
+    border: none;
+    box-shadow: none;
+}
+
 #eqns .eqn.parse-error {
     color: red;
 }

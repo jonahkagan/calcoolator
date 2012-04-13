@@ -19,17 +19,23 @@ G.makeEqnView = function () {
         var displayEqn = fun.repData("eqn") ?
              fun.repData("eqn") :
              toEqnString(fun.coefs());
-            //console.log(fun.coefs, displayEqn,toEqnString(fun.coefs) );
-        console.log('"' + displayEqn + '"');
+        //console.log('"' + displayEqn + '"');
 
-        $content = $("<span class=\"eqn\">" + displayEqn + "</span>")
+        $content = $(
+            "<div class=\"eqn\">" +
+                "<span class=\"eqn-name\">" + fun.name + "(x)=</span>" +
+                "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
+            "</div>"
+            )
             .appendTo($parent)
             .keyup(handleKey)
-            .mathquill("editable")
+
+        $content.find(".eqn-name").mathquill();
+        $content.find(".eqn-editor").mathquill("editable");
 
         updateParseStatus();
 
-        lastLatexStr = $content.mathquill("latex");
+        lastLatexStr = $content.find("#eqn-editor").mathquill("latex");
     };
     
     me.update = function (newFun) {
@@ -38,7 +44,6 @@ G.makeEqnView = function () {
     };
 
     function updateParseStatus() {
-        console.log("toggle", fun.coefs());
         $content.toggleClass("parse-error", fun.coefs() ? false : true);
     }
 

@@ -14,7 +14,11 @@ G.makeModel = function() {
             src: srcRep
         });
     }
-    
+
+    function newName() {
+
+    }
+
     model.removeFunction = function(fun) {
         
     }

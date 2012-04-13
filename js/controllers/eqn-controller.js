@@ -8,37 +8,33 @@ G.makeEqnController = function (model) {
     eqnDude.subscribe("selectFunction", me.onSelectFunction);
     eqnDude.display();
 
-    me.onUpdate = function (data) {
-        var changedFun = _.find(data.functions, function (fun) {
-            return fun === data.changedFun;
-        }); // might be undefined
-
+    me.onUpdate = function (event) {
         // Only redisplay eqns if another representation
         // submitted the change
-        if (data.src === me.name && changedFun) {
+        if (event.src === me.name && event.changedFun) {
             // Update the changed eqn with the results of the parse
-            eqnDude.updateEqn(changedFun);
+            eqnDude.updateEqn(event.changedFun);
         } else {
             // Remove the old eqn string from the changed function so
             // the view can make a new one.
-            if (changedFun) { changedFun.repData(null); }
+            if (event.changedFun) { event.changedFun.repData(null); }
 
-            eqnDude.display(data.functions);
+            eqnDude.display(event.functions);
         }
     };
 
-    function onEqnChange(data) {
+    function onEqnChange(event) {
         // Update the fun based on the new eqnStr
-        data.fun.repData("eqn", data.eqnStr);
-        var coefs = parser.parseAndSimplify(data.eqnStr);
+        event.fun.repData("eqn", event.eqnStr);
+        var coefs = parser.parseAndSimplify(event.eqnStr);
         if (coefs) {
             console.log("new coefs", coefs);
-            data.fun.coefs(coefs);
+            event.fun.coefs(coefs);
         } else {
-            console.log("no parse for " + data.eqnStr);
-            data.fun.coefs(null);
+            console.log("no parse for " + event.eqnStr);
+            event.fun.coefs(null);
         }
-        model.changeFunction(data.fun, "eqn");
+        model.changeFunction(event.fun, "eqn");
     }
 
     return me;
