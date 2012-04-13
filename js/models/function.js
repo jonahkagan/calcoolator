@@ -1,7 +1,11 @@
 G.makeFun = function(name, initCoefs) {
     var fun = {
         name: name,
-        color: G.color(Math.random()*255, Math.random()*255, Math.random()*255), // fix this
+        color: G.color(
+            G.u.round(0, Math.random()*255),
+            G.u.round(0, Math.random()*255),
+            G.u.round(0, Math.random()*255)
+        ), // fix this
         isSelected: false
     };
     var coefs;

@@ -23,14 +23,16 @@ G.makeEqnView = function () {
 
         $content = $(
             "<div class=\"eqn\">" +
-                "<span class=\"eqn-name\">" + fun.name + "(x)=</span>" +
+                "<span class=\"eqn-name\">" + fun.name + "</span>" +
+                "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
             "</div>"
             )
             .appendTo($parent)
             .keyup(handleKey)
 
-        $content.find(".eqn-name").mathquill();
+        $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
+        $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor").mathquill("editable");
 
         updateParseStatus();

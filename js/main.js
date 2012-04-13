@@ -12,8 +12,11 @@ G.color = function(r, g, b) {
     return {
         r: r,
         g: g,
-        b: b
-    }
+        b: b,
+        toCSS: function () {
+            return "rgb(" + r + "," + g + "," + b + ")";
+        }
+    };
 };
 
 G.die = function(msg, obj) { console.error(msg); }

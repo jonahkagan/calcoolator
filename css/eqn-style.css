@@ -1,12 +1,12 @@
 #eqns {
-    width: 150px;
+    width: 250px;
     border: 1px solid darkGray;
 }
 
 #eqns .eqn {
-    width: 140px;
-    border: 1px solid darkGray;
-    padding: 5px;
+    width: 230px;
+    border-bottom: 1px solid darkGray;
+    padding: 10px 10px;
 }
 
 #eqns .new-eqn {
@@ -18,17 +18,30 @@
 
 #eqns .new-eqn,
 #eqns .eqn {
-    height: 40px;
+    height: 30px;
 }
 
+/* Equation Name */
+#eqns .eqn .eqn-name {
+    margin-right: -5px;
+}
 #eqns .eqn .eqn-name sub {
     font-size: 80%;
+}
+
+/* Equation Editor */
+#eqns .eqn .eqn-editor {
+    width: 160px;
 }
 
 #eqns .eqn .eqn-editor,
 #eqns .eqn .eqn-editor:focus {
     border: none;
     box-shadow: none;
+}
+
+#eqns .eqn .eqn-editor textarea {
+    resize: none;
 }
 
 #eqns .eqn.parse-error {
