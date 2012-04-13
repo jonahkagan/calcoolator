@@ -8,6 +8,8 @@ G.makeEqnController = function (model) {
     eqnDude.subscribe("selectFunction", me.onSelectFunction);
     eqnDude.display();
 
+    // TODO handle select, remove
+    // TODO only redisplay one function at a time
     me.onUpdate = function (event) {
         // Only redisplay eqns if another representation
         // submitted the change

@@ -8,7 +8,7 @@
     padding: 10px 10px;
     width: 230px;
     white-space: nowrap;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 #eqns .new-eqn {
@@ -42,7 +42,8 @@
     box-shadow: none;
 }
 
-#eqns .eqn .eqn-editor textarea {
+#eqns .eqn .eqn-editor textarea,
+#eqns .eqn .eqn-editor textarea:active {
     resize: none;
 }
 
