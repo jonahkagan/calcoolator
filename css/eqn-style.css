@@ -6,6 +6,7 @@
 #eqns .eqn {
     border-bottom: 1px solid darkGray;
     padding: 10px 10px;
+    position: relative;
     width: 230px;
     white-space: nowrap;
     overflow-x: auto;
@@ -47,6 +48,15 @@
     resize: none;
 }
 
+/* Remove button */
+#eqns .eqn .eqn-remove {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-size: 8px;
+}
+
+/* Special classes */
 #eqns .eqn .parse-error.eqn-editor {
     color: red;
 }

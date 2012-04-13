@@ -29,6 +29,7 @@ G.makeEqnView = function () {
                 "<span class=\"eqn-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
+                "<button class=\"eqn-remove\">X</button>" +
             "</div>"
             )
             .appendTo($parent)
@@ -38,6 +39,8 @@ G.makeEqnView = function () {
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor").mathquill("editable");
+
+        $content.find(".eqn-remove").click(handleRemove);
 
         updateParseStatus();
         me.updateSelectedStatus();
@@ -78,6 +81,11 @@ G.makeEqnView = function () {
     function handleClick(e) {
         me.updateSelectedStatus();
         me.broadcast("eqnSelected", { fun: fun });
+    }
+
+    function handleRemove(e) {
+        me.broadcast("eqnRemoved", { fun: fun });
+        return false;
     }
 
     // Dynamically resize equation text to fit the editor

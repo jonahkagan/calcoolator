@@ -10,8 +10,9 @@ G.makeEqnDudeView = function () {
         _.each(funs, function (fun) {
             var eqv = G.makeEqnView();
             eqv.display(fun, $content);
-            eqv.subscribe("eqnChanged", onEqnChange);
-            eqv.subscribe("eqnSelected", onEqnSelect);
+            bubble(eqv, "eqnChanged");
+            bubble(eqv, "eqnSelected");
+            bubble(eqv, "eqnRemoved");
             eqvs.push(eqv);
         });
 
@@ -33,12 +34,12 @@ G.makeEqnDudeView = function () {
         });
     };
 
-    function onEqnChange(event) {
-        me.broadcast("eqnChanged", event);
-    }
-
-    function onEqnSelect(event) {
-        me.broadcast("eqnSelected", event);
+    // Subscribes to an event on the eqn view and bubbles the same
+    // event up to the controller
+    function bubble(eqv, eventName) {
+        eqv.subscribe(eventName, function (e) {
+            me.broadcast(eventName, e);
+        });
     }
 
     return me;

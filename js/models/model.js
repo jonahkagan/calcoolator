@@ -22,8 +22,12 @@ G.makeModel = function() {
         };
     }());
 
-    model.removeFunction = function(fun) {
-        
+    model.removeFunction = function(fun, srcRep) {
+        functions = _.without(functions, fun);
+        G.eventManager.broadcast("modelChanged", {
+            functions: functions,
+            src: srcRep
+        });
     }
     
     model.getFunctions = function() {
