@@ -8,7 +8,7 @@ G.makeEqnView = function () {
     //
     // Number coefficients in the equation are scrubbable
 
-    var $content, lastLatexStr, fun;
+    var $content, $editor, lastLatexStr, fun;
 
     me.display = function (afun, $parent) {
         fun = afun;
@@ -31,11 +31,11 @@ G.makeEqnView = function () {
             .keyup(handleKey)
 
         $content.find(".eqn-name").mathquill();
-        $content.find(".eqn-editor").mathquill("editable");
+        $editor = $content.find(".eqn-editor").mathquill("editable");
 
         updateParseStatus();
 
-        lastLatexStr = $content.find("#eqn-editor").mathquill("latex");
+        lastLatexStr = $editor.mathquill("latex");
     };
     
     me.update = function (newFun) {
@@ -44,12 +44,12 @@ G.makeEqnView = function () {
     };
 
     function updateParseStatus() {
-        $content.toggleClass("parse-error", fun.coefs() ? false : true);
+        $editor.toggleClass("parse-error", fun.coefs() ? false : true);
     }
 
     function handleKey(e) {
         console.log("key");
-        var newLatexStr = $content.mathquill("latex");
+        var newLatexStr = $editor.mathquill("latex");
         if (newLatexStr !== lastLatexStr) {
             console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
             me.broadcast("eqnChanged", {

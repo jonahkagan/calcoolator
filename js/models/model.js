@@ -4,7 +4,7 @@ G.makeModel = function() {
     var selectedFunction = null;
         
     model.newFunction = function (srcRep) {
-        var fun = G.makeFun('f', [0, 1]);
+        var fun = G.makeFun(newName(), [0, 1]);
         functions.push(fun);
         if (selectedFunction) selectedFunction.isSelected = false;
         fun.isSelected = true;
@@ -15,9 +15,14 @@ G.makeModel = function() {
         });
     }
 
-    function newName() {
-
-    }
+    // Create a new function name with increasing subscript each time
+    // the function is called.
+    var newName = (function () {;
+        var funIdx = 1;
+        return function () {
+            return "f_" + (funIdx++);
+        };
+    }());
 
     model.removeFunction = function(fun) {
         

@@ -21,6 +21,10 @@
     height: 40px;
 }
 
+#eqns .eqn .eqn-name sub {
+    font-size: 80%;
+}
+
 #eqns .eqn .eqn-editor,
 #eqns .eqn .eqn-editor:focus {
     border: none;
