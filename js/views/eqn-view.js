@@ -59,9 +59,12 @@ G.makeEqnView = function () {
             $editor.html(toEqnString(fun.coefs())).mathquill("editable");
             _.chain(findSeqs())
                 .filter(function (seq) { return seq.type === "num"; })
-                // Adding scrubbing class to all numbers, not just
-                // the ones being scrubbed :(
-                .each(function (seq) { $(seq.spans).addClass("scrubbable")});
+                .each(function (seq) {
+                    $(seq.spans).addClass("scrubbable");
+                    if (G.opts.colorCoefs) {
+                        $(seq.spans).css("color", fun.color.toCSS());
+                    }
+                });
         } else {
             refresh();
         }
@@ -118,7 +121,9 @@ G.makeEqnView = function () {
         // (i.e., neighboring spans with digits or decimal points).
         return _.reduce($editor.children(), function (seqs, span) {
             // Find the next non-zero coef
-            if (/[0-9\.]/.test($(span).text())) { // If num or dot
+            if (span.nodeName === "SPAN" &&
+                /[0-9\.]/.test($(span).text())) // If num or dot
+            {
                 var lastSeq = _.last(seqs);
                 if (lastSeq.type === "num") { // If last span was a num
                     lastSeq.spans.push(span); // then add span to seq
@@ -182,6 +187,10 @@ G.makeEqnView = function () {
             .off("mousedown")
             .addClass("scrubbable")
             .one("mousedown", onMouseDown);
+
+        if (G.opts.colorCoefs) {
+            $(spans).css("color", fun.color.toCSS());
+        }
 
         var onMouseMove = function (e) {
             console.log("move", fun.name);

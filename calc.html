@@ -37,6 +37,13 @@
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
     
+    <style>
+        #opts {
+            border-top: 1px solid black;
+            margin-top: 10px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -45,6 +52,10 @@
     <canvas id="graphCanvas"></canvas>
     <input type="button" value="+" id="graphPlus"/>
 
+    <div id="opts">
+        <input type="checkbox" id="colorCoefs" checked="true"/>
+        <label for="colorCoefs">Coefs same color as function</label>
+    </div>
 
 </body>
 </html>

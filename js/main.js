@@ -6,8 +6,17 @@ G.init = function(p) {
     var graphController = G.makeGraphController(model, p);
     var eqnController = G.makeEqnController(model);
 
-    model.newFunction();
+    _.defer(model.newFunction);
 
+    G.opts = {};
+    $('#opts').children().each(function (i, optCheck) {
+        console.log(optCheck, optCheck.id, optCheck.checked);
+        $(optCheck).change(function () {
+            console.log("change", optCheck.id);
+            G.opts[optCheck.id] = optCheck.checked;
+            model.removeFunction();
+        }).change();
+    });
 };
 
 G.color = function(r, g, b) {

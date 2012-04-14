@@ -82,6 +82,7 @@
 }
 
 #eqns .selected.eqn {
-    border: 1px solid black;
+    /*border: 1px solid black;*/
+    box-shadow: #68B4DF 0 0 2px 1px;
 }
 
