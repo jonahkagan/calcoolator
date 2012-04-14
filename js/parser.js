@@ -87,9 +87,8 @@ G.makeParser = function() {
                 coefs.push(0);
                 i = 0;
             }
-            //console.log(ast.toString());
             // check higher order terms
-            var exp = i; // exponent of cur term
+            var exp = 1; // exponent of cur term
             for (; i < ast.kids.length; i++) {
                 if (isTermWithCoef(ast.kids[i])) {
                     // insert 0s for missing terms
@@ -761,7 +760,7 @@ function test(eqn) {
     console.log('#####################');
 }
 
-/*
+test('x^2+x');
 test('x^2 + 1');
 test('2x+5');
 test("1(x)+5(x+1)(x+1)3");
@@ -788,4 +787,3 @@ test('1 + 2 / 3');
 //test('1 + (2 + 3');
 //test('1 + (2 + (3)');
 test('1 + 3^4^5 + 6');
-*/
