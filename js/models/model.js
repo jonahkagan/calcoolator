@@ -40,14 +40,14 @@ G.makeModel = function() {
     };
     
     model.selectFunction = function(fun, srcRep) {
-        if (fun) {
+        if (fun && !fun.isSelected) {
             selectFun(fun);
+            G.eventManager.broadcast("modelChanged", {
+                functions: functions,
+                selectedFun: fun,
+                src: srcRep
+            });
         }
-        G.eventManager.broadcast("modelChanged", {
-            functions: functions,
-            selectedFun: fun,
-            src: srcRep
-        });
     };
 
     function selectFun(fun) {

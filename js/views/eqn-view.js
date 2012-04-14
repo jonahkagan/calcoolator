@@ -33,7 +33,8 @@ G.makeEqnView = function () {
             "</div>"
             )
             .appendTo($parent)
-            .keyup(handleKey)
+            .keydown(onKeyDown)
+            .keyup(onKeyUp)
             // Pass the same event through to the editor so it knows
             // the position of the mouse
             .mousedown(function (e) { $editor.trigger(e); });
@@ -56,15 +57,8 @@ G.makeEqnView = function () {
 
     me.update = function () {
         if (isDragging) {
-            $editor.html(toEqnString(fun.coefs())).mathquill("editable");
-            _.chain(findSeqs())
-                .filter(function (seq) { return seq.type === "num"; })
-                .each(function (seq) {
-                    $(seq.spans).addClass("scrubbable");
-                    if (G.opts.colorCoefs) {
-                        $(seq.spans).css("color", fun.color.toCSS());
-                    }
-                });
+            $editor.mathquill("latex", toEqnString(fun.coefs()));
+            colorCoefs();
         } else {
             refresh();
         }
@@ -85,16 +79,28 @@ G.makeEqnView = function () {
         resizeFont();
     }
 
+    function colorCoefs(seqs) {
+        _.chain(seqs || findSeqs())
+            .filter(function (seq) { return seq.type === "num"; })
+            .each(function (seq) {
+                $(seq.spans).addClass("scrubbable");
+                if (G.opts.colorCoefs) {
+                    $(seq.spans).css("color", fun.color.toCSS());
+                }
+            });
+    }
+
     function updateParseStatus() {
         $editor.toggleClass("parse-error", fun.coefs() ? false : true);
     }
 
-    function handleKey(e) {
-        if (e.which === 13) { // catch Enter
+    function onKeyUp(e) {
+        if (e.which === 13) { // simplify on Enter
             $editor.mathquill("latex", toEqnString(fun.coefs())); 
             refresh();
             return;
         }
+        console.log(e.which);
         var newLatexStr = $editor.mathquill("latex");
         if (newLatexStr !== lastLatexStr) {
             //console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
@@ -104,9 +110,11 @@ G.makeEqnView = function () {
             });
         }
         lastLatexStr = newLatexStr;
+    }
 
-        createScrubbers();
+    function onKeyDown(e) {
         resizeFont();
+        colorCoefs();
     }
 
     function selectFunction(e) {
@@ -192,6 +200,8 @@ G.makeEqnView = function () {
             .off("mousedown")
             .addClass("scrubbable")
             .one("mousedown", onMouseDown);
+
+        colorCoefs(spans);
 
         if (G.opts.colorCoefs) {
             $(spans).css("color", fun.color.toCSS());
