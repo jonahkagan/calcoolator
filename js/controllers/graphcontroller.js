@@ -42,6 +42,7 @@ G.makeGraphController = function(model, p) {
         // Update whichever function changed if the event src wasn't
         // "graph" TODO
         //console.log("updating views!");
+        console.log(data);
         if (data && data.functions) {
             functions = data.functions;
         }
@@ -53,6 +54,9 @@ G.makeGraphController = function(model, p) {
                 if (!fun.repData("graph") || fun.repData("graph").degree != fun.degree) {
                     // make new rep data
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
+                }
+                else if (data.src !== "graph") {
+                    // slide anchor
                 }
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
@@ -131,6 +135,13 @@ G.makeRepHandler = function() {
     handler.getRepFromCoefs = function(fun, coefs) {
         if (handlers[fun.degree]) {
             return handlers[fun.degree].getRepFromCoefs(fun, coefs);
+        }
+        return null;
+    };
+    
+    handler.minModifyRep = function(fun, coefs, repData) {
+        if (handlers[fun.degree]) {
+            return handlers[fun.degree].minModifyRep(fun, coefs, repData);
         }
         return null;
     };
