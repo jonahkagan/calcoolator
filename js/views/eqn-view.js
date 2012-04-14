@@ -90,6 +90,11 @@ G.makeEqnView = function () {
     }
 
     function handleKey(e) {
+        if (e.which === 13) { // catch Enter
+            $editor.mathquill("latex", toEqnString(fun.coefs())); 
+            refresh();
+            return;
+        }
         var newLatexStr = $editor.mathquill("latex");
         if (newLatexStr !== lastLatexStr) {
             //console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
@@ -259,7 +264,11 @@ G.makeEqnView = function () {
 
     function latexToEqn(latexStr) {
         return latexStr.replace(/\\cdot/g, "*")
-            .replace(/\\\:/g, " ");
+            .replace(/\\\:/g, " ")
+            .replace(/\{/g, "(")
+            .replace(/\}/g, ")")
+            .replace(/\\right/g, "")
+            .replace(/\\left/g, "");
     }
     //console.log(toEqnString([0,1,2,0]));
     //console.log(toEqnString([0]));
