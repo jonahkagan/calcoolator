@@ -18,7 +18,7 @@ G.makeModel = function() {
     var newName = (function () {;
         var funIdx = 1;
         return function () {
-            return "f_" + (funIdx++);
+            return "f_{" + (funIdx++) + "}";
         };
     }());
 

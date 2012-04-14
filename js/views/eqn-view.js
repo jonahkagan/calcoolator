@@ -34,7 +34,9 @@ G.makeEqnView = function () {
             )
             .appendTo($parent)
             .keyup(handleKey)
-            .mousedown(selectFunction);
+            // Pass the same event through to the editor so it knows
+            // the position of the mouse
+            .mousedown(function (e) { $editor.trigger(e); });
 
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
@@ -93,7 +95,7 @@ G.makeEqnView = function () {
 
     function selectFunction(e) {
         me.broadcast("eqnSelected", { fun: fun });
-        // Stop bubbling so we don't select twice
+        // Stop bubbling so we don't select twice/infinite loop
         e.stopPropagation();
     }
 
@@ -160,7 +162,6 @@ G.makeEqnView = function () {
 
             $(document).on("mousemove", onMouseMove);
             $(document).on("mouseup", onMouseUp);
-            //selectFunction();
         };
 
         $(spans)
