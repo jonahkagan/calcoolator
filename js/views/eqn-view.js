@@ -34,11 +34,13 @@ G.makeEqnView = function () {
             )
             .appendTo($parent)
             .keyup(handleKey)
-            .click(selectFunction);
+            .mousedown(selectFunction);
 
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
-        $editor = $content.find(".eqn-editor").mathquill("editable");
+        $editor = $content.find(".eqn-editor")
+            .mathquill("editable")
+            .mousedown(selectFunction);
 
         $content.find(".eqn-remove").click(removeFunction);
 
@@ -58,6 +60,10 @@ G.makeEqnView = function () {
     me.updateSelect = function () {
         updateSelectedStatus();
     };
+
+    function updateSelectedStatus() {
+        $content.toggleClass("selected", fun.isSelected);
+    }
 
     function refresh() {
         createScrubbers();
@@ -85,13 +91,10 @@ G.makeEqnView = function () {
         resizeFont();
     }
 
-    function updateSelectedStatus() {
-        $content.toggleClass("selected", fun.isSelected);
-        if (fun.isSelected) { $editor.focus(); }
-    }
-
     function selectFunction(e) {
         me.broadcast("eqnSelected", { fun: fun });
+        // Stop bubbling so we don't select twice
+        e.stopPropagation();
     }
 
     function removeFunction(e) {
@@ -125,9 +128,6 @@ G.makeEqnView = function () {
 
         var coefPos = 0;
 
-        // Get rid of mathquill click handlers for selecting text
-        $editor.off("mousedown");
-
         // Associate each seq of spans with a coef and add the
         // handlers
         _.chain(seqs)
@@ -157,9 +157,10 @@ G.makeEqnView = function () {
             console.log("down");
             isDragging = true;
             cur = e.pageX;
+
             $(document).on("mousemove", onMouseMove);
             $(document).on("mouseup", onMouseUp);
-            selectFunction();
+            //selectFunction();
         };
 
         $(spans)

@@ -61,11 +61,11 @@ G.makeParser = function() {
     };
 
     function ast2coefs(origAst) {
-        console.log(origAst.toString());
+        //console.log(origAst.toString());
         // If simplification yields canonical form,
         // convert to coef list
         var ast = simplify(origAst), coefs = [];
-        console.log(ast.toString());
+        //console.log(ast.toString());
         // a
         if (ast.is('num')) {
             return [ parseFloat(ast.num) ];
