@@ -15,6 +15,7 @@
 #eqns .new-eqn {
     background: lightGray;
     color: gray;
+    cursor: default;
     text-align: center;
     padding-top: 10px;
 }
@@ -22,6 +23,8 @@
 #eqns .new-eqn,
 #eqns .eqn {
     height: 30px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 /* Equation Name */
@@ -43,13 +46,26 @@
     box-shadow: none;
 }
 
-#eqns .eqn .eqn-editor textarea,
-#eqns .eqn .eqn-editor textarea:active {
+#eqns .eqn-editor {
+    overflow: hidden;
+}
+
+#eqns .eqn textarea,
+#eqns .eqn textarea:active {
     resize: none;
 }
 
+/* Scrubbing */
 #eqns .eqn .eqn-editor .scrubbable {
     color: blue;
+}
+.scrubbable, .scrubbing,
+.scrubbing .eqn *,
+.scrubbing .eqn * span,
+.scrubbing .eqn * var {
+    cursor: pointer;
+    cursor: move;
+    cursor: col-resize;
 }
 
 /* Remove button */

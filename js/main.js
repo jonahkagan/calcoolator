@@ -6,6 +6,8 @@ G.init = function(p) {
     var graphController = G.makeGraphController(model, p);
     var eqnController = G.makeEqnController(model);
 
+    model.newFunction();
+
 };
 
 G.color = function(r, g, b) {

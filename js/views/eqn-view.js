@@ -43,8 +43,11 @@ G.makeEqnView = function () {
         $editor = $content.find(".eqn-editor")
             .mathquill("editable")
             .mousedown(selectFunction);
+            //.find("span").addClass("scrubbable");
 
-        $content.find(".eqn-remove").click(removeFunction);
+        $content.find(".eqn-remove")
+            .click(removeFunction)
+            .mousedown(function (e) { e.stopPropagation(); });
 
         refresh();
 
@@ -54,6 +57,11 @@ G.makeEqnView = function () {
     me.update = function () {
         if (isDragging) {
             $editor.html(toEqnString(fun.coefs())).mathquill("editable");
+            _.chain(findSeqs())
+                .filter(function (seq) { return seq.type === "num"; })
+                // Adding scrubbing class to all numbers, not just
+                // the ones being scrubbed :(
+                .each(function (seq) { $(seq.spans).addClass("scrubbable")});
         } else {
             refresh();
         }
@@ -101,16 +109,14 @@ G.makeEqnView = function () {
 
     function removeFunction(e) {
         me.broadcast("eqnRemoved", { fun: fun });
+        // Stop bubbling to avoid selecting when we should be removing
+        e.stopPropagation();
     }
 
-    // Create scrubbable numbers in the editor
-    function createScrubbers() {
-        var coefs = fun.coefs(); if (!coefs) { return; }
-
-        // We have to work around mathquill here.
-        // First, find sequences of spans that represent numbers
+    function findSeqs() {
+        // Find sequences of spans that represent numbers
         // (i.e., neighboring spans with digits or decimal points).
-        var seqs = _.reduce($editor.children(), function (seqs, span) {
+        return _.reduce($editor.children(), function (seqs, span) {
             // Find the next non-zero coef
             if (/[0-9\.]/.test($(span).text())) { // If num or dot
                 var lastSeq = _.last(seqs);
@@ -127,8 +133,15 @@ G.makeEqnView = function () {
             }
             return seqs;
         }, []);
+    }
 
-        var coefPos = 0;
+    // Create scrubbable numbers in the editor
+    function createScrubbers() {
+        var coefs = fun.coefs(); if (!coefs) { return; }
+
+        // We have to work around mathquill here.
+        var seqs = findSeqs(),
+            coefPos = 0;
 
         // Associate each seq of spans with a coef and add the
         // handlers
@@ -159,9 +172,10 @@ G.makeEqnView = function () {
             console.log("down");
             isDragging = true;
             cur = e.pageX;
-
+            $("body").addClass("scrubbing");
             $(document).on("mousemove", onMouseMove);
             $(document).on("mouseup", onMouseUp);
+            e.originalEvent.preventDefault(); // prevents text cursor
         };
 
         $(spans)
@@ -187,21 +201,18 @@ G.makeEqnView = function () {
         var onMouseUp = function (e) {
             console.log("up");
             isDragging = false;
+            $("body").removeClass("scrubbing");
             $(document).off("mousemove", onMouseMove);
             $(document).off("mouseup", onMouseUp);
             refresh();
         }
     }
 
-    function newSpan(val) {
-        return "<span class=\"dragging\">" + G.u.round(2, val) + "</span>";
-    }
-
     function splitSpan($span) {
         return _.map(
             $span.text().split(""),
             function (char) {
-                return "<span class=\"post-drag\">" + char + "</span>";
+                return "<span>" + char + "</span>";
             }
         ).join("");
     }

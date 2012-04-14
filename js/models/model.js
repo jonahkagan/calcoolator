@@ -23,6 +23,11 @@ G.makeModel = function() {
     }());
 
     model.removeFunction = function(fun, srcRep) {
+        if (fun === selectedFunction) {
+            var i = _.indexOf(functions, fun) + 1;
+            // Watch out for the end of the list
+            selectFun(functions[i] || functions[i-2]);
+        }
         functions = _.without(functions, fun);
         G.eventManager.broadcast("modelChanged", {
             functions: functions,
@@ -46,7 +51,7 @@ G.makeModel = function() {
     };
 
     function selectFun(fun) {
-        console.log("selecting", fun);
+        console.log("selecting", fun.name);
         if (selectedFunction) {
             selectedFunction.isSelected = false;
         }
