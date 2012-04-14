@@ -24,13 +24,15 @@ G.makeEqnDudeView = function () {
             });
     };
 
-    me.updateEqn = function (changedFun) {
+    me.changeEqn = function (changedFun) {
         _.find(eqvs, function (eqv) {
             return eqv.fun() === changedFun;
-        }).update(changedFun);
+        }).update();
+    };
 
+    me.selectEqn = function (selectedFun) {
         _.each(eqvs, function (eqv) {
-            eqv.updateSelectedStatus();
+            eqv.updateSelect();
         });
     };
 

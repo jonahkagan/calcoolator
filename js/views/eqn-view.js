@@ -34,35 +34,40 @@ G.makeEqnView = function () {
             )
             .appendTo($parent)
             .keyup(handleKey)
-            .click(handleClick);
+            .click(selectFunction);
 
         $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor").mathquill("editable");
 
-        $content.find(".eqn-remove").click(handleRemove);
+        $content.find(".eqn-remove").click(removeFunction);
 
         refresh();
 
         lastLatexStr = $editor.mathquill("latex");
     };
 
-    me.update = function (newFun) {
+    me.update = function () {
         if (isDragging) {
-            $editor.html(toEqnString(newFun.coefs())).mathquill("editable");
+            $editor.html(toEqnString(fun.coefs())).mathquill("editable");
         } else {
-            fun = newFun;
             refresh();
         }
     };
 
-    function updateParseStatus() {
-        $editor.toggleClass("parse-error", fun.coefs() ? false : true);
+    me.updateSelect = function () {
+        updateSelectedStatus();
+    };
+
+    function refresh() {
+        createScrubbers();
+        updateParseStatus();
+        updateSelectedStatus();
+        resizeFont();
     }
 
-    me.updateSelectedStatus = function() {
-        $content.toggleClass("selected", fun.isSelected);
-        if (fun.isSelected) { $editor.focus(); }
+    function updateParseStatus() {
+        $editor.toggleClass("parse-error", fun.coefs() ? false : true);
     }
 
     function handleKey(e) {
@@ -80,23 +85,26 @@ G.makeEqnView = function () {
         resizeFont();
     }
 
-    function handleClick(e) {
-        me.updateSelectedStatus();
+    function updateSelectedStatus() {
+        $content.toggleClass("selected", fun.isSelected);
+        if (fun.isSelected) { $editor.focus(); }
+    }
+
+    function selectFunction(e) {
         me.broadcast("eqnSelected", { fun: fun });
     }
 
-    function handleRemove(e) {
+    function removeFunction(e) {
         me.broadcast("eqnRemoved", { fun: fun });
-        return false;
     }
 
     // Create scrubbable numbers in the editor
     function createScrubbers() {
+        var coefs = fun.coefs(); if (!coefs) { return; }
+
         // We have to work around mathquill here.
         // First, find sequences of spans that represent numbers
         // (i.e., neighboring spans with digits or decimal points).
-        var coefs = fun.coefs(); if (!coefs) { return; }
-
         var seqs = _.reduce($editor.children(), function (seqs, span) {
             // Find the next non-zero coef
             if (/[0-9\.]/.test($(span).text())) { // If num or dot
@@ -117,7 +125,11 @@ G.makeEqnView = function () {
 
         var coefPos = 0;
 
+        // Get rid of mathquill click handlers for selecting text
         $editor.off("mousedown");
+
+        // Associate each seq of spans with a coef and add the
+        // handlers
         _.chain(seqs)
             .filter(function (s) {
                 return s.type === "num";
@@ -136,44 +148,47 @@ G.makeEqnView = function () {
 
     var isDragging;
     function addDragHandler(spans, coefPos) {
-        var val = parseFloat(
-            _.map(spans, function (span) {
+        var orig, cur,
+            val = parseFloat(_.map(spans, function (span) {
                 return $(span).text();
-            }).join('')),
-            orig, cur;
+            }).join(''));
+
+        var onMouseDown = function (e) {
+            console.log("down");
+            isDragging = true;
+            cur = e.pageX;
+            $(document).on("mousemove", onMouseMove);
+            $(document).on("mouseup", onMouseUp);
+            selectFunction();
+        };
 
         $(spans)
+            .off("mousedown")
             .addClass("scrubbable")
-            .mousedown(function (e) {
+            .one("mousedown", onMouseDown);
+
+        var onMouseMove = function (e) {
+            console.log("move", fun.name);
+            if (isDragging) {
+                orig = cur;
                 cur = e.pageX;
-                if (isDragging) {
-                    return false;
-                }
-                isDragging = true;
-                $(document).mousemove(function (e) {
-                    if (isDragging) {
-                        orig = cur;
-                        cur = e.pageX;
-                        var delta = (cur - orig) * 0.1;
-                        val += delta ? delta : 0;
-                        fun.coefs()[coefPos] = val;
-                        me.broadcast("eqnChanged", {
-                            fun: fun,
-                            eqnStr: toEqnString(fun.coefs())
-                        });
-                    } else {
-                        $(document).off("mousemove");
-                    }
-                    return false;
+                var delta = (cur - orig) * 0.1;
+                val += delta ? delta : 0;
+                fun.coefs()[coefPos] = val;
+                me.broadcast("eqnChanged", {
+                    fun: fun,
+                    eqnStr: toEqnString(fun.coefs())
                 });
-            });
-        // TODO remove this handler when done
-        $(document).mouseup(function (e) {
+            }
+        }
+
+        var onMouseUp = function (e) {
+            console.log("up");
             isDragging = false;
-            $(document).off("mousemove");
-            $(document).off("mouseup");
+            $(document).off("mousemove", onMouseMove);
+            $(document).off("mouseup", onMouseUp);
             refresh();
-        });
+        }
     }
 
     function newSpan(val) {
@@ -187,13 +202,6 @@ G.makeEqnView = function () {
                 return "<span class=\"post-drag\">" + char + "</span>";
             }
         ).join("");
-    }
-
-    function refresh() {
-        createScrubbers();
-        updateParseStatus();
-        me.updateSelectedStatus();
-        resizeFont();
     }
 
     // Dynamically resize equation text to fit the editor

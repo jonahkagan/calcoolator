@@ -15,9 +15,9 @@ G.makeEqnController = function (model) {
         // submitted the change
         if (event.src === me.name && event.changedFun) {
             // Update the changed eqn with the results of the parse
-            eqnDude.updateEqn(event.changedFun);
+            eqnDude.changeEqn(event.changedFun);
         } else if (event.selectedFun) {
-            eqnDude.updateEqn(event.selectedFun);
+            eqnDude.selectEqn(event.selectedFun);
         } else {
             // Remove the old eqn string from the changed function so
             // the view can make a new one.
