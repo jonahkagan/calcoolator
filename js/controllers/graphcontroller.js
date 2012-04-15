@@ -29,6 +29,9 @@ G.makeGraphController = function(model, p) {
                     // make new rep data
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
                 }
+                else {
+                    fun.repData("graph", repHandler.modifyRep(fun, fun.coefs(), fun.repData("graph")));
+                }
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
                 repView.subscribe("repChanged", controller.onRepChanged);
@@ -42,7 +45,6 @@ G.makeGraphController = function(model, p) {
         // Update whichever function changed if the event src wasn't
         // "graph" TODO
         //console.log("updating views!");
-        console.log(data);
         if (data && data.functions) {
             functions = data.functions;
         }
@@ -56,7 +58,7 @@ G.makeGraphController = function(model, p) {
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
                 }
                 else if (data.src !== "graph") {
-                    // slide anchor
+                    fun.repData("graph", repHandler.modifyRep(fun, fun.coefs(), fun.repData("graph")));
                 }
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
@@ -80,7 +82,6 @@ G.makeGraphController = function(model, p) {
     controller.onDrag = function(data) {
         //move anchor
         if (!anchorSelected) {
-            console.log(data);
             G.graphGlobals.ORIGIN_X += data.dx;
             G.graphGlobals.ORIGIN_Y += data.dy;
             controller.onDudeChange();
@@ -120,7 +121,6 @@ G.makeGraphController = function(model, p) {
     return controller;
 };
 
-
 G.makeRepHandler = function() {
     var handler = {};
     var handlers = [null, G.makeRepHandlerD1(), G.makeRepHandlerD2()];
@@ -139,13 +139,18 @@ G.makeRepHandler = function() {
         return null;
     };
     
-    handler.minModifyRep = function(fun, coefs, repData) {
+    /*
+     usually fixes translate anchor and slides other anchor to move
+     minimally
+     to be implemented by rep handlers
+    */
+    handler.modifyRep = function(fun, coefs, repData) {
         if (handlers[fun.degree]) {
-            return handlers[fun.degree].minModifyRep(fun, coefs, repData);
+            return handlers[fun.degree].modifyRep(fun, coefs, repData);
         }
         return null;
     };
-
+     
     return handler;
 }
 
@@ -185,6 +190,49 @@ G.makeRepHandlerD1 = function() {
         repData.rotate = G.makeAnchor(pixelRot.x(), pixelRot.y(), 'rotate');
         repData.degree = 1;
         return repData;
+    };
+    
+
+    handler.modifyRep = function(fun, coefs, repData) {
+        // fix translate anchor to function
+        var unitTrans = G.makePoint(0, coefs[0]);
+        var pixelTrans = G.graphGlobals.unitToPixel(unitTrans);
+        repData.translate = G.makeAnchor(pixelTrans.x(), pixelTrans.y(), 'translate');
+        
+        // slide rotate anchor to be as pixelly close as possible to old rot anchor
+        
+        var pixel1 = G.makePoint(0,0);
+        var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+        unit1.y(fun.evaluate(unit1.x()));
+        pixel1 = G.graphGlobals.unitToPixel(unit1);
+        var oldRot = repData.rotate;
+        var closestPixel = pixel1;
+        var minDist = G.dist(pixel1.x(), pixel1.y(), oldRot.x(), oldRot.y());
+        
+        while(pixel1.x() < G.graphGlobals.START_W) {
+            var dist = G.dist(pixel1.x(), pixel1.y(), oldRot.x(), oldRot.y());
+            var distToTrans = G.dist(pixel1.x(), pixel1.y(), pixelTrans.x(), pixelTrans.y());
+            if (dist < minDist && distToTrans > G.graphGlobals.ANCHOR_BUFFER
+                    && withinEdgeBuffer(pixel1)) {
+                minDist = dist;
+                closestPixel = pixel1;
+            }
+            
+            pixel1.x(pixel1.x() + G.graphGlobals.PIXEL_STEP);
+            var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+            unit1.y(fun.evaluate(unit1.x()));
+            pixel1 = G.graphGlobals.unitToPixel(unit1);
+        }
+        repData.rotate = G.makeAnchor(closestPixel.x(), closestPixel.y(), "rotate");
+
+        return repData;
+    };
+    
+    function withinEdgeBuffer(pt) {
+        var buff = G.graphGlobals.ANCHOR_BUFFER;
+        var w = G.graphGlobals.START_W;
+        var h = G.graphGlobals.START_H;
+        return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
     };
     
     return handler;
@@ -229,8 +277,49 @@ G.makeRepHandlerD2 = function(fun) {
         repData.degree = 2;
         return repData;
     };
+
+    handler.modifyRep = function(fun, coefs, repData) {
+        // fix translate anchor to function
+        var center = -1 * coefs[1] / (2*coefs[2]);
+        var unitTrans = G.makePoint(center, fun.evaluate(center));
+        var pixelTrans = G.graphGlobals.unitToPixel(unitTrans);
+        repData.translate = G.makeAnchor(pixelTrans.x(), pixelTrans.y(), "translate");
+
+        // slide rotate anchor to be as pixelly close as possible to old rot anchor
+        
+        var pixel1 = G.makePoint(0,0);
+        var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+        unit1.y(fun.evaluate(unit1.x()));
+        pixel1 = G.graphGlobals.unitToPixel(unit1);
+        var oldBend = repData.bend;
+        var closestPixel = pixel1;
+        var minDist = G.dist(pixel1.x(), pixel1.y(), oldBend.x(), oldBend.y());
+        
+        while(pixel1.x() < G.graphGlobals.START_W) {
+            var dist = G.dist(pixel1.x(), pixel1.y(), oldBend.x(), oldBend.y());
+            var distToTrans = G.dist(pixel1.x(), pixel1.y(), pixelTrans.x(), pixelTrans.y());
+            if (dist < minDist && distToTrans > G.graphGlobals.ANCHOR_BUFFER
+                    && withinEdgeBuffer(pixel1)) {
+                minDist = dist;
+                closestPixel = pixel1;
+            }
+            
+            pixel1.x(pixel1.x() + G.graphGlobals.PIXEL_STEP);
+            var unit1 = G.graphGlobals.pixelToUnit(pixel1);
+            unit1.y(fun.evaluate(unit1.x()));
+            pixel1 = G.graphGlobals.unitToPixel(unit1);
+        }
+        repData.bend = G.makeAnchor(closestPixel.x(), closestPixel.y(), "rotate");
+
+        return repData;
+    };
     
-    //rep.setRepFromCoefs(fun.coefs);
+    function withinEdgeBuffer(pt) {
+        var buff = G.graphGlobals.ANCHOR_BUFFER;
+        var w = G.graphGlobals.START_W;
+        var h = G.graphGlobals.START_H;
+        return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
+    };
     
     return handler;
 }

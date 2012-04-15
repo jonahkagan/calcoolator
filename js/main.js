@@ -17,6 +17,9 @@ G.init = function(p) {
             model.removeFunction();
         }).change();
     });
+    
+    // utility functions from processing
+    G.dist = p.dist;
 };
 
 G.color = function(r, g, b) {

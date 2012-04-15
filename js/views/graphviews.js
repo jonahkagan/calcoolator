@@ -4,6 +4,7 @@ G.graphGlobals = {
     START_W: 600,
     START_H: 600,
     ANCHOR_SIZE: 10,
+    ANCHOR_BUFFER: 20,
     EPSILON: 10,
     ORIGIN_X: 0,
     ORIGIN_Y: 0,
