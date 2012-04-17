@@ -4,11 +4,11 @@ G.makeEqnView = function () {
     var MIN_FONT_SIZE = 10,
         MAX_FONT_SIZE = 16,
         FONT_RESIZE_PCT = 0.75;
-    // Displays a text field with a function name f(x)
+
+    // Displays a text field with a function name f(x).
     // As the user types an equation, parses the equation
     // Also tries to simplify the equation if possible, and shows a
-    // simplify button if it is possible
-    //
+    // simplify button if it is possible.
     // Number coefficients in the equation are scrubbable
 
     var $content, $editor, lastLatexStr, fun;
@@ -100,7 +100,7 @@ G.makeEqnView = function () {
             refresh();
             return;
         }
-        console.log(e.which);
+        //console.log(e.which);
         var newLatexStr = $editor.mathquill("latex");
         if (newLatexStr !== lastLatexStr) {
             //console.log("old latex", lastLatexStr, 'new latex', newLatexStr);
