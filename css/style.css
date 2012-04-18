@@ -28,8 +28,8 @@ span.mathquill-rendered-math textarea:active {
 
 span.mathquill-rendered-math,
 span.mathquill-rendered-math:focus {
-    border: none;
-    box-shadow: none;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 

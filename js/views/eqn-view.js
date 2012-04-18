@@ -135,7 +135,8 @@ G.makeEqnView = function () {
         return _.reduce($editor.children(), function (seqs, span) {
             // Find the next non-zero coef
             if (span.nodeName === "SPAN" &&
-                /[0-9\.]/.test($(span).text())) // If num or dot
+                // If num, dash, or dot
+                /[0-9\.\-]/.test(fixMinus($(span).text())))
             {
                 var lastSeq = _.last(seqs);
                 if (lastSeq.type === "num") { // If last span was a num
@@ -183,8 +184,9 @@ G.makeEqnView = function () {
     function addDragHandler(spans, coefPos) {
         var orig, cur,
             val = parseFloat(_.map(spans, function (span) {
-                return $(span).text();
+                return fixMinus($(span).text());
             }).join(''));
+            console.log("val", val);
 
         var onMouseDown = function (e) {
             console.log("down");
@@ -280,9 +282,13 @@ G.makeEqnView = function () {
             .replace(/\\right/g, "")
             .replace(/\\left/g, "");
     }
-    //console.log(toEqnString([0,1,2,0]));
-    //console.log(toEqnString([0]));
     
+    // Replaces the 'minus' character with a hyphen
+    function fixMinus(str) {
+       if (str.charCodeAt(0) === 8722) { str = "-"; } 
+       return str;
+    }
+
     me.fun = function () { return fun; };
 
     return me;
