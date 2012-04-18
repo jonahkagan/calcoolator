@@ -26,7 +26,7 @@ G.makeEqnView = function () {
 
         $content = $(
             "<div class=\"eqn\">" +
-                "<span class=\"eqn-name\">" + fun.name + "</span>" +
+                "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
                 "<button class=\"eqn-remove\">X</button>" +
@@ -39,7 +39,7 @@ G.makeEqnView = function () {
             // the position of the mouse
             .mousedown(function (e) { $editor.trigger(e); });
 
-        $content.find(".eqn-name").mathquill().css("color", fun.color.toCSS());
+        $content.find(".fun-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
         $editor = $content.find(".eqn-editor")
             .mathquill("editable")

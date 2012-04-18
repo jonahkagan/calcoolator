@@ -11,3 +11,12 @@
     vertical-align: top;
     outline: none;
 }
+
+/* Fun Name */
+span.fun-name {
+    margin-right: -3px;
+}
+span.fun-name sub {
+    font-size: 80%;
+}
+

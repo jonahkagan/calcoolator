@@ -27,14 +27,6 @@
     -moz-user-select: none;
 }
 
-/* Equation Name */
-#eqns .eqn .eqn-name {
-    margin-right: -5px;
-}
-#eqns .eqn .eqn-name sub {
-    font-size: 80%;
-}
-
 /* Equation Editor */
 #eqns .eqn .eqn-editor {
     /*width: 160px;*/

@@ -17,7 +17,10 @@ G.makeTableView = function () {
             "<div class=\"tbl\"><table>" +
                 "<tr>" +
                     "<th><span>x</span></th>" +
-                    "<th><span>" + fun.name + "(x)</span></th>" +
+                    "<th>" + 
+                        "<span class=\"fun-name\">" + fun.name + "</span>" +
+                        "<span>(x)</span>" + 
+                    "</th>" +
                 "</tr>" +
                 rows.join("") +
             "</table></div>"
@@ -27,7 +30,7 @@ G.makeTableView = function () {
                 var $span = $(span);
                 //console.log($(span), $(span).is("tbl-x"));
                 $span.mathquill($span.hasClass("tbl-x") ? "editable" : "");
-                if ($span.hasClass("tbl-y")) {
+                if ($span.hasClass("tbl-y") || $span.hasClass("fun-name")) {
                     $span.css("color", fun.color.toCSS());
                 }
             });
