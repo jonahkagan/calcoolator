@@ -26,12 +26,6 @@
     border: 1px solid blue;
 }
 
-#tbls .tbl .tbl-x,
-#tbls .tbl .tbl-x:focus {
-    border: none;
-    box-shadow: none;
-}
-
 #eqns .tbl textarea,
 #eqns .tbl textarea:active {
     resize: none;

@@ -20,3 +20,16 @@ span.fun-name sub {
     font-size: 80%;
 }
 
+/* Anti-mathquill */
+span.mathquill-rendered-math textarea,
+span.mathquill-rendered-math textarea:active {
+    resize: none;
+}
+
+span.mathquill-rendered-math,
+span.mathquill-rendered-math:focus {
+    border: none;
+    box-shadow: none;
+}
+
+
