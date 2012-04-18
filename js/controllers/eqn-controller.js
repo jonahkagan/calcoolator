@@ -21,7 +21,7 @@ G.makeEqnController = function (model) {
         } else {
             // Remove the old eqn string from the changed function so
             // the view can make a new one.
-            if (event.changedFun) { event.changedFun.repData("eqn", null); }
+            if (event.changedFun) { event.changedFun.repData(me.name, null); }
 
             eqnDude.display(event.functions);
         }
@@ -29,7 +29,7 @@ G.makeEqnController = function (model) {
 
     function onEqnChange(event) {
         // Update the fun based on the new eqnStr
-        event.fun.repData("eqn", event.eqnStr);
+        event.fun.repData(me.name, event.eqnStr);
         var coefs = parser.parseAndSimplify(event.eqnStr);
         if (coefs) {
             console.log("new coefs", coefs);
@@ -38,7 +38,7 @@ G.makeEqnController = function (model) {
             console.log("no parse for " + event.eqnStr);
             event.fun.coefs(null);
         }
-        model.changeFunction(event.fun, "eqn");
+        model.changeFunction(event.fun, me.name);
     }
 
     return me;

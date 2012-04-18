@@ -1,6 +1,9 @@
 #eqns {
-    display: inline-block;
     vertical-align: top;
+}
+
+#left {
+    display: inline-block;
 }
 
 #graphCanvas {

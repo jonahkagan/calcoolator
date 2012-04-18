@@ -10,9 +10,9 @@ G.makeEqnDudeView = function () {
         _.each(funs, function (fun) {
             var eqv = G.makeEqnView();
             eqv.display(fun, $content);
-            bubble(eqv, "eqnChanged");
-            bubble(eqv, "eqnSelected");
-            bubble(eqv, "eqnRemoved");
+            me.bubble(eqv, "eqnChanged");
+            me.bubble(eqv, "eqnSelected");
+            me.bubble(eqv, "eqnRemoved");
             eqvs.push(eqv);
         });
 
@@ -35,14 +35,6 @@ G.makeEqnDudeView = function () {
             eqv.updateSelect();
         });
     };
-
-    // Subscribes to an event on the eqn view and bubbles the same
-    // event up to the controller
-    function bubble(eqv, eventName) {
-        eqv.subscribe(eventName, function (e) {
-            me.broadcast(eventName, e);
-        });
-    }
 
     return me;
 };

@@ -13,17 +13,20 @@
     
     <script src="js/models/funrep.js"></script>
     <script src="js/models/fungraphrep.js"></script>
-    <script src="js/models/fun-eqn-rep.js"></script>
     <script src="js/models/function.js"></script>
     <script src="js/models/model.js"></script>
 
     <script src="js/controllers/controller.js"></script>
     <script src="js/controllers/graphcontroller.js"></script>
     <script src="js/controllers/eqn-controller.js"></script>
+    <script src="js/controllers/table-controller.js"></script>
+
     <script src="js/views/view.js"></script>
     <script src="js/views/graphviews.js"></script>
     <script src="js/views/eqn-dude-view.js"></script>
     <script src="js/views/eqn-view.js"></script>
+    <script src="js/views/table-dude-view.js"></script>
+    <script src="js/views/table-view.js"></script>
 
     <script src="js/main.js"></script>
     <script src="js/parser.js"></script>
@@ -36,6 +39,7 @@
 
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/table-style.css"/>
     
     <style>
         #opts {
@@ -48,7 +52,11 @@
 <body>
 
 
-    <div id="eqns"></div>
+    <div id="left">
+        <div id="eqns"></div>
+        <div id="tbls"></div>
+    </div>
+
     <canvas id="graphCanvas"></canvas>
     <input type="button" value="+" id="graphPlus"/>
 

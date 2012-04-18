@@ -34,6 +34,14 @@ G.makeEventManager = function() {
         }
     };
 
+    // Subscribes to an event on the other manager and bubbles
+    // the same event (up) to this manager 
+    eventManager.bubble = function (otherMan, eventName) {
+        otherMan.subscribe(eventName, function (e) {
+            eventManager.broadcast(eventName, e);
+        });
+    };
+
     function makeEvent(e) {
         var event = {
             name: e

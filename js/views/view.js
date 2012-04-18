@@ -6,6 +6,7 @@ G.makeDudeView = function() {
     dudeView.eventManager = G.makeEventManager();
     dudeView.subscribe = dudeView.eventManager.subscribe;
     dudeView.broadcast = dudeView.eventManager.broadcast;
+    dudeView.bubble = dudeView.eventManager.bubble;
     
     dudeView.display = function(functions) {
         throw "display not implemented!!";
