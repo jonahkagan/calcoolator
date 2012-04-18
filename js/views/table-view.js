@@ -10,7 +10,7 @@ G.makeTableView = function () {
                         G.u.round(2, pt.x()) +
                     "</span></td>" +
                     "<td><span class=\"tbl-y\">" +
-                        G.u.round(2, pt.y()) +
+                        (pt.y() !== null ? G.u.round(2, pt.y()) : "?") +
                     "</span></td></tr>";
         });
         $content = $(

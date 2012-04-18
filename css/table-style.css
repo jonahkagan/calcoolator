@@ -10,15 +10,16 @@
 
 #tbls .tbl table td {
     padding: 5px;
+    text-align: right;
 }
 
 #tbls .tbl table th {
-    border-bottom: 1px solid darkGray;
+    border-bottom: 2px solid black;
 }
 
 #tbls .tbl table td:first-child,
 #tbls .tbl table th:first-child {
-    border-right: 1px solid darkGray;
+    border-right: 2px solid black;
 }
 
 #tbls .tbl .seed {

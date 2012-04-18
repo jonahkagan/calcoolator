@@ -8,8 +8,8 @@
     padding: 10px 10px;
     position: relative;
     width: 230px;
-    white-space: nowrap;
-    overflow-x: auto;
+    /*white-space: nowrap;*/
+    overflow: none;
 }
 
 #eqns .new-eqn {
