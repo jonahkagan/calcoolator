@@ -1,0 +1,37 @@
+#tbls .tbl {
+    display: inline-block;
+    border: 1px solid darkGray;
+    padding: 5px;
+}
+
+#tbls .tbl table {
+    border-collapse: collapse;
+}
+
+#tbls .tbl table td {
+    padding: 5px;
+}
+
+#tbls .tbl table th {
+    border-bottom: 1px solid darkGray;
+}
+
+#tbls .tbl table td:first-child,
+#tbls .tbl table th:first-child {
+    border-right: 1px solid darkGray;
+}
+
+#tbls .tbl .seed {
+    border: 1px solid blue;
+}
+
+#tbls .tbl .tbl-x,
+#tbls .tbl .tbl-x:focus {
+    border: none;
+    box-shadow: none;
+}
+
+#eqns .tbl textarea,
+#eqns .tbl textarea:active {
+    resize: none;
+}
