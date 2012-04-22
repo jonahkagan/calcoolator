@@ -1,3 +1,8 @@
+#tbls {
+    position: absolute;
+    right: 0px;
+}
+
 #tbls .tbl {
     display: inline-block;
     border: 1px solid darkGray;

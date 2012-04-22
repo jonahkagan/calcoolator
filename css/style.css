@@ -1,4 +1,9 @@
+body {
+    margin: 0px;
+}
+
 #eqns {
+    position: absolute;
     vertical-align: top;
 }
 
@@ -10,6 +15,16 @@
     display: inline-block;
     vertical-align: top;
     outline: none;
+}
+
+#graphPlus {
+    position: absolute;
+    top: 0px;
+}
+
+#opts {
+    position: absolute;
+    left: 300px;
 }
 
 /* Fun Name */
