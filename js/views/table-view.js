@@ -1,7 +1,7 @@
 G.makeTableView = function () {
     var me = G.makeRepView();
 
-    var $content, $seeds = [], fun;
+    var $content, fun;
 
     me.display = function (afun, $parent) {
         fun = afun;
@@ -33,7 +33,7 @@ G.makeTableView = function () {
 
         $table.find("tr").each(function (i, row) {
             if (i > 0 && i <= fun.degree+1) {
-                $seeds.push($(row).addClass("seed"));
+                $(row).addClass("seed");
             }
         });
 
@@ -45,13 +45,15 @@ G.makeTableView = function () {
             .mathquill()
             .css("color", fun.color.toCSS());
 
+        $table.find(".tbl-y")
+            .css("color", fun.color.toCSS());
+
+        $table.find("tr").not(".seed").find(".tbl-y")
+            .mathquill();
+
         $table.find(".seed .tbl-y")
             .mathquill("editable")
             .keyup(onKeyUp);
-
-        $table.find(".tbl-y")
-            .mathquill()
-            .css("color", fun.color.toCSS());
 
         return $table;
     }
@@ -70,8 +72,10 @@ G.makeTableView = function () {
             .rest() // drop the header row
             .map(function (row) {
                 var coords = $(row).find("td > span"),
-                    x = parseFloat($(coords[0]).mathquill("latex")),
-                    y = parseFloat($(coords[1]).mathquill("latex"));
+                    x = $(coords[0]).mathquill("latex"),
+                    y = $(coords[1]).mathquill("latex");
+                x = (x !== "") ? parseFloat(x) : undefined;
+                y = (y !== "") ? parseFloat(y) : undefined;
                 return G.makePoint(x, y);
             }).value();
 
