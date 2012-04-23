@@ -61,9 +61,13 @@ G.makeTableView = function () {
     }
 
     me.update = function () {
-        $table = createTable();
-        $content.replaceWith($table);
-        $content = $table;
+        //$table = createTable();
+        //$content.replaceWith($table);
+        //$content = $table;
+        var ys = _.map(fun.repData("table"), function (pt) { return pt.y(); });
+        $content.find(".tbl-y").each(function (i, span) {
+            $(span).mathquill("latex", ys[i] + "");
+        });
     };
 
     me.updateSelect = function () {
@@ -74,10 +78,13 @@ G.makeTableView = function () {
             .rest() // drop the header row
             .map(function (row) {
                 var coords = $(row).find("td > span"),
-                    x = $(coords[0]).mathquill("latex"),
-                    y = $(coords[1]).mathquill("latex");
-                x = (x !== "") ? parseFloat(x) : undefined;
-                y = (y !== "") ? parseFloat(y) : undefined;
+                    x = parseFloat($(coords[0]).mathquill("latex")),
+                    y = parseFloat($(coords[1]).mathquill("latex"));
+                if (_.isNaN(x) || _.isNaN(y)) {
+                    $(row).addClass("nan");
+                    return;
+                }
+                $(row).removeClass("nan");
                 return G.makePoint(x, y);
             }).value();
 
