@@ -95,8 +95,9 @@ G.makeGraphController = function(model, p) {
             controller.onDudeChange(data);
         }
         else if (data.mouseX && data.mouseY) {
+            var snap = dude.snapToGridOn();
             for (r in reps) {
-                reps[r].drag(data.mouseX, data.mouseY);
+                reps[r].drag(data.mouseX, data.mouseY, snap);
             }
         }
     }
@@ -184,7 +185,6 @@ G.makeRepHandlerD1 = function() {
     
     handler.getNewCoefsFromRep = function(fun, repData) {
         var coefs = [];
-        console.log(repData);
         if (repData.changed == 'rotate') {
             var unitRot = G.graphGlobals.pixelToUnit(repData.rotate);
             var unitTrans = G.graphGlobals.pixelToUnit(repData.translate);

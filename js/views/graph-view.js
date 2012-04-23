@@ -75,11 +75,15 @@ G.makeGraphRep = function(fun, p) {
         }
     }
     
-    rep.drag = function(mouseX, mouseY) {
+    rep.drag = function(mouseX, mouseY, snap) {
         // drag anchor
         //console.log("before" + repData.rotate.x() + ", " + repData.rotate.y());
         for (a in repData) {
             if (repData[a].isSelected) {
+                if (snap) {
+                    mouseX = G.graphGlobals.nearestX(mouseX);
+                    mouseY = G.graphGlobals.nearestY(mouseY);
+                }
                 repData[a].x(mouseX);
                 repData[a].y(mouseY);
                 repData.changed = repData[a].name;

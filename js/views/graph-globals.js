@@ -39,8 +39,24 @@ G.graphGlobals = {
         return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
     },
     
-    snapToGridOn: function() {
-        
+    nearestX: function(x) {
+        var lineSpace = (40 + G.graphGlobals.SCALE % 40) / 2;
+        var distFromOrigin = x - G.graphGlobals.ORIGIN_X;
+        var lineBefore = Math.floor(distFromOrigin / lineSpace);
+        var lineAfter = lineBefore + 1;        
+        lineBefore = lineBefore * lineSpace + G.graphGlobals.ORIGIN_X;
+        lineAfter = lineAfter * lineSpace + G.graphGlobals.ORIGIN_X;
+        return (Math.abs(x - lineBefore) < Math.abs(x - lineAfter)) ? lineBefore : lineAfter;
+    },
+    
+    nearestY: function(y) {
+        var lineSpace = (40 + G.graphGlobals.SCALE % 40) / 2;
+        var distFromOrigin = y - G.graphGlobals.ORIGIN_Y;
+        var lineBefore = Math.floor(distFromOrigin / lineSpace);
+        var lineAfter = lineBefore + 1;        
+        lineBefore = lineBefore * lineSpace + G.graphGlobals.ORIGIN_Y;
+        lineAfter = lineAfter * lineSpace + G.graphGlobals.ORIGIN_Y;
+        return (Math.abs(y - lineBefore) < Math.abs(y - lineAfter)) ? lineBefore : lineAfter;
     }
     
 };

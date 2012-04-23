@@ -90,6 +90,9 @@ G.makeGraphDude = function(p) {
         drawGrid();
     };
     
+    graphDude.snapToGridOn = function() {
+        return $("#snapToGrid").prop("checked");
+    };
     
     // SET UP PROCESSING
     p.setup = function () {
