@@ -141,7 +141,7 @@ G.makeGraphDude = function(p) {
             }
             G.graphGlobals.SCALE = G.graphGlobals.SCROLL_SCALE / 40.0;
             */
-            graphDude.broadcast("dudeChanged");
+            graphDude.broadcast("dudeChanged", {action: "zoom"});
             event.preventDefault();
         }
     }

@@ -30,6 +30,17 @@ G.graphGlobals = {
         var px = (pt.x() * ppu) + G.graphGlobals.ORIGIN_X;
         var py = -1 * (pt.y() * ppu) + G.graphGlobals.ORIGIN_Y;
         return G.makePoint(px, py);
+    },
+    
+    withinEdgeBuffer: function(pt) {
+        var buff = G.graphGlobals.ANCHOR_BUFFER;
+        var w = G.graphGlobals.START_W;
+        var h = G.graphGlobals.START_H;
+        return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
+    },
+    
+    snapToGridOn: function() {
+        
     }
     
 };

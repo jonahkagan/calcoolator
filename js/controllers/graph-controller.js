@@ -19,6 +19,7 @@ G.makeGraphController = function(model, p) {
     };
     
     controller.onDudeChange = function(event) {
+        console.log(event);
         dude.display();
         if (functions) {
             reps = [];
@@ -30,7 +31,13 @@ G.makeGraphController = function(model, p) {
                     fun.repData("graph", repHandler.getRepFromCoefs(fun, fun.coefs()));
                 }
                 else {
-                    fun.repData("graph", repHandler.modifyRep(fun, fun.coefs(), fun.repData("graph")));
+                    if (event.action === "pan") {
+                        var newRep = repHandler.translateRep(fun, fun.coefs(), fun.repData("graph"), event.dx, event.dy);
+                        fun.repData("graph", newRep);
+                    }
+                    else if (event.action === "zoom") {
+                        fun.repData("graph", repHandler.modifyRep(fun, fun.coefs(), fun.repData("graph")));
+                    }
                 }
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
@@ -84,7 +91,8 @@ G.makeGraphController = function(model, p) {
         if (!anchorSelected) {
             G.graphGlobals.ORIGIN_X += data.dx;
             G.graphGlobals.ORIGIN_Y += data.dy;
-            controller.onDudeChange();
+            data["action"] = "pan";
+            controller.onDudeChange(data);
         }
         else if (data.mouseX && data.mouseY) {
             for (r in reps) {
@@ -151,6 +159,23 @@ G.makeRepHandler = function() {
         return null;
     };
      
+    /*
+     translates anchors. if anchor is translated off screen, modifies
+    */
+    handler.translateRep = function(fun, coefs, repData, dx, dy) {
+        for (a in repData) {
+            var rep = repData[a];
+            if (rep.x) { // is an anchor
+                rep.x(rep.x() + dx);
+                rep.y(rep.y() + dy);
+                if (!G.graphGlobals.withinEdgeBuffer(rep)) {
+                    return handler.modifyRep(fun, coefs, repData);
+                }
+            }
+        }
+        return repData;
+    };
+    
     return handler;
 }
 
@@ -213,7 +238,7 @@ G.makeRepHandlerD1 = function() {
             var dist = G.dist(pixel1.x(), pixel1.y(), oldRot.x(), oldRot.y());
             var distToTrans = G.dist(pixel1.x(), pixel1.y(), pixelTrans.x(), pixelTrans.y());
             if (dist < minDist && distToTrans > G.graphGlobals.ANCHOR_BUFFER
-                    && withinEdgeBuffer(pixel1)) {
+                    && G.graphGlobals.withinEdgeBuffer(pixel1)) {
                 minDist = dist;
                 closestPixel = pixel1;
             }
@@ -228,12 +253,7 @@ G.makeRepHandlerD1 = function() {
         return repData;
     };
     
-    function withinEdgeBuffer(pt) {
-        var buff = G.graphGlobals.ANCHOR_BUFFER;
-        var w = G.graphGlobals.START_W;
-        var h = G.graphGlobals.START_H;
-        return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
-    };
+
     
     return handler;
 }
@@ -299,7 +319,7 @@ G.makeRepHandlerD2 = function(fun) {
             var dist = G.dist(pixel1.x(), pixel1.y(), oldBend.x(), oldBend.y());
             var distToTrans = G.dist(pixel1.x(), pixel1.y(), pixelTrans.x(), pixelTrans.y());
             if (dist < minDist && distToTrans > G.graphGlobals.ANCHOR_BUFFER
-                    && withinEdgeBuffer(pixel1)) {
+                    && G.graphGlobals.withinEdgeBuffer(pixel1)) {
                 minDist = dist;
                 closestPixel = pixel1;
             }
@@ -313,14 +333,7 @@ G.makeRepHandlerD2 = function(fun) {
 
         return repData;
     };
-    
-    function withinEdgeBuffer(pt) {
-        var buff = G.graphGlobals.ANCHOR_BUFFER;
-        var w = G.graphGlobals.START_W;
-        var h = G.graphGlobals.START_H;
-        return pt.x() > buff && pt.x() < w - buff && pt.y() > buff && pt.y() < h - buff;
-    };
-    
+
     return handler;
 }
 
@@ -338,6 +351,7 @@ G.makeAnchor = function(x, y, name) {
         if (x !== undefined) {
             _dx = x - anchor.x();
         }
+        
         return _pt.x(x);
     };
     
