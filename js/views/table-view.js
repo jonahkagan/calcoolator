@@ -41,8 +41,10 @@ G.makeTableView = function () {
             .mathquill("editable")
             .keyup(onKeyUp)
 
+        $table.find("th span")
+            .mathquill();
+
         $table.find(".fun-name")
-            .mathquill()
             .css("color", fun.color.toCSS());
 
         $table.find(".tbl-y")
