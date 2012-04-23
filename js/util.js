@@ -30,5 +30,14 @@ G.u = {
         } 
         return -1;
     },
+
+    // Returns true if lst1 and lst2 have the same length and are
+    // are pairwise equal according to the given equality test.
+    listEquals: function (lst1, lst2, equals) {
+        return lst1.length === lst2.length &&
+            _.all(_.zip(lst1, lst2), function (pair) {
+                return equals(pair[0], pair[1]);
+            });
+    },
     
 };

@@ -12,14 +12,12 @@ G.makeTableController = function (model) {
     tableDude.display();
 
     me.onUpdate = function (event) {
-        // Only redisplay eqns if another representation
-        // submitted the change
+        if (event.changedFun) { evalPts(event.changedFun); }
         if (event.src === me.name && event.changedFun) {
             tableDude.changeTable(event.changedFun);
         } else if (event.selectedFun) {
             tableDude.selectTable(event.selectedFun);
         } else {
-            if (event.changedFun) { evalPts(event.changedFun); }
             _.each(event.functions, function (fun) {
                 if (!fun.repData(me.name)) {
                     fun.repData(me.name, _.map(_.range(NUM_PTS), G.makePoint));
@@ -33,16 +31,23 @@ G.makeTableController = function (model) {
 
     function onTableChange(event) {
         event.fun.repData(me.name, event.pts);
-        var coefs = event.fun.fitToPoints(
-            _.first(event.pts, event.fun.degree + 1));
-        if (coefs) {
-            console.log("new coefs", coefs);
-            event.fun.coefs(coefs);
-        } else {
-            console.log("no fun from points", event.xs);
-            event.fun.coefs(null);
+        if (event.coord === "x") {
+            // If x coord changes, just reevaluate the points
+            evalPts(event.fun);
+            tableDude.changeTable(event.fun);
+        } else if (event.coord === "y") {
+            // If y coord changes, then we change the function
+            var coefs = event.fun.fitToPoints(
+                _.first(event.pts, event.fun.degree + 1));
+            if (coefs) {
+                console.log("new coefs", coefs);
+                event.fun.coefs(coefs);
+            } else {
+                console.log("no fun from points", event.xs);
+                event.fun.coefs(null);
+            }
+            model.changeFunction(event.fun, me.name);
         }
-        model.changeFunction(event.fun, me.name);
     }
     
     function evalPts(fun) {

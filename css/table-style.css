@@ -31,6 +31,10 @@
     border: 1px solid blue;
 }
 
+#tbls .tbl .nan {
+    border: 1px solid red;
+}
+
 #eqns .tbl textarea,
 #eqns .tbl textarea:active {
     resize: none;

@@ -5,6 +5,11 @@ G.makeTableView = function () {
 
     me.display = function (afun, $parent) {
         fun = afun;
+        $content = createTable();
+        $content.appendTo($parent);
+    };
+
+    function createTable() {
         var rows = _.map(fun.repData("table"), function (pt) {
             return "<tr><td><span class=\"tbl-x\">" +
                         G.u.round(2, pt.x()) +
@@ -13,7 +18,7 @@ G.makeTableView = function () {
                         (pt.y() !== null ? G.u.round(2, pt.y()) : "?") +
                     "</span></td></tr>";
         });
-        $content = $(
+        $table = $(
             "<div class=\"tbl\"><table>" +
                 "<tr>" +
                     "<th><span>x</span></th>" +
@@ -25,27 +30,74 @@ G.makeTableView = function () {
                 rows.join("") +
             "</table></div>"
         ); 
-        $content.find("tr").each(function (i, row) {
-            $(row).find("span").each(function (j, span) {
-                var $span = $(span);
-                //console.log($(span), $(span).is("tbl-x"));
-                $span.mathquill($span.hasClass("tbl-x") ? "editable" : "");
-                if ($span.hasClass("tbl-y") || $span.hasClass("fun-name")) {
-                    $span.css("color", fun.color.toCSS());
-                }
-            });
+
+        $table.find("tr").each(function (i, row) {
             if (i > 0 && i <= fun.degree+1) {
                 $(row).addClass("seed");
             }
         });
-        $content.appendTo($parent);
-    };
+
+        $table.find(".tbl-x")
+            .mathquill("editable")
+            .keyup(onKeyUp)
+
+        $table.find("th span")
+            .mathquill();
+
+        $table.find(".fun-name")
+            .css("color", fun.color.toCSS());
+
+        $table.find(".tbl-y")
+            .css("color", fun.color.toCSS());
+
+        $table.find("tr").not(".seed").find(".tbl-y")
+            .mathquill();
+
+        $table.find(".seed .tbl-y")
+            .mathquill("editable")
+            .keyup(onKeyUp);
+
+        return $table;
+    }
 
     me.update = function () {
+        //$table = createTable();
+        //$content.replaceWith($table);
+        //$content = $table;
+        var ys = _.map(fun.repData("table"), function (pt) { return pt.y(); });
+        $content.find(".tbl-y").each(function (i, span) {
+            $(span).mathquill("latex", ys[i] + "");
+        });
     };
 
     me.updateSelect = function () {
     };
+
+    function onKeyUp(e) {
+        var newPts = _.chain($content.find("tr"))
+            .rest() // drop the header row
+            .map(function (row) {
+                var coords = $(row).find("td > span"),
+                    x = parseFloat($(coords[0]).mathquill("latex")),
+                    y = parseFloat($(coords[1]).mathquill("latex"));
+                if (_.isNaN(x) || _.isNaN(y)) {
+                    $(row).addClass("nan");
+                    return;
+                }
+                $(row).removeClass("nan");
+                return G.makePoint(x, y);
+            }).value();
+
+        if (_.all(newPts, function (pt) { return pt !== undefined; }) &&
+            !G.u.listEquals(newPts, fun.repData("table"), G.makePoint.equals))
+        {
+            me.broadcast("tableChanged", {
+                fun: fun,
+                pts: newPts,
+                coord: $(e.currentTarget).hasClass("tbl-x") ? "x" : "y"
+            });
+        }
+    }
 
     function selectFunction(e) {
         me.broadcast("eqnSelected", { fun: fun });

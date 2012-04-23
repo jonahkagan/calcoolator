@@ -72,7 +72,7 @@ G.makeFun = function(name, initCoefs) {
 
 G.makePoint = function(x, y) {
     if (x === undefined || y === undefined) {
-        throw "cannot make point with undefined x,y";
+        return undefined;
     }
     
     var pt = {};
@@ -93,5 +93,14 @@ G.makePoint = function(x, y) {
         return _y;
     }
     
+    pt.toString = function () {
+        return "(" + x + ", " + y + ")";
+    };
+
     return pt;
 }
+
+G.makePoint.equals = function (pt1, pt2) {
+    return pt1.x() === pt2.x() && pt1.y() === pt2.y();
+};
+    
