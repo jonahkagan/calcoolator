@@ -9,30 +9,69 @@ G.makeGraphDude = function(p) {
     
     function drawGrid() {
         p.background(250);
-        
+
+
         // Gridlines
         p.stroke(230);
         p.strokeWeight(1);
         var x = G.graphGlobals.ORIGIN_X;
-        var lineSpace = 20 + G.graphGlobals.SCALE % 50;
+        var lineSpace = 40 + G.graphGlobals.SCALE % 40;
+        var lineCount = 0;
+        var unitCount = 0;
+
         while (x >= 0) {
+            if (lineCount % 4 === 0 && lineCount > 0) {
+                p.stroke(170);
+                var label = (G.graphGlobals.ORIGIN_X - x) / G.graphGlobals.pixelsPerUnit();
+                p.text("-" + label, x+4, G.graphGlobals.ORIGIN_Y + 17);
+            }
+            else {
+                p.stroke(230);
+            }
             p.line(x, 0, x, p.height);
             x -= lineSpace;
+            lineCount++;
         }
+        lineCount = 0;
         x = G.graphGlobals.ORIGIN_X;
         while (x <= p.width) {
+            if (lineCount % 4 === 0) {
+                p.stroke(170);
+                var label = (x - G.graphGlobals.ORIGIN_X) / G.graphGlobals.pixelsPerUnit();
+                p.text(label, x+4, G.graphGlobals.ORIGIN_Y + 17);
+            }
+            else {
+                p.stroke(230);
+            }
             p.line(x, 0, x, p.height);
             x += lineSpace;
+            lineCount++;
         }
         var y = G.graphGlobals.ORIGIN_Y;
+        lineCount = 0;
         while (y >= 0) {
+            if (lineCount % 4 === 0) {
+                p.stroke(170)
+            }
+            else {
+                p.stroke(230);
+            }
             p.line(0, y, p.width, y);
             y -= lineSpace;
+            lineCount++;
         }
         y = G.graphGlobals.ORIGIN_Y;
+        lineCount = 0;
         while (y <= p.height) {
+            if (lineCount % 4 === 0) {
+                p.stroke(170)
+            }
+            else {
+                p.stroke(230);
+            }
             p.line(0, y, p.width, y);
             y += lineSpace;
+            lineCount++;
         }
 
 
@@ -41,7 +80,7 @@ G.makeGraphDude = function(p) {
         p.line(G.graphGlobals.ORIGIN_X, 0, G.graphGlobals.ORIGIN_X, p.height);
         p.line(0, G.graphGlobals.ORIGIN_Y, p.width, G.graphGlobals.ORIGIN_Y);
     }
-    
+
     graphDude.display = function(functions) {
         drawGrid();
     };
@@ -54,6 +93,7 @@ G.makeGraphDude = function(p) {
         G.graphGlobals.ORIGIN_Y = p.height/2;
         p.smooth();
         p.noLoop();
+        p.textFont(p.loadFont("lib/font/Symbola.ttf"));
         drawGrid();
     };
     
@@ -89,8 +129,18 @@ G.makeGraphDude = function(p) {
     
     window.onmousewheel = function(event) {
         if (event.target.id === "graphCanvas") {
-            //G.graphGlobals.SCALE = Math.max(G.graphGlobals.SCALE + event.wheelDeltaY/5, 20);
-            G.graphGlobals.SCALE += event.wheelDeltaY/5;
+            G.graphGlobals.SCALE = Math.max(G.graphGlobals.SCALE + event.wheelDeltaY/5, 20);
+            //G.graphGlobals.SCALE += event.wheelDeltaY/5;
+            /*
+            console.log(event.wheelDeltaY);
+            if (event.wheelDeltaY > 0) {
+                G.graphGlobals.SCROLL_SCALE += 20;
+            }
+            else {
+                G.graphGlobals.SCROLL_SCALE -= 20;
+            }
+            G.graphGlobals.SCALE = G.graphGlobals.SCROLL_SCALE / 40.0;
+            */
             graphDude.broadcast("dudeChanged");
             event.preventDefault();
         }

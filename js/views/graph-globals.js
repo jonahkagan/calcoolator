@@ -1,5 +1,9 @@
 G.graphGlobals = {
-    SCALE: 40,
+    SCALE: 40, // -1, 0, 1, 2, ...
+    SCROLL_SCALE: 0, // -40, 0, 40, 80, ...
+    STARTING_UNIT: 40,
+    MIN_SQUARE_SIZE: 40,
+    MAX_SQUARE_SIZE: 80,
     PIXEL_STEP: 1,
     START_W: $(window).width(),
     START_H: $(window).height(),
@@ -9,15 +13,22 @@ G.graphGlobals = {
     ORIGIN_X: 0,
     ORIGIN_Y: 0,
     
+    pixelsPerUnit: function() {
+        return G.graphGlobals.SCALE;
+        //return G.graphGlobals.STARTING_UNIT*2.0^G.graphGlobals.SCALE;
+    },
+    
     pixelToUnit: function(pt) {
-        var ux = (pt.x() - G.graphGlobals.ORIGIN_X) / G.graphGlobals.SCALE;
-        var uy = -1 * (pt.y() - G.graphGlobals.ORIGIN_Y) / G.graphGlobals.SCALE;
+        var ppu = G.graphGlobals.pixelsPerUnit();
+        var ux = (pt.x() - G.graphGlobals.ORIGIN_X) / ppu;
+        var uy = -1 * (pt.y() - G.graphGlobals.ORIGIN_Y) / ppu;
         return G.makePoint(ux, uy);
     },
 
     unitToPixel: function(pt) {
-        var px = (pt.x() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_X;
-        var py = -1 * (pt.y() * G.graphGlobals.SCALE) + G.graphGlobals.ORIGIN_Y;
+        var ppu = G.graphGlobals.pixelsPerUnit();
+        var px = (pt.x() * ppu) + G.graphGlobals.ORIGIN_X;
+        var py = -1 * (pt.y() * ppu) + G.graphGlobals.ORIGIN_Y;
         return G.makePoint(px, py);
     }
     
