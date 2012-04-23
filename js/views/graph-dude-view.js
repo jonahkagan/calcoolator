@@ -14,6 +14,7 @@ G.makeGraphDude = function(p) {
         // Gridlines
         p.stroke(230);
         p.strokeWeight(1);
+        p.fill(170);
         var x = G.graphGlobals.ORIGIN_X;
         var lineSpace = 40 + G.graphGlobals.SCALE % 40;
         var lineCount = 0;
@@ -50,8 +51,10 @@ G.makeGraphDude = function(p) {
         var y = G.graphGlobals.ORIGIN_Y;
         lineCount = 0;
         while (y >= 0) {
-            if (lineCount % 4 === 0) {
-                p.stroke(170)
+            if (lineCount % 4 === 0 && lineCount !== 0) {
+                p.stroke(170);
+                var label = (G.graphGlobals.ORIGIN_Y - y) / G.graphGlobals.pixelsPerUnit();
+                p.text(label, G.graphGlobals.ORIGIN_X + 4, y-1);
             }
             else {
                 p.stroke(230);
@@ -63,8 +66,10 @@ G.makeGraphDude = function(p) {
         y = G.graphGlobals.ORIGIN_Y;
         lineCount = 0;
         while (y <= p.height) {
-            if (lineCount % 4 === 0) {
-                p.stroke(170)
+            if (lineCount % 4 === 0 && lineCount !== 0) {
+                p.stroke(170);
+                var label = (G.graphGlobals.ORIGIN_Y - y) / G.graphGlobals.pixelsPerUnit();
+                p.text(label, G.graphGlobals.ORIGIN_X + 4, y-1);
             }
             else {
                 p.stroke(230);
