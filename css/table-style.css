@@ -35,6 +35,10 @@
     border: 1px solid red;
 }
 
+#tbls .selected.tbl {
+    box-shadow: #68B4DF 0 0 2px 1px;
+}
+
 #eqns .tbl textarea,
 #eqns .tbl textarea:active {
     resize: none;

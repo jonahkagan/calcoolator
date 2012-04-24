@@ -8,6 +8,7 @@ G.makeTableView = function () {
         fun = afun;
         $content = createTable();
         $content.appendTo($parent);
+        me.updateSelect();
     };
 
     function createTable() {
@@ -58,6 +59,8 @@ G.makeTableView = function () {
             .mathquill("editable")
             .keyup(onKeyUp);
 
+        $table.click(selectFunction);
+
         return $table;
     }
 
@@ -72,6 +75,8 @@ G.makeTableView = function () {
     };
 
     me.updateSelect = function () {
+        console.log("update", fun.name);
+        $content.toggleClass("selected", fun.isSelected);
     };
 
     function onKeyUp(e) {
@@ -101,13 +106,13 @@ G.makeTableView = function () {
     }
 
     function selectFunction(e) {
-        me.broadcast("eqnSelected", { fun: fun });
+        me.broadcast("tableSelected", { fun: fun });
         // Stop bubbling so we don't select twice/infinite loop
         e.stopPropagation();
     }
 
     function removeFunction(e) {
-        me.broadcast("eqnRemoved", { fun: fun });
+        me.broadcast("tableRemoved", { fun: fun });
         // Stop bubbling to avoid selecting when we should be removing
         e.stopPropagation();
     }
