@@ -64,12 +64,12 @@ G.makeTableView = function () {
             .mathquill("editable")
             .keyup(onKeyUp);
 
-        $table.find(".remove")
+        var $remove = $table.find(".remove")
             .hide()
             .click(removeFunction)
             .mousedown(function (e) { e.stopPropagation(); });
 
-        $content.hover(function (e) { $remove.show(); },
+        $table.hover(function (e) { $remove.show(); },
                        function (e) { $remove.hide(); });
 
 
