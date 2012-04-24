@@ -19,11 +19,10 @@
 }
 
 #eqns .new-eqn {
-    background: lightGray;
     color: gray;
     cursor: default;
-    text-align: center;
-    padding-top: 10px;
+    padding: 10px 10px 10px 20px;
+    border-bottom: 1px solid darkGray;
 }
 
 #eqns .new-eqn,
@@ -55,14 +54,6 @@
     cursor: col-resize;
 }
 
-/* Remove button */
-#eqns .eqn .eqn-remove {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    font-size: 8px;
-}
-
 /* Special classes */
 #eqns .eqn .parse-error.eqn-editor {
     color: red;
@@ -72,4 +63,3 @@
     /*border: 1px solid black;*/
     box-shadow: #B4F285 0 0 2px 1px;
 }
-

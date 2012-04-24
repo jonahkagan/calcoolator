@@ -24,7 +24,7 @@ G.makeEqnView = function () {
              toEqnString(fun.coefs());
         //console.log('"' + displayEqn + '"');
 
-        $remove = $("<button class=\"eqn-remove\">X</button>");
+        $remove = $("<div class=\"eqn-remove\">X</div>");
         $remove.hide();
         $content = $(
             "<div class=\"eqn\">" +
