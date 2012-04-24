@@ -1,13 +1,19 @@
-#eqns {
+#eqns-bg {
     width: 250px;
+}
+
+#eqns {
+    position: absolute;
+    width: 250px;
+    height: inherit;
     border: 1px solid darkGray;
 }
 
 #eqns .eqn {
     border-bottom: 1px solid darkGray;
-    padding: 10px 10px;
+    padding: 10px 10px 10px 20px;
     position: relative;
-    width: 230px;
+    width: 220px;
     /*white-space: nowrap;*/
     overflow: none;
 }
@@ -64,6 +70,6 @@
 
 #eqns .selected.eqn {
     /*border: 1px solid black;*/
-    box-shadow: #68B4DF 0 0 2px 1px;
+    box-shadow: #B4F285 0 0 2px 1px;
 }
 

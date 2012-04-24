@@ -24,20 +24,24 @@ G.makeEqnView = function () {
              toEqnString(fun.coefs());
         //console.log('"' + displayEqn + '"');
 
+        $remove = $("<button class=\"eqn-remove\">X</button>");
+        $remove.hide();
         $content = $(
             "<div class=\"eqn\">" +
                 "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
-                "<button class=\"eqn-remove\">X</button>" +
             "</div>"
             )
+            .append($remove)
             .appendTo($parent)
             .keydown(onKeyDown)
             .keyup(onKeyUp)
             // Pass the same event through to the editor so it knows
             // the position of the mouse
-            .mousedown(function (e) { $editor.trigger(e); });
+            .mousedown(function (e) { $editor.trigger(e); })
+
+            .hover(function(e) {$content.find(".eqn-remove").show()}, function(e) {$content.find(".eqn-remove").hide()});
 
         $content.find(".fun-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
@@ -205,9 +209,8 @@ G.makeEqnView = function () {
 
         colorCoefs(spans);
 
-        if (G.opts.colorCoefs) {
-            $(spans).css("color", fun.color.toCSS());
-        }
+        $(spans).css("color", fun.color.toCSS());
+        
 
         var onMouseMove = function (e) {
             console.log("move", fun.name);
