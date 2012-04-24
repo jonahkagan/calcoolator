@@ -17,11 +17,17 @@ G.makeEqnDudeView = function () {
         });
 
         // Display a new equation box
-        $("<div class=\"new-eqn\">Add new equation...</div>")
+        $("<div class=\"new-eqn\">" +
+                "<span id=\"new-fun-name\">f</span>" +
+                "<span id=\"new-eqn-of-x\">(x)=</span>" +
+          "</div>")
             .appendTo($content)
             .click(function () {
                 me.broadcast("newFunction");
             });
+            
+        $content.find("#new-fun-name").mathquill();
+        $content.find("#new-eqn-of-x").mathquill();
     };
 
     me.changeEqn = function (changedFun) {

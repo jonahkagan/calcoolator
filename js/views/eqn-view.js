@@ -24,20 +24,24 @@ G.makeEqnView = function () {
              toEqnString(fun.coefs());
         //console.log('"' + displayEqn + '"');
 
+        $remove = $("<div class=\"remove\">X</div>");
+        $remove.hide();
         $content = $(
             "<div class=\"eqn\">" +
                 "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
-                "<button class=\"remove\">X</button>" +
             "</div>"
             )
+            .append($remove)
             .appendTo($parent)
             .keydown(onKeyDown)
             .keyup(onKeyUp)
             // Pass the same event through to the editor so it knows
             // the position of the mouse
-            .mousedown(function (e) { $editor.trigger(e); });
+            .mousedown(function (e) { $editor.trigger(e); })
+
+            .hover(function(e) {$content.find(".remove").show()}, function(e) {$content.find(".remove").hide()});
 
         $content.find(".fun-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();

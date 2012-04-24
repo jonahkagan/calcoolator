@@ -41,16 +41,10 @@
     </script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/graph-style.css"/>
     <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
     <link rel="stylesheet" type="text/css" href="css/table-style.css"/>
     
-    <style>
-        #opts {
-            border-top: 1px solid black;
-            margin-top: 10px;
-            padding: 10px;
-        }
-    </style>
 </head>
 <body>
 
@@ -62,14 +56,15 @@
         <label for="tlbVert">Vertical tables</label>
     </div>
 
-    <div id="left">
-        <div id="eqns"></div>
-        <div id="tbls"></div>
-    </div>
+    <div id="eqns-bg" class="bg"></div>
+    <div id="eqns"></div>
+    
+    <div id="tbls-bg" class="bg"></div>
+    <div id="tbls"></div>
+
 
     <canvas id="graphCanvas"></canvas>
-    <div id="axisLabels"></div>
-    <input type="button" value="+" id="graphPlus"/>
+    <div type="button" value="+" id="graphPlus" class="unselectable">+</div>
 
 
 </body>

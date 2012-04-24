@@ -19,7 +19,6 @@ G.makeGraphController = function(model, p) {
     };
     
     controller.onDudeChange = function(event) {
-        console.log(event);
         dude.display();
         if (functions) {
             reps = [];
