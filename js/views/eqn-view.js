@@ -32,12 +32,13 @@ G.makeEqnView = function () {
                 "<div class=\"remove\">X</div>" +
             "</div>"
             )
+            .append($remove)
             .appendTo($parent)
             .keydown(onKeyDown)
             .keyup(onKeyUp)
             // Pass the same event through to the editor so it knows
             // the position of the mouse
-            .mousedown(function (e) { $editor.trigger(e); })
+            .mousedown(function (e) { $editor.trigger(e); });
 
         $content.find(".fun-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
