@@ -29,7 +29,7 @@ G.makeEqnView = function () {
                 "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
-                "<button class=\"eqn-remove\">X</button>" +
+                "<button class=\"remove\">X</button>" +
             "</div>"
             )
             .appendTo($parent)
@@ -46,7 +46,7 @@ G.makeEqnView = function () {
             .mousedown(selectFunction);
             //.find("span").addClass("scrubbable");
 
-        $content.find(".eqn-remove")
+        $content.find(".remove")
             .click(removeFunction)
             .mousedown(function (e) { e.stopPropagation(); });
 
@@ -84,9 +84,7 @@ G.makeEqnView = function () {
             .filter(function (seq) { return seq.type === "num"; })
             .each(function (seq) {
                 $(seq.spans).addClass("scrubbable");
-                if (G.opts.colorCoefs) {
-                    $(seq.spans).css("color", fun.color.toCSS());
-                }
+                $(seq.spans).css("color", fun.color.toCSS());
             });
     }
 
@@ -204,10 +202,6 @@ G.makeEqnView = function () {
             .one("mousedown", onMouseDown);
 
         colorCoefs(spans);
-
-        if (G.opts.colorCoefs) {
-            $(spans).css("color", fun.color.toCSS());
-        }
 
         var onMouseMove = function (e) {
             console.log("move", fun.name);

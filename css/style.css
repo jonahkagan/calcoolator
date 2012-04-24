@@ -47,4 +47,12 @@ span.mathquill-rendered-math:focus {
     box-shadow: none !important;
 }
 
+/* Remove button */
+button.remove {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    font-size: 8px;
+    color: darkRed;
+}
 

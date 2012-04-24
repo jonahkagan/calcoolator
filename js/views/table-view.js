@@ -32,9 +32,11 @@ G.makeTableView = function () {
                 "</tr>" +
                 rows.join("") +
             "</table>" +
-            "<button class=\"tbl-remove\">X</button>" +
+            "<button class=\"remove\">X</button>" +
         "</div>"
         ); 
+
+        $table.addClass(G.opts.tblVert ? "vert" : "horz");
 
         $table.find("tr").each(function (i, row) {
             if (i > 0 && i <= fun.degree+1) {
@@ -62,7 +64,9 @@ G.makeTableView = function () {
             .mathquill("editable")
             .keyup(onKeyUp);
 
-        $table.find(".tbl-remove").click(removeFunction);
+        $table.find(".remove")
+            .click(removeFunction)
+            .mousedown(function (e) { e.stopPropagation(); });
 
         $table.click(selectFunction);
 

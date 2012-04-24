@@ -1,7 +1,7 @@
 G.makeTableController = function (model) {
     var me = G.makeController(model, "table");
 
-    var NUM_PTS = 10;
+    var NUM_PTS = 5;
 
     var tableDude = G.makeTableDudeView(NUM_PTS);
 

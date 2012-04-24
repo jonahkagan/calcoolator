@@ -49,14 +49,6 @@
     cursor: col-resize;
 }
 
-/* Remove button */
-#eqns .eqn .eqn-remove {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    font-size: 8px;
-}
-
 /* Special classes */
 #eqns .eqn .parse-error.eqn-editor {
     color: red;
