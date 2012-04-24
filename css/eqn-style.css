@@ -42,9 +42,6 @@
 }
 
 /* Scrubbing */
-#eqns .eqn .eqn-editor .scrubbable {
-    color: blue;
-}
 .scrubbable, .scrubbing,
 .scrubbing .eqn *,
 .scrubbing .eqn * span,

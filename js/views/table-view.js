@@ -32,7 +32,7 @@ G.makeTableView = function () {
                 "</tr>" +
                 rows.join("") +
             "</table>" +
-            "<button class=\"remove\">X</button>" +
+            "<div class=\"remove\">X</div>" +
         "</div>"
         ); 
 
@@ -65,8 +65,13 @@ G.makeTableView = function () {
             .keyup(onKeyUp);
 
         $table.find(".remove")
+            .hide()
             .click(removeFunction)
             .mousedown(function (e) { e.stopPropagation(); });
+
+        $content.hover(function (e) { $remove.show(); },
+                       function (e) { $remove.hide(); });
+
 
         $table.click(selectFunction);
 

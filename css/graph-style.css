@@ -1,0 +1,33 @@
+#graphCanvas {
+    outline: none;
+}
+
+#graphPlus {
+    position: absolute;
+    right: 300px;
+    top: 100px;
+    height: 56px;
+    line-height: 50px;
+    font-size: 100px;
+    color: #ddd;
+    opacity: .8;
+}
+
+#graphPlus:hover {
+    color: #B4F285;
+    text-shadow: #ccc 1px 1px 2px;
+    cursor: pointer;
+}
+
+#graphPlus:active {
+    text-shadow: none;
+}
+
+#opts {
+    position: absolute;
+    left: 270px;
+    top: 10px;
+    font-family: 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: #888;
+}

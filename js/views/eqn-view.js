@@ -24,24 +24,20 @@ G.makeEqnView = function () {
              toEqnString(fun.coefs());
         //console.log('"' + displayEqn + '"');
 
-        $remove = $("<div class=\"remove\">X</div>");
-        $remove.hide();
         $content = $(
             "<div class=\"eqn\">" +
                 "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
+                "<div class=\"remove\">X</div>" +
             "</div>"
             )
-            .append($remove)
             .appendTo($parent)
             .keydown(onKeyDown)
             .keyup(onKeyUp)
             // Pass the same event through to the editor so it knows
             // the position of the mouse
             .mousedown(function (e) { $editor.trigger(e); })
-
-            .hover(function(e) {$content.find(".remove").show()}, function(e) {$content.find(".remove").hide()});
 
         $content.find(".fun-name").mathquill().css("color", fun.color.toCSS());
         $content.find(".eqn-of-x").mathquill();
@@ -50,9 +46,14 @@ G.makeEqnView = function () {
             .mousedown(selectFunction);
             //.find("span").addClass("scrubbable");
 
-        $content.find(".remove")
+
+        var $remove = $content.find(".remove")
+            .hide()
             .click(removeFunction)
             .mousedown(function (e) { e.stopPropagation(); });
+
+        $content.hover(function (e) { $remove.show(); },
+                       function (e) { $remove.hide(); });
 
         refresh();
 
@@ -77,6 +78,7 @@ G.makeEqnView = function () {
     }
 
     function refresh() {
+        console.log("refresh");
         createScrubbers();
         updateParseStatus();
         updateSelectedStatus();
@@ -84,9 +86,11 @@ G.makeEqnView = function () {
     }
 
     function colorCoefs(seqs) {
+        console.log(seqs);
         _.chain(seqs || findSeqs())
             .filter(function (seq) { return seq.type === "num"; })
             .each(function (seq) {
+                console.log("coloring");
                 $(seq.spans).addClass("scrubbable");
                 $(seq.spans).css("color", fun.color.toCSS());
             });
@@ -180,6 +184,8 @@ G.makeEqnView = function () {
                 addDragHandler(seq.spans, coefPos);
                 coefPos += 1;
             });
+
+        colorCoefs(seqs);
     }
 
     var isDragging;
@@ -204,8 +210,6 @@ G.makeEqnView = function () {
             .off("mousedown")
             .addClass("scrubbable")
             .one("mousedown", onMouseDown);
-
-        colorCoefs(spans);
 
         var onMouseMove = function (e) {
             console.log("move", fun.name);
