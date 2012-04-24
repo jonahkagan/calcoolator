@@ -21,7 +21,8 @@ G.makeTableView = function () {
                     "</span></td></tr>";
         });
         $table = $(
-            "<div class=\"tbl\"><table>" +
+        "<div class=\"tbl\">" +
+            "<table>" +
                 "<tr>" +
                     "<th><span>x</span></th>" +
                     "<th>" + 
@@ -30,7 +31,9 @@ G.makeTableView = function () {
                     "</th>" +
                 "</tr>" +
                 rows.join("") +
-            "</table></div>"
+            "</table>" +
+            "<button class=\"tbl-remove\">X</button>" +
+        "</div>"
         ); 
 
         $table.find("tr").each(function (i, row) {
@@ -58,6 +61,8 @@ G.makeTableView = function () {
         $table.find(".seed .tbl-y")
             .mathquill("editable")
             .keyup(onKeyUp);
+
+        $table.find(".tbl-remove").click(removeFunction);
 
         $table.click(selectFunction);
 
