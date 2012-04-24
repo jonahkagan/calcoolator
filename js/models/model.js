@@ -23,7 +23,7 @@ G.makeModel = function() {
     }());
 
     model.removeFunction = function(fun, srcRep) {
-        if (fun === selectedFunction) {
+        if (fun === selectedFunction && functions.length > 1) {
             var i = _.indexOf(functions, fun) + 1;
             // Watch out for the end of the list
             selectFun(functions[i] || functions[i-2]);
