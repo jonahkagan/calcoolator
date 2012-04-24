@@ -29,8 +29,13 @@ body {
 
 /* Fun Name */
 span.fun-name {
-    margin-right: -3px;
+    margin-right: -2px;
 }
+
+#eqns span.fun-name {
+    margin-right: -5px;
+}
+
 span.fun-name sub {
     font-size: 80%;
 }
