@@ -2,24 +2,27 @@ G.makeTableView = function () {
     var me = G.makeRepView();
 
     var $content, fun;
+    var round = G.u.roundTo(2);
 
     me.display = function (afun, $parent) {
         fun = afun;
         $content = createTable();
         $content.appendTo($parent);
+        me.updateSelect();
     };
 
     function createTable() {
         var rows = _.map(fun.repData("table"), function (pt) {
             return "<tr><td><span class=\"tbl-x\">" +
-                        G.u.round(2, pt.x()) +
+                        fmt(pt.x()) +
                     "</span></td>" +
                     "<td><span class=\"tbl-y\">" +
-                        (pt.y() !== null ? G.u.round(2, pt.y()) : "?") +
+                        fmt(pt.y()) +
                     "</span></td></tr>";
         });
         $table = $(
-            "<div class=\"tbl\"><table>" +
+        "<div class=\"tbl\">" +
+            "<table>" +
                 "<tr>" +
                     "<th><span>x</span></th>" +
                     "<th>" + 
@@ -28,7 +31,9 @@ G.makeTableView = function () {
                     "</th>" +
                 "</tr>" +
                 rows.join("") +
-            "</table></div>"
+            "</table>" +
+            "<button class=\"tbl-remove\">X</button>" +
+        "</div>"
         ); 
 
         $table.find("tr").each(function (i, row) {
@@ -57,6 +62,10 @@ G.makeTableView = function () {
             .mathquill("editable")
             .keyup(onKeyUp);
 
+        $table.find(".tbl-remove").click(removeFunction);
+
+        $table.click(selectFunction);
+
         return $table;
     }
 
@@ -66,11 +75,13 @@ G.makeTableView = function () {
         //$content = $table;
         var ys = _.map(fun.repData("table"), function (pt) { return pt.y(); });
         $content.find(".tbl-y").each(function (i, span) {
-            $(span).mathquill("latex", ys[i] + "");
+            $(span).mathquill("latex", fmt(ys[i]));
         });
     };
 
     me.updateSelect = function () {
+        console.log("update", fun.name);
+        $content.toggleClass("selected", fun.isSelected);
     };
 
     function onKeyUp(e) {
@@ -100,18 +111,22 @@ G.makeTableView = function () {
     }
 
     function selectFunction(e) {
-        me.broadcast("eqnSelected", { fun: fun });
+        me.broadcast("tableSelected", { fun: fun });
         // Stop bubbling so we don't select twice/infinite loop
         e.stopPropagation();
     }
 
     function removeFunction(e) {
-        me.broadcast("eqnRemoved", { fun: fun });
+        me.broadcast("tableRemoved", { fun: fun });
         // Stop bubbling to avoid selecting when we should be removing
         e.stopPropagation();
     }
 
     me.fun = function () { return fun; };
+
+    function fmt(n) {
+        return (n !== null) ? round(n) + "" : "?";
+    }
 
     return me;
 };
