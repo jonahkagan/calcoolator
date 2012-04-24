@@ -51,6 +51,11 @@
 
 
 /* Horizontal */
+#tbls.horz {
+    width: 250px;
+}
+
 #tbls .horz.tbl {
     width: 100%;
+    height: 30px;
 }

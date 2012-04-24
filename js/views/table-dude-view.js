@@ -5,7 +5,10 @@ G.makeTableDudeView = function () {
 
     me.display = function (funs) {
         tables = [];
-        $content.empty();
+        $content
+            .addClass(G.opts.tblVert ? "vert" : "horz")
+            .removeClass(G.opts.tblVert ? "horz" : "vert")
+            .empty();
         // Display all the tables
         tables = _.map(funs, function (fun) {
             var table = G.makeTableView();
