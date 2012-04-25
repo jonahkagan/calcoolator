@@ -260,7 +260,7 @@ G.makeEqnView = function () {
 
     function toEqnString(coefs) {
         return _.chain(coefs)
-            .map(G.u.roundTo(2))
+            .map(_.roundTo(2))
             .map(function (coef, i) {
                 var xterm = (i === 0) ? "" :
                             (i === 1) ? "x" :

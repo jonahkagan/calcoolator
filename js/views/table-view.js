@@ -2,7 +2,7 @@ G.makeTableView = function () {
     var me = G.makeRepView();
 
     var $content, fun, coords;
-    var round = G.u.roundTo(2);
+    var round = _.roundTo(2);
 
     me.display = function (afun, $parent) {
         fun = afun;
@@ -101,7 +101,7 @@ G.makeTableView = function () {
         //$content.replaceWith($table);
         //$content = $table;
         updateSeeds(); // For some reason, need to do this before updating numbers
-        G.u.with2(_.each, fun.repData("table"), coords,
+        _.with2(_.each, fun.repData("table"), coords,
             function (pt, coord) {
                 // Don't update while typing
                 if (!coord.yCon.find("textarea").is(":focus")) {
@@ -144,7 +144,7 @@ G.makeTableView = function () {
         });
 
         if (_.all(newPts, function (pt) { return pt; }) &&
-            !G.u.listEquals(newPts, fun.repData("table"), G.makePoint.equals))
+            !_.listEquals(newPts, fun.repData("table"), G.makePoint.equals))
         {
             me.broadcast("tableChanged", {
                 fun: fun,
