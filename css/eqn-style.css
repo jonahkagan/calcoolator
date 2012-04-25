@@ -52,7 +52,8 @@
 
 /* Special classes */
 #eqns .eqn .parse-error.eqn-editor {
-    color: red;
+    /*color: red;*/
+    border-bottom: 1px dashed red;
 }
 
 #eqns .selected.eqn {
