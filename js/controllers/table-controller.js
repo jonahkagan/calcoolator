@@ -12,12 +12,12 @@ G.makeTableController = function (model) {
     tableDude.display();
 
     me.onUpdate = function (event) {
-        if (event.changedFun) { evalPts(event.changedFun); }
-        if (event.src === me.name && event.changedFun) {
+        if (event.changedFun) {
+            evalPts(event.changedFun);
             tableDude.changeTable(event.changedFun);
         } else if (event.selectedFun) {
             tableDude.selectTable(event.selectedFun);
-        } else {
+        } else { // New or remove
             _.each(event.functions, function (fun) {
                 if (!fun.repData(me.name)) {
                     fun.repData(me.name, _.map(_.range(NUM_PTS), G.makePoint));

@@ -79,7 +79,6 @@ G.makeEqnView = function () {
     }
 
     function refresh() {
-        console.log("refresh");
         createScrubbers();
         updateParseStatus();
         updateSelectedStatus();
@@ -87,11 +86,9 @@ G.makeEqnView = function () {
     }
 
     function colorCoefs(seqs) {
-        console.log(seqs);
         _.chain(seqs || findSeqs())
             .filter(function (seq) { return seq.type === "num"; })
             .each(function (seq) {
-                console.log("coloring");
                 $(seq.spans).addClass("scrubbable");
                 $(seq.spans).css("color", fun.color.toCSS());
             });
@@ -195,7 +192,7 @@ G.makeEqnView = function () {
             val = parseFloat(_.map(spans, function (span) {
                 return fixMinus($(span).text());
             }).join(''));
-            console.log("val", val);
+            //console.log("val", val);
 
         var onMouseDown = function (e) {
             console.log("down");

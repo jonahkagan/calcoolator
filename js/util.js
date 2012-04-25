@@ -31,12 +31,20 @@ G.u = {
         return -1;
     },
 
+    // Calls a list iterator function with two lists and applies the
+    // function f to each pair of elements from the list.
+    with2: function (iter, lst1, lst2, f) {
+        iter(_.zip(lst1, lst2), function (pair, i) {
+            return f(pair[0], pair[1], i);
+        });
+    },
+
     // Returns true if lst1 and lst2 have the same length and are
     // are pairwise equal according to the given equality test.
     listEquals: function (lst1, lst2, equals) {
         return lst1.length === lst2.length &&
-            _.all(_.zip(lst1, lst2), function (pair) {
-                return equals(pair[0], pair[1]);
+            G.u.with2(_.all, lst1, lst2, function (elt1, elt2) {
+                return equals(elt1, elt2);
             });
     },
     
