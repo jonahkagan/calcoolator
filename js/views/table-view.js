@@ -18,6 +18,7 @@ G.makeTableView = function () {
         $content = createTable();
         $content.appendTo($parent);
         me.updateSelect();
+        updateSeeds();
     };
 
     function makeCoordContent(num, klass) {
@@ -71,13 +72,6 @@ G.makeTableView = function () {
        
         (G.opts.tblVert ? makeVertTable : makeHorzTable)($table.find("table"));
 
-        _.chain(coords)
-            .first(fun.degree + 1)
-            .each(function (coord) {
-                coord.xCon.parent().addClass("seed");
-                coord.yCon.parent().addClass("seed");
-            });
-
         $table.find(".tbl-x")
             .mathquill("editable")
             .keyup(onKeyUp)
@@ -90,13 +84,6 @@ G.makeTableView = function () {
 
         $table.find(".tbl-y")
             .css("color", fun.color.toCSS());
-
-        $table.find("td:not(.seed) .tbl-y")
-            .mathquill();
-
-        $table.find("td.seed .tbl-y")
-            .mathquill("editable")
-            .keyup(onKeyUp);
 
         var $remove = $table.find(".remove")
             .hide()
@@ -113,8 +100,7 @@ G.makeTableView = function () {
         //$table = createTable();
         //$content.replaceWith($table);
         //$content = $table;
-        // TODO update seed points as well, (really should just
-        // remake this view on degree change)
+        updateSeeds(); // For some reason, need to do this before updating numbers
         G.u.with2(_.each, fun.repData("table"), coords,
             function (pt, coord) {
                 // Don't update while typing
@@ -128,12 +114,29 @@ G.makeTableView = function () {
         $content.toggleClass("selected", fun.isSelected);
     };
 
+    function updateSeeds() {
+        _.chain(coords)
+            //.first(fun.degree + 1)
+            .each(function (coord, i) {
+                coord.xCon.parent().toggleClass("seed", i <= fun.degree);
+                coord.yCon.parent().toggleClass("seed", i <= fun.degree);
+            });
+
+        $table.find("td:not(.seed) .tbl-y")
+            .mathquill("revert")
+            .mathquill();
+
+        $table.find("td.seed .tbl-y")
+            .mathquill("revert")
+            .mathquill("editable")
+            .keyup(onKeyUp);
+    }
+
+
     function onKeyUp(e) {
         var newPts = _.map(coords, function (coord) {
             var x = parseFloat(coord.xCon.mathquill("latex")),
                 y = parseFloat(coord.yCon.mathquill("latex"));
-                console.log(x, _.isNaN(x));
-                console.log(y, _.isNaN(y));
             $(coord.xCon).toggleClass("nan", _.isNaN(x));
             $(coord.yCon).toggleClass("nan", _.isNaN(y));
             if (_.isNaN(x) || _.isNaN(y)) { return null; }

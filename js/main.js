@@ -1,15 +1,20 @@
 G.init = function(p) {
     function initOpts() {
         G.opts = {};
+        var realLog = console.log;
         $('#opts').children().each(function (i, optCheck) {
             $(optCheck).change(function () {
                 G.opts[optCheck.id] = optCheck.checked;
                 model.removeFunction(); // refresh without doing anything
+                if (optCheck.id === "debug") {
+                   console.log = optCheck.checked ?
+                        realLog :
+                        function () {};
+                }
             }).change();
         });
     }
     
-
     // global event manager for global events
     G.eventManager = G.makeEventManager();
     var model = G.makeModel();
