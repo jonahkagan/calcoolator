@@ -30,9 +30,11 @@ G.makeEqnDudeView = function () {
         $content.find("#new-eqn-of-x").mathquill();
         
         if (G.opts.tblVert) {
-            var tableHeight = 215;
+            var tableHeight = 225;
             $(document).find("#eqns").css("height", $(document).height() - tableHeight);
-            $(document).find("#eqns-bg").css("height", $(document).height() - tableHeight);
+        }
+        else {
+            $(document).find("#eqns").css("height", "100%");
         }
     };
 

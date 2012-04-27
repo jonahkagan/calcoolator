@@ -27,12 +27,10 @@ G.makeTableDudeView = function () {
             });
             
         if (G.opts.tblVert) {
-            var tableHeight = 215;
+            var tableHeight = 225;
             $content.css("top", $(document).height() - tableHeight);
-            $("#tbls-bg").addClass("vert");
-            $("#tbls-bg").css("top", $(document).height() - tableHeight);
-            $("#new-table").css("height", tableHeight-10);
-            $("#new-table").css("top", -tableHeight+10);
+            $("#new-table").css("height", tableHeight);
+            $("#new-table").css("top", -tableHeight+16);
 
         }
     };

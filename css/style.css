@@ -8,11 +8,7 @@ body {
 .bg {
     position: absolute;
     height: 100%;
-    background: #fafafa;
-    opacity: .8;
-    -moz-box-shadow:    3px 3px 5px 6px #ccc;
-    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
-    box-shadow:         1px 1px 5px 4px #ccc;
+
 }
 
 .selected {
