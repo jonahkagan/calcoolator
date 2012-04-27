@@ -246,15 +246,18 @@ G.makeEqnView = function () {
     // Dynamically resize equation text to fit the editor
     function resizeFont() {
         var edWidth = $editor.width(),
-            maxWidth = $content.width() - $editor.position().left,
+            $ofX =  $content.find(".eqn-of-x"),
+            maxWidth = $content.width() - ($ofX.position().left + $ofX.width()),
             size = parseFloat($content.css("font-size"));
 
         if (edWidth > maxWidth && size > MIN_FONT_SIZE) {
             $content.css("font-size", "-=" + 1);
+            resizeFont();
         } else if (edWidth < maxWidth * FONT_RESIZE_PCT &&
                    size < MAX_FONT_SIZE)
         {
             $content.css("font-size", "+=" + 1);
+            resizeFont();
         }
     }
 
