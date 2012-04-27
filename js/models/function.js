@@ -2,9 +2,9 @@ G.makeFun = function(name, initCoefs) {
     var fun = {
         name: name,
         color: G.color(
-            G.u.round(0, Math.random()*255),
-            G.u.round(0, Math.random()*255),
-            G.u.round(0, Math.random()*255)
+            _.round(0, Math.random()*255),
+            _.round(0, Math.random()*255),
+            _.round(0, Math.random()*255)
         ), // fix this
         isSelected: false
     };

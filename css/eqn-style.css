@@ -11,9 +11,8 @@
 
 #eqns .eqn {
     border-bottom: 1px solid darkGray;
-    padding: 10px 10px 10px 20px;
     position: relative;
-    width: 220px;
+    width: 228px;
     /*white-space: nowrap;*/
     overflow: none;
 }
@@ -21,12 +20,12 @@
 #eqns .new-eqn {
     color: gray;
     cursor: default;
-    padding: 10px 10px 10px 20px;
     border-bottom: 1px solid darkGray;
 }
 
 #eqns .new-eqn,
 #eqns .eqn {
+    padding: 10px 10px 10px 12px;
     height: 30px;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -53,6 +52,6 @@
 
 /* Special classes */
 #eqns .eqn .parse-error.eqn-editor {
-    color: red;
+    /*color: red;*/
+    border-bottom: 1px dashed red;
 }
-

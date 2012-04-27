@@ -69,8 +69,8 @@ span.mathquill-rendered-math textarea:active {
     resize: none;
 }
 
-span.mathquill-rendered-math,
-span.mathquill-rendered-math:focus {
-    border: none !important;
-    box-shadow: none !important;
-}
+/*span.mathquill-rendered-math,*/
+/*span.mathquill-rendered-math:focus {*/
+/*    border: none !important;*/
+/*    box-shadow: none !important;*/
+/*}*/

@@ -1,48 +1,76 @@
 G.makeTableView = function () {
     var me = G.makeRepView();
 
-    var $content, fun;
-    var round = G.u.roundTo(2);
+    var $content, fun, coords;
+    var round = _.roundTo(2);
 
     me.display = function (afun, $parent) {
         fun = afun;
+        coords = _.map(fun.repData("table"), function (pt) {
+            var xStr = fmt(pt.x()), yStr = fmt(pt.y());
+            return {
+                x: xStr,
+                y: yStr,
+                xCon: makeCoordContent(xStr, "tbl-x"),
+                yCon: makeCoordContent(yStr, "tbl-y")
+            };
+        });
         $content = createTable();
         $content.appendTo($parent);
         me.updateSelect();
+        updateSeeds();
     };
 
+    function makeCoordContent(num, klass) {
+        return $("<span class=" + klass + ">" + num + "</span>");
+    }
+
+    function header(c) { 
+        return (c === "x") ?
+            "<th><span>x</span></th>" :
+            "<th>" + 
+                "<span class=\"fun-name\">" + fun.name + "</span>" +
+                "<span>(x)</span>" + 
+            "</th>";
+    }
+
+    function makeHorzTable($table) {
+        function row(c) {
+            var $row = $("<tr></tr>")
+                .appendTo($table)
+                .append(header(c));
+            _.each(coords, function (coord) { 
+                coord[c + "Con"]
+                    .appendTo($row)
+                    .wrap("<td></td>");
+            });
+        }
+        row("x");
+        row("y");
+    }
+
+    function makeVertTable($table) {
+        $table.append("<tr>" + header("x") + header("y") + "</tr>")
+        _.each(coords, function (coord) {
+            $("<tr></tr>")
+                .appendTo($table)
+                .append(coord.xCon)
+                .append(coord.yCon)
+                .find("span").wrap("<td></td>");
+        });
+    }
+
     function createTable() {
-        var rows = _.map(fun.repData("table"), function (pt) {
-            return "<tr><td><span class=\"tbl-x\">" +
-                        fmt(pt.x()) +
-                    "</span></td>" +
-                    "<td><span class=\"tbl-y\">" +
-                        fmt(pt.y()) +
-                    "</span></td></tr>";
-        });
         $table = $(
-        "<div class=\"tbl\">" +
-            "<table>" +
-                "<tr>" +
-                    "<th><span>x</span></th>" +
-                    "<th>" + 
-                        "<span class=\"fun-name\">" + fun.name + "</span>" +
-                        "<span>(x)</span>" + 
-                    "</th>" +
-                "</tr>" +
-                rows.join("") +
-            "</table>" +
-            "<div class=\"remove\">X</div>" +
-        "</div>"
-        ); 
-
-        $table.addClass(G.opts.tblVert ? "vert" : "horz");
-
-        $table.find("tr").each(function (i, row) {
-            if (i > 0 && i <= fun.degree+1) {
-                $(row).addClass("seed");
-            }
-        });
+            "<div class=\"tbl\">" +
+                "<table></table>" +
+                "<div class=\"remove\">X</div>" +
+            "</div>"
+            ) 
+            .click(selectFunction)
+            .addClass(G.opts.tblVert ? "vert" : "horz");
+       
+        (G.opts.tblVert ? makeVertTable : makeHorzTable)($table.find("table"));
 
         $table.find(".tbl-x")
             .mathquill("editable")
@@ -57,23 +85,13 @@ G.makeTableView = function () {
         $table.find(".tbl-y")
             .css("color", fun.color.toCSS());
 
-        $table.find("tr").not(".seed").find(".tbl-y")
-            .mathquill();
-
-        $table.find(".seed .tbl-y")
-            .mathquill("editable")
-            .keyup(onKeyUp);
-
         var $remove = $table.find(".remove")
             .hide()
             .click(removeFunction)
             .mousedown(function (e) { e.stopPropagation(); });
 
         $table.hover(function (e) { $remove.show(); },
-                       function (e) { $remove.hide(); });
-
-
-        $table.click(selectFunction);
+                     function (e) { $remove.hide(); });
 
         return $table;
     }
@@ -82,34 +100,51 @@ G.makeTableView = function () {
         //$table = createTable();
         //$content.replaceWith($table);
         //$content = $table;
-        var ys = _.map(fun.repData("table"), function (pt) { return pt.y(); });
-        $content.find(".tbl-y").each(function (i, span) {
-            $(span).mathquill("latex", fmt(ys[i]));
-        });
+        updateSeeds(); // For some reason, need to do this before updating numbers
+        _.with2(_.each, fun.repData("table"), coords,
+            function (pt, coord) {
+                // Don't update while typing
+                if (!coord.yCon.find("textarea").is(":focus")) {
+                    coord.yCon.mathquill("latex", fmt(pt.y()));
+                }
+            });
     };
 
     me.updateSelect = function () {
-        console.log("update", fun.name);
         $content.toggleClass("selected", fun.isSelected);
     };
 
-    function onKeyUp(e) {
-        var newPts = _.chain($content.find("tr"))
-            .rest() // drop the header row
-            .map(function (row) {
-                var coords = $(row).find("td > span"),
-                    x = parseFloat($(coords[0]).mathquill("latex")),
-                    y = parseFloat($(coords[1]).mathquill("latex"));
-                if (_.isNaN(x) || _.isNaN(y)) {
-                    $(row).addClass("nan");
-                    return;
-                }
-                $(row).removeClass("nan");
-                return G.makePoint(x, y);
-            }).value();
+    function updateSeeds() {
+        _.chain(coords)
+            //.first(fun.degree + 1)
+            .each(function (coord, i) {
+                coord.xCon.parent().toggleClass("seed", i <= fun.degree);
+                coord.yCon.parent().toggleClass("seed", i <= fun.degree);
+            });
 
-        if (_.all(newPts, function (pt) { return pt !== undefined; }) &&
-            !G.u.listEquals(newPts, fun.repData("table"), G.makePoint.equals))
+        $table.find("td:not(.seed) .tbl-y")
+            .mathquill("revert")
+            .mathquill();
+
+        $table.find("td.seed .tbl-y")
+            .mathquill("revert")
+            .mathquill("editable")
+            .keyup(onKeyUp);
+    }
+
+
+    function onKeyUp(e) {
+        var newPts = _.map(coords, function (coord) {
+            var x = parseFloat(coord.xCon.mathquill("latex")),
+                y = parseFloat(coord.yCon.mathquill("latex"));
+            $(coord.xCon).toggleClass("nan", _.isNaN(x));
+            $(coord.yCon).toggleClass("nan", _.isNaN(y));
+            if (_.isNaN(x) || _.isNaN(y)) { return null; }
+            return G.makePoint(x, y);
+        });
+
+        if (_.all(newPts, function (pt) { return pt; }) &&
+            !_.listEquals(newPts, fun.repData("table"), G.makePoint.equals))
         {
             me.broadcast("tableChanged", {
                 fun: fun,
@@ -134,7 +169,7 @@ G.makeTableView = function () {
     me.fun = function () { return fun; };
 
     function fmt(n) {
-        return (n !== null) ? round(n) + "" : "?";
+        return (n !== null) ? (round(n) + "") : "?";
     }
 
     return me;

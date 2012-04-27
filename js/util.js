@@ -1,4 +1,4 @@
-G.u = {
+_.mixin({
 
     // Partially applies f to args. I.e., if f takes n arguments,
     // then partial(f, args) takes n-args.length arguments and
@@ -19,7 +19,7 @@ G.u = {
     // Returns a function that rounds a number to the given number of
     // places.
     roundTo: function (places) {
-        return G.u.partial(G.u.round, places);
+        return _.partial(_.round, places);
     },
 
     // Finds the index of the first element in the list which passes
@@ -31,13 +31,21 @@ G.u = {
         return -1;
     },
 
+    // Calls a list iterator function with two lists and applies the
+    // function f to each pair of elements from the list.
+    with2: function (iter, lst1, lst2, f) {
+        iter(_.zip(lst1, lst2), function (pair, i) {
+            return f(pair[0], pair[1], i);
+        });
+    },
+
     // Returns true if lst1 and lst2 have the same length and are
     // are pairwise equal according to the given equality test.
     listEquals: function (lst1, lst2, equals) {
         return lst1.length === lst2.length &&
-            _.all(_.zip(lst1, lst2), function (pair) {
-                return equals(pair[0], pair[1]);
+            _.with2(_.all, lst1, lst2, function (elt1, elt2) {
+                return equals(elt1, elt2);
             });
     },
     
-};
+});
