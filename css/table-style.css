@@ -36,11 +36,17 @@
     border: 1px solid red;
 }
 
-#tbls .selected.tbl {
-    box-shadow: #68B4DF 0 0 2px 1px;
+/* Vertical */
+#tbls-bg.vert {
+    width: 100%;
 }
 
-/* Vertical */
+#tbls.vert {
+    position: relative;
+    left: 0px;
+    display: inline-block;
+}
+
 #tbls .vert.tbl {
     width: 120px;
 }
@@ -49,6 +55,10 @@
     width: 50px;
 }
 
+#tbls .new-table.vert {
+    position: relative;
+    display: inline-block;
+}
 
 /* Horizontal */
 #tbls.horz {

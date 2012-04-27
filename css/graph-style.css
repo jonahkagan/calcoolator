@@ -1,9 +1,10 @@
 #graphCanvas {
+    position: fixed;
     outline: none;
 }
 
 #graphPlus {
-    position: absolute;
+    position: fixed;
     right: 300px;
     top: 100px;
     height: 56px;

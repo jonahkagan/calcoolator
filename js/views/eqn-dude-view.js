@@ -28,6 +28,12 @@ G.makeEqnDudeView = function () {
             
         $content.find("#new-fun-name").mathquill();
         $content.find("#new-eqn-of-x").mathquill();
+        
+        if (G.opts.tblVert) {
+            var tableHeight = 215;
+            $(document).find("#eqns").css("height", $(document).height() - tableHeight);
+            $(document).find("#eqns-bg").css("height", $(document).height() - tableHeight);
+        }
     };
 
     me.changeEqn = function (changedFun) {

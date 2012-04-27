@@ -1,6 +1,8 @@
 body {
     margin: 0px;
     height: 100%;
+    width: 100%;
+    position: fixed;
 }
 
 .bg {
@@ -11,6 +13,10 @@ body {
     -moz-box-shadow:    3px 3px 5px 6px #ccc;
     -webkit-box-shadow: 3px 3px 5px 6px #ccc;
     box-shadow:         1px 1px 5px 4px #ccc;
+}
+
+.selected {
+    box-shadow: #B4F285 0 0 2px 1px;
 }
 
 .unselectable {

@@ -20,11 +20,21 @@ G.makeTableDudeView = function () {
         });
 
         // Display a new equation box
-        $("<div class=\"new-table\">Add new table...</div>")
+        $("<div class=\"tbl\" id=\"new-table\">Add new table...</div>")
             .appendTo($content)
             .click(function () {
                 me.broadcast("newFunction");
             });
+            
+        if (G.opts.tblVert) {
+            var tableHeight = 215;
+            $content.css("top", $(document).height() - tableHeight);
+            $("#tbls-bg").addClass("vert");
+            $("#tbls-bg").css("top", $(document).height() - tableHeight);
+            $("#new-table").css("height", tableHeight-10);
+            $("#new-table").css("top", -tableHeight+10);
+
+        }
     };
 
     me.changeTable = function (changedFun) {
