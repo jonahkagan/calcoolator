@@ -8,6 +8,11 @@ G.makeGraphDude = function(p) {
     };
     
     function drawGrid() {
+        p.redraw();
+    }
+
+    p.draw = function () {
+        console.log("drawing");
         p.background(250);
 
 
@@ -99,12 +104,10 @@ G.makeGraphDude = function(p) {
         p.size(G.graphGlobals.START_W, G.graphGlobals.START_H);
         G.graphGlobals.ORIGIN_X = p.width/2;
         G.graphGlobals.ORIGIN_Y = p.height/2;
-        p.smooth();
         p.noLoop();
         p.textFont(p.loadFont("lib/font/Symbola.ttf"));
-        drawGrid();
     };
-    
+
     p.mouseClicked = function() {
         graphDude.broadcast("mouseClicked", {
             mouseX: p.mouseX,
