@@ -18,8 +18,7 @@ G.makeEqnDudeView = function () {
 
         // Display a new equation box
         $("<div class=\"new-eqn\">" +
-                "<span id=\"new-fun-name\">f</span>" +
-                "<span id=\"new-eqn-of-x\">(x)=</span>" +
+                "<div type=\"button\" value=\"+\" id=\"eqnPlus\" class=\"plus unselectable\">+</div>" +
           "</div>")
             .appendTo($content)
             .click(function () {

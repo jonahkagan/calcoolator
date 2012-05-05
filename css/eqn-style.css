@@ -2,6 +2,11 @@
     width: 250px;
 }
 
+#eqnPlus {
+    font-size: 70px;
+    text-align: center;
+}
+
 #eqns {
     position: fixed;
     width: 250px;
@@ -24,7 +29,7 @@
 #eqns .new-eqn {
     color: gray;
     cursor: default;
-    border-bottom: 1px solid darkGray;
+    //border-bottom: 1px solid darkGray;
 }
 
 #eqns .new-eqn,

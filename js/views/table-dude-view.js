@@ -20,7 +20,9 @@ G.makeTableDudeView = function () {
         });
 
         // Display a new equation box
-        $("<div class=\"tbl\" id=\"new-table\">Add new table...</div>")
+        $("<div class=\"tbl\" id=\"new-table\">" +
+            "<div id=\"tblPlus\" class=\"plus unselectable\">+</div>" +    
+            "</div>")
             .appendTo($content)
             .click(function () {
                 me.broadcast("newFunction");
@@ -30,7 +32,7 @@ G.makeTableDudeView = function () {
             var tableHeight = 225;
             $content.css("top", $(document).height() - tableHeight);
             $("#new-table").css("height", tableHeight);
-            $("#new-table").css("top", -tableHeight+16);
+            $("#new-table").css("top", -tableHeight+35);
 
         }
     };
