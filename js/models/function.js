@@ -1,10 +1,13 @@
 G.makeFun = function(name, initCoefs) {
+    var color = G.colors.shift();
+    G.colors.push(color);
+    
     var fun = {
         name: name,
         color: G.color(
-            _.round(0, Math.random()*255),
-            _.round(0, Math.random()*255),
-            _.round(0, Math.random()*255)
+            color.r,
+            color.g,
+            color.b
         ), // fix this
         isSelected: false
     };
