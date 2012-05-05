@@ -14,7 +14,7 @@ G.makeGraphController = function(model, p) {
         var coefs = repHandler.getNewCoefsFromRep(data.fun, data.repData);
         // fix anchors and stuff
         data.fun.repData("graph", data.repData);
-        data.fun.coefs(coefs);
+        data.fun.coefs(coefs, "graph");
         model.changeFunction(data.fun, "graph");
     };
     
