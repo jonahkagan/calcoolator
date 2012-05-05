@@ -101,6 +101,10 @@
     border-right: 2px solid black;
 }
 
+#tbls .horz.tbl {
+    display: block;
+}
+
 #tbls .horz.tbl table td {
     padding: 2px;
     text-align: left;
