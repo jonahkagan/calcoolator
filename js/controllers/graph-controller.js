@@ -19,6 +19,7 @@ G.makeGraphController = function(model, p) {
     };
     
     controller.onDudeChange = function(event) {
+        var selectedRepView;
         dude.display();
         if (functions) {
             reps = [];
@@ -41,13 +42,19 @@ G.makeGraphController = function(model, p) {
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
                 repView.subscribe("repChanged", controller.onRepChanged);
-                repView.display();
+                if (fun.isSelected) {
+                    selectedRepView = repView;
+                } else {
+                    repView.display();
+                }
                 reps.push(repView);
             }
+            selectedRepView.display();
         }
     };
     
     controller.onUpdate = function(data) {
+        var selectedRepView;
         // Update whichever function changed if the event src wasn't
         // "graph" TODO
         //console.log("updating views!");
@@ -69,9 +76,14 @@ G.makeGraphController = function(model, p) {
                 var repView = G.makeGraphRep(fun, p);
                 repView.subscribe("selectFunction", controller.onSelectFunction);
                 repView.subscribe("repChanged", controller.onRepChanged);
-                repView.display();
+                if (fun.isSelected) {
+                    selectedRepView = repView;
+                } else {
+                    repView.display();
+                }
                 reps.push(repView);
             }
+            selectedRepView.display();
         }
     }
     
