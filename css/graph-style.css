@@ -6,18 +6,8 @@
 #graphPlus {
     position: fixed;
     left: 282px;
-    top: 35px;
+    top: 60px;
     height: 56px;
     line-height: 50px;
     font-size: 100px;
-}
-
-
-#opts {
-    position: absolute;
-    left: 270px;
-    top: 10px;
-    font-family: 'Helvetica', sans-serif;
-    font-size: 12px;
-    color: #888;
 }

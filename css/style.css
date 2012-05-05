@@ -5,6 +5,10 @@ body {
     position: fixed;
 }
 
+#container {
+    margin-top: 40px;
+}
+
 .bg {
     position: absolute;
     height: 100%;

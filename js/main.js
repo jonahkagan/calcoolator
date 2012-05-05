@@ -21,6 +21,7 @@ G.init = function(p) {
 
     initOpts();
 
+    var topbarController = G.makeTopbarController(model);
     var graphController = G.makeGraphController(model, p);
     var eqnController = G.makeEqnController(model);
     var tableController = G.makeTableController(model);

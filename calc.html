@@ -15,11 +15,14 @@
     <script src="js/models/model.js"></script>
 
     <script src="js/controllers/controller.js"></script>
+    <script src="js/controllers/topbar-controller.js"></script>
     <script src="js/controllers/graph-controller.js"></script>
     <script src="js/controllers/eqn-controller.js"></script>
     <script src="js/controllers/table-controller.js"></script>
 
     <script src="js/views/view.js"></script>
+    <script src="js/views/topbar-view.js"></script>
+        
     <script src="js/views/graph-globals.js"></script>
     <script src="js/views/graph-dude-view.js"></script>
     <script src="js/views/graph-view.js"></script>
@@ -39,6 +42,7 @@
     </script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/topbar-style.css"/>
     <link rel="stylesheet" type="text/css" href="css/graph-style.css"/>
     <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
     <link rel="stylesheet" type="text/css" href="css/table-style.css"/>
@@ -46,27 +50,31 @@
 </head>
 <body>
 
-
-
-
     <canvas id="graphCanvas"></canvas>
     <div type="button" value="+" id="graphPlus" class="plus unselectable">+</div>
-    
-    <div id="opts">
-        <input type="checkbox" id="debug" checked="true"/>
-        <label for="debug">Debug</label>
-
-        <input type="checkbox" id="snapToGrid" checked="true"/>
-        <label for="snapToGrid">Snap to grid</label>
-
-        <input type="checkbox" id="tblVert" checked="true"/>
-        <label for="tlbVert">Vertical tables</label>
-    </div>
-
 
     <div id="eqns"></div>
     
     <div id="tbls"></div>
+
+    <div id="topbar">
+        <div id="logo">Cal-cool-ator</div>
+        <div id="topfuns"></div>
+
+        <div id="opts">
+            <input type="checkbox" id="debug" checked="true"/>
+            <label for="debug">Debug</label>
+    
+            <input type="checkbox" id="snapToGrid" checked="true"/>
+            <label for="snapToGrid">Snap to grid</label>
+    
+            <input type="checkbox" id="tblVert" checked="true"/>
+            <label for="tlbVert">Vertical tables</label>
+        </div>
+        
+    
+    </div>
+
 
 </body>
 </html>

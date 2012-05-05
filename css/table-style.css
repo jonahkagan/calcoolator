@@ -96,7 +96,7 @@
 #tbls.horz {
     width: 250px;
     height: 100%;
-    top: 0px !important;
+    top: 40px !important;
 }
 
 #tbls.horz .plus {
