@@ -46,6 +46,14 @@
     display: inline-block;
 }
 
+#tbls.vert .plus {
+    font-size: 100px;
+    text-align: center;
+    line-height: 0px;
+    position: relative;
+    top: 100px;
+}
+
 #tbls .vert.tbl {
     width: 120px;
 }
@@ -88,7 +96,12 @@
 #tbls.horz {
     width: 250px;
     height: 100%;
-    top: 0px !important;
+    top: 40px !important;
+}
+
+#tbls.horz .plus {
+    font-size: 70px;
+    text-align: center;
 }
 
 #tbls .horz.tbl {
@@ -128,4 +141,5 @@
 .horz #new-table {
     width: 250px;
     height: 50px;
+    border: none;
 }

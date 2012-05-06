@@ -25,17 +25,15 @@ G.makeFun = function(name, initCoefs) {
         return null;
     };
 
-    fun.coefs = function (newCoefs) {
+    fun.coefs = function (newCoefs, src) {
         if (newCoefs !== undefined) {
             coefs = _.clone(newCoefs);
-            if (coefs) {
+            if (coefs && src !== "graph") { // don't change degrees if source is graph
                 fun.degree = 1;
                 for (var i = 0; i < coefs.length; i++) {
                     if (coefs[i] != 0)
                         fun.degree = i;
                 }
-            } else {
-                fun.degree = null;
             }
         }
         return coefs;

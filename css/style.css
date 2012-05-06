@@ -5,6 +5,10 @@ body {
     position: fixed;
 }
 
+#container {
+    margin-top: 40px;
+}
+
 .bg {
     position: absolute;
     height: 100%;
@@ -24,6 +28,21 @@ body {
    -ms-user-select: none;
    user-select: none;
    cursor: default;
+}
+
+.plus {
+    color: #ddd;
+    opacity: .8;
+}
+
+.plus:hover {
+    color: #B4F285;
+    text-shadow: #ccc 1px 1px 2px;
+    cursor: pointer;
+}
+
+.plus:active {
+    text-shadow: none;
 }
 
 /* Remove button */

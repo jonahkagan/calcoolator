@@ -262,7 +262,7 @@ G.makeEqnView = function () {
     }
 
     function toEqnString(coefs) {
-        return _.chain(coefs)
+        var str = _.chain(coefs)
             .map(_.roundTo(2))
             .map(function (coef, i) {
                 var xterm = (i === 0) ? "" :
@@ -275,6 +275,7 @@ G.makeEqnView = function () {
             .compact().value()
             .reverse()
             .join("+");
+        return str.length > 0 ? str : "0";
     }
 
     function latexToEqn(latexStr) {
