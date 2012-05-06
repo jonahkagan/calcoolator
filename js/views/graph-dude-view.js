@@ -12,83 +12,85 @@ G.makeGraphDude = function(p) {
     }
 
     p.draw = function () {
-        console.log("drawing");
+        //console.log("drawing");
         p.background(250);
 
+        var PPU = G.graphGlobals.SCALE, // pixels per unit
+            // how many units fit on the screen
+            maxUnits = Math.max(p.width, p.height) / PPU,
+            // how many powers of 10 each major line represents in units
+            lineScale = Math.floor(_.logBase(10, PPU)) - 1,
+            // intermediate step values between this lineScale and
+            // the next
+            possibleSteps = _.map([1, 2, 5], function (n) {
+                // 1/10^lineScale is how many units our basic step
+                // would be at this lineScale
+                return n * Math.pow(10, -lineScale);
+            }),
+            // how far apart major lines are in units
+            // we want the step that yields the most major lines
+            majorStep = _.first(_.sortBy(possibleSteps, function (step) {
+                // how close step is to fitting the target
+                // num of lines on the screen
+                return Math.abs(maxUnits / step - G.graphGlobals.MAJOR_LINES);
+            })),
+            // how far apart minor lines are in units
+            minorStep = majorStep / 5;
+
+        function drawLines(step, drawLine) {
+            _.each( // for each unit
+                _.range(0, // from the origin
+                        maxUnits, // to the wall
+                        step), // with this step
+                function (u) {
+                    drawLine(u);
+                    drawLine(-u);
+                }
+            );
+        }
+
+        p.strokeWeight(1);
 
         // Gridlines
         p.stroke(230);
-        p.strokeWeight(1);
+        drawLines(minorStep, drawVert(false));
+        drawLines(minorStep, drawHorz(false));
+
+        p.stroke(170);
         p.fill(170);
-        var x = G.graphGlobals.ORIGIN_X;
-        var lineSpace = 40 + G.graphGlobals.SCALE % 40;
-        var lineCount = 0;
-        var unitCount = 0;
-
-        while (x >= 0) {
-            if (lineCount % 4 === 0 && lineCount > 0) {
-                p.stroke(170);
-                var label = (x - G.graphGlobals.ORIGIN_X) / G.graphGlobals.pixelsPerUnit();
-                p.text(label, x+4, G.graphGlobals.ORIGIN_Y + 17);
-            }
-            else {
-                p.stroke(230);
-            }
-            p.line(x, 0, x, p.height);
-            x -= lineSpace;
-            lineCount++;
-        }
-        lineCount = 0;
-        x = G.graphGlobals.ORIGIN_X;
-        while (x <= p.width) {
-            if (lineCount % 4 === 0) {
-                p.stroke(170);
-                var label = (x - G.graphGlobals.ORIGIN_X) / G.graphGlobals.pixelsPerUnit();
-                p.text(label, x+4, G.graphGlobals.ORIGIN_Y + 17);
-            }
-            else {
-                p.stroke(230);
-            }
-            p.line(x, 0, x, p.height);
-            x += lineSpace;
-            lineCount++;
-        }
-        var y = G.graphGlobals.ORIGIN_Y;
-        lineCount = 0;
-        while (y >= 0) {
-            if (lineCount % 4 === 0 && lineCount !== 0) {
-                p.stroke(170);
-                var label = (G.graphGlobals.ORIGIN_Y - y) / G.graphGlobals.pixelsPerUnit();
-                p.text(label, G.graphGlobals.ORIGIN_X + 4, y-1);
-            }
-            else {
-                p.stroke(230);
-            }
-            p.line(0, y, p.width, y);
-            y -= lineSpace;
-            lineCount++;
-        }
-        y = G.graphGlobals.ORIGIN_Y;
-        lineCount = 0;
-        while (y <= p.height) {
-            if (lineCount % 4 === 0 && lineCount !== 0) {
-                p.stroke(170);
-                var label = (G.graphGlobals.ORIGIN_Y - y) / G.graphGlobals.pixelsPerUnit();
-                p.text(label, G.graphGlobals.ORIGIN_X + 4, y-1);
-            }
-            else {
-                p.stroke(230);
-            }
-            p.line(0, y, p.width, y);
-            y += lineSpace;
-            lineCount++;
-        }
-
+        drawLines(majorStep, drawVert(true));
+        drawLines(majorStep, drawHorz(true));
 
         // Axes
         p.stroke(0);
         p.line(G.graphGlobals.ORIGIN_X, 0, G.graphGlobals.ORIGIN_X, p.height);
         p.line(0, G.graphGlobals.ORIGIN_Y, p.width, G.graphGlobals.ORIGIN_Y);
+    }
+
+    function drawVert(label) {
+        return function (ux) {
+            var px = G.graphGlobals.unitToPixel(G.makePoint(ux,0)).x();
+            if (px < p.width && px > 0) {
+                p.line(px, 0, px, p.height);
+                if (label) {
+                    p.text(G.graphGlobals.fmtLabel(ux),
+                           px+4, G.graphGlobals.ORIGIN_Y+17);
+                }
+            }
+        };
+    }
+
+    function drawHorz(label) {
+        return function (uy) {
+            var py = G.graphGlobals.unitToPixel(G.makePoint(0,uy)).y();
+            if (py < p.height && py > 0) {
+                p.line(0, py, p.width, py);
+                if (label) {
+                    p.text(G.graphGlobals.fmtLabel(uy),
+                           G.graphGlobals.ORIGIN_X+4, py-1);
+                }
+            }
+        };
     }
 
     graphDude.display = function(functions) {
@@ -144,15 +146,19 @@ G.makeGraphDude = function(p) {
             //console.log(G.graphGlobals.SCALE);
             
             //console.log(event.wheelDeltaY);
-            if (event.wheelDeltaY > 0) {
-                G.graphGlobals.SCROLL_SCALE += .5;
-            }
-            else {
-                G.graphGlobals.SCROLL_SCALE -= .5;
-            }
+            //if (event.wheelDeltaY > 0) {
+            //    G.graphGlobals.SCROLL_SCALE += .5;
+            //}
+            //else {
+            //    G.graphGlobals.SCROLL_SCALE -= .5;
+            //}
             //G.graphGlobals.SCALE = G.graphGlobals.SCROLL_SCALE / 40.0;
             
+            G.graphGlobals.SCALE *= 1.0 + G.graphGlobals.ZOOM *
+                ((event.wheelDeltaY > 0) ? 1 : -1);
             
+            // SCALE pixels per unit
+            //G.graphGlobals.SCALE = ...
             
             
             //G.graphGlobals.SCROLL_SCALE += event.wheelDeltaY/10;
@@ -160,11 +166,11 @@ G.makeGraphDude = function(p) {
             //G.graphGlobals.SCROLL_SCALE = Math.floor(G.graphGlobals.SCROLL_SCALE);
 
 
-            G.graphGlobals.SCROLL_SCALE = Math.min(G.graphGlobals.SCROLL_SCALE, 10);
-            G.graphGlobals.SCROLL_SCALE = Math.max(G.graphGlobals.SCROLL_SCALE, -10);
+            //G.graphGlobals.SCROLL_SCALE = Math.min(G.graphGlobals.SCROLL_SCALE, 10);
+            //G.graphGlobals.SCROLL_SCALE = Math.max(G.graphGlobals.SCROLL_SCALE, -10);
             
-            G.graphGlobals.SCALE = G.graphGlobals.STARTING_UNIT * Math.pow(2, G.graphGlobals.SCROLL_SCALE);
-            console.log(G.graphGlobals.SCROLL_SCALE);
+            //G.graphGlobals.SCALE = G.graphGlobals.STARTING_UNIT * Math.pow(2, G.graphGlobals.SCROLL_SCALE);
+            //console.log(G.graphGlobals.SCROLL_SCALE);
 
             graphDude.broadcast("dudeChanged", {action: "zoom"});
             event.preventDefault();

@@ -47,5 +47,10 @@ _.mixin({
                 return equals(elt1, elt2);
             });
     },
+
+    logBase: function (base, n) {
+        return Math.log(n) / ((base === 10) ? Math.LN10
+                                            : Math.log(base));
+    },
     
 });

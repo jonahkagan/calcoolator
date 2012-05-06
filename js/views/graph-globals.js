@@ -1,6 +1,7 @@
 G.graphGlobals = {
-    SCALE: 40, // -1, 0, 1, 2, ...
-    SCROLL_SCALE: 0, // -40, 0, 40, 80, ...
+    SCALE: 40, // num pixels per unit
+    //SCROLL_SCALE: 0, // -40, 0, 40, 80, ...
+    ZOOM: 0.05, // pct to zoom by
     STARTING_UNIT: 40,
     MIN_SQUARE_SIZE: 40,
     MAX_SQUARE_SIZE: 80,
@@ -12,6 +13,11 @@ G.graphGlobals = {
     EPSILON: 10,
     ORIGIN_X: 0,
     ORIGIN_Y: 0,
+    MAJOR_LINES: 10, // how many major gridlines to aim for
+
+    fmtLabel: function (n) {
+        return _.round(5, n) + '';
+    },
     
     pixelsPerUnit: function() {
         return G.graphGlobals.SCALE;
