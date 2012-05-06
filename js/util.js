@@ -22,6 +22,11 @@ _.mixin({
         return _.partial(_.round, places);
     },
 
+    // Rounds a number to the closest multiple of interval
+    roundWithin: function (interval, num) {
+        return Math.round(num / interval) * interval;
+    },
+
     // Finds the index of the first element in the list which passes
     // the test.
     indexOfWithTest: function (list, test) {

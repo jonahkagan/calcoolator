@@ -81,8 +81,10 @@ G.makeGraphRep = function(fun, p) {
         for (a in repData) {
             if (repData[a].isSelected) {
                 if (snap) {
-                    mouseX = G.graphGlobals.nearestX(mouseX);
-                    mouseY = G.graphGlobals.nearestY(mouseY);
+                    var nearest = G.graphGlobals.nearestPoint(
+                        G.makePoint(mouseX, mouseY));
+                    mouseX = nearest.x();
+                    mouseY = nearest.y();
                 }
                 repData[a].x(mouseX);
                 repData[a].y(mouseY);

@@ -37,6 +37,8 @@ G.makeGraphDude = function(p) {
             // how far apart minor lines are in units
             minorStep = majorStep / 5;
 
+        G.graphGlobals.UNIT_STEP = minorStep; // we'll need this for snap to grid
+
         function drawLines(unitsPos, unitsNeg, step, drawLine) {
             _.each( // for each unit
                 _.range(0, // from the origin
