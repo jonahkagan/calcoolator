@@ -145,36 +145,8 @@ G.makeGraphDude = function(p) {
     
     window.onmousewheel = function(event) {
         if (event.target.id === "graphCanvas") {
-            //G.graphGlobals.SCALE = Math.max(G.graphGlobals.SCALE + event.wheelDeltaY/5, 20);
-            //console.log(G.graphGlobals.SCALE);
-            
-            //console.log(event.wheelDeltaY);
-            //if (event.wheelDeltaY > 0) {
-            //    G.graphGlobals.SCROLL_SCALE += .5;
-            //}
-            //else {
-            //    G.graphGlobals.SCROLL_SCALE -= .5;
-            //}
-            //G.graphGlobals.SCALE = G.graphGlobals.SCROLL_SCALE / 40.0;
-            
             G.graphGlobals.SCALE *= 1.0 + G.graphGlobals.ZOOM *
                 ((event.wheelDeltaY > 0) ? 1 : -1);
-            
-            // SCALE pixels per unit
-            //G.graphGlobals.SCALE = ...
-            
-            
-            //G.graphGlobals.SCROLL_SCALE += event.wheelDeltaY/10;
-            //G.graphGlobals.SCROLL_SCALE = Math.floor((G.graphGlobals.SCROLL_SCALE*10))/10.0;
-            //G.graphGlobals.SCROLL_SCALE = Math.floor(G.graphGlobals.SCROLL_SCALE);
-
-
-            //G.graphGlobals.SCROLL_SCALE = Math.min(G.graphGlobals.SCROLL_SCALE, 10);
-            //G.graphGlobals.SCROLL_SCALE = Math.max(G.graphGlobals.SCROLL_SCALE, -10);
-            
-            //G.graphGlobals.SCALE = G.graphGlobals.STARTING_UNIT * Math.pow(2, G.graphGlobals.SCROLL_SCALE);
-            //console.log(G.graphGlobals.SCROLL_SCALE);
-
             graphDude.broadcast("dudeChanged", {action: "zoom"});
             event.preventDefault();
         }

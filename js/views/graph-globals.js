@@ -1,8 +1,6 @@
 G.graphGlobals = {
-    SCALE: 40, // num pixels per unit
-    //SCROLL_SCALE: 0, // -40, 0, 40, 80, ...
+    SCALE: 20, // num pixels per unit
     ZOOM: 0.05, // pct to zoom by
-    STARTING_UNIT: 40,
     MIN_SQUARE_SIZE: 40,
     MAX_SQUARE_SIZE: 80,
     PIXEL_STEP: 1,
@@ -21,7 +19,6 @@ G.graphGlobals = {
     
     pixelsPerUnit: function() {
         return G.graphGlobals.SCALE;
-        //return G.graphGlobals.STARTING_UNIT*2.0^G.graphGlobals.SCALE;
     },
     
     pixelToUnit: function(pt) {
