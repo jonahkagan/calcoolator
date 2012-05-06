@@ -37,29 +37,32 @@ G.makeGraphDude = function(p) {
             // how far apart minor lines are in units
             minorStep = majorStep / 5;
 
-        function drawLines(step, drawLine) {
+        function drawLines(unitsPos, unitsNeg, step, drawLine) {
             _.each( // for each unit
                 _.range(0, // from the origin
-                        maxUnits, // to the wall
+                        unitsPos, // to the wall
                         step), // with this step
-                function (u) {
-                    drawLine(u);
-                    drawLine(-u);
-                }
-            );
+                drawLine);
+            _.each(_.range(0, unitsNeg, step),
+                   function (u) { drawLine(-u); });
         }
+
+        var unitsXPos = (p.width - G.graphGlobals.ORIGIN_X) / PPU,
+            unitsXNeg = G.graphGlobals.ORIGIN_X / PPU,
+            unitsYPos = G.graphGlobals.ORIGIN_Y / PPU,
+            unitsYNeg = (p.height - G.graphGlobals.ORIGIN_Y) / PPU;
 
         p.strokeWeight(1);
 
         // Gridlines
         p.stroke(230);
-        drawLines(minorStep, drawVert(false));
-        drawLines(minorStep, drawHorz(false));
+        drawLines(unitsXPos, unitsXNeg, minorStep, drawVert(false));
+        drawLines(unitsYPos, unitsYNeg, minorStep, drawHorz(false));
 
         p.stroke(170);
         p.fill(170);
-        drawLines(majorStep, drawVert(true));
-        drawLines(majorStep, drawHorz(true));
+        drawLines(unitsXPos, unitsXNeg, majorStep, drawVert(true));
+        drawLines(unitsYPos, unitsYNeg, majorStep, drawHorz(true));
 
         // Axes
         p.stroke(0);
@@ -74,7 +77,7 @@ G.makeGraphDude = function(p) {
                 p.line(px, 0, px, p.height);
                 if (label) {
                     p.text(G.graphGlobals.fmtLabel(ux),
-                           px+4, G.graphGlobals.ORIGIN_Y+17);
+                           px+4, G.graphGlobals.ORIGIN_Y+14);
                 }
             }
         };
@@ -85,9 +88,9 @@ G.makeGraphDude = function(p) {
             var py = G.graphGlobals.unitToPixel(G.makePoint(0,uy)).y();
             if (py < p.height && py > 0) {
                 p.line(0, py, p.width, py);
-                if (label) {
+                if (label && uy !== 0) {
                     p.text(G.graphGlobals.fmtLabel(uy),
-                           G.graphGlobals.ORIGIN_X+4, py-1);
+                           G.graphGlobals.ORIGIN_X+4, py-2);
                 }
             }
         };
