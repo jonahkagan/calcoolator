@@ -4,7 +4,7 @@ G.makeEqnController = function (model) {
     var eqnDude = G.makeEqnDudeView();
 
     eqnDude.subscribe("eqnChanged", onEqnChange);
-    eqnDude.subscribe("newFunction", me.onNewFunction);
+    //eqnDude.subscribe("newFunction", me.onNewFunction);
     eqnDude.subscribe("eqnSelected", me.onSelectFunction);
     eqnDude.subscribe("eqnRemoved", me.onRemoveFunction);
     eqnDude.display();

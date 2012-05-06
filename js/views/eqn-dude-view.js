@@ -16,18 +16,6 @@ G.makeEqnDudeView = function () {
             eqvs.push(eqv);
         });
 
-        // Display a new equation box
-        $("<div class=\"new-eqn\">" +
-                "<div type=\"button\" value=\"+\" id=\"eqnPlus\" class=\"plus unselectable\">+</div>" +
-          "</div>")
-            .appendTo($content)
-            .click(function () {
-                me.broadcast("newFunction");
-            });
-            
-        $content.find("#new-fun-name").mathquill();
-        $content.find("#new-eqn-of-x").mathquill();
-        
         if (G.opts.tblVert) {
             var tableHeight = 225;
             $(document).find("#eqns").css("height", $(document).height() - tableHeight);

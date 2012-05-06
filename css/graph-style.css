@@ -2,12 +2,3 @@
     position: fixed;
     outline: none;
 }
-
-#graphPlus {
-    position: fixed;
-    left: 282px;
-    top: 60px;
-    height: 56px;
-    line-height: 50px;
-    font-size: 100px;
-}
