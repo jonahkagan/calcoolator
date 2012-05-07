@@ -37,9 +37,9 @@ G.colors = [
     {r:255, g:45, b:94}, // hot pink
     {r:0, g:169, b:123}, // sea green
     {r:255, g:106, b:6}, // orange
-    {r:222, g:51, b:28}, // orange-red
+    {r:232, g:2, b:24}, // red
     {r:92, g:186, b:0}, // light green
-    {r:222, g:158, b:6}, // light orange
+    {r:255, g:158, b:6}, // light orange
     {r:83, g:33, b:194}, // dark purple
     {r:0, g:186, b:225}, // light blue
     {r:11, g:65, b:238}, // dark blue

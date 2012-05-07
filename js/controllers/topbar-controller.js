@@ -17,6 +17,14 @@ G.makeTopbarController = function (model) {
             view.subscribe("funRemoved", me.onRemoveFunction);
             view.display($("#topfuns"));
         });
+        
+        $newfun = $(
+            "<div id=\"newfun\">+</div>"
+            )
+            .appendTo($("#topfuns"))
+            .click(function() {
+                model.newFunction("topbar");
+            });
     };
 
     return me;

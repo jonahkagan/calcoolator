@@ -64,7 +64,6 @@ G.makeTableView = function () {
         $table = $(
             "<div class=\"tbl\">" +
                 "<table></table>" +
-                "<div class=\"remove\">X</div>" +
             "</div>"
             ) 
             .click(selectFunction)
@@ -84,14 +83,6 @@ G.makeTableView = function () {
 
         $table.find(".tbl-y")
             .css("color", fun.color.toCSS());
-
-        var $remove = $table.find(".remove")
-            .hide()
-            .click(removeFunction)
-            .mousedown(function (e) { e.stopPropagation(); });
-
-        $table.hover(function (e) { $remove.show(); },
-                     function (e) { $remove.hide(); });
 
         return $table;
     }

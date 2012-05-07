@@ -29,10 +29,8 @@ G.makeEqnView = function () {
                 "<span class=\"fun-name\">" + fun.name + "</span>" +
                 "<span class=\"eqn-of-x\">(x)=</span>" +
                 "<span class=\"eqn-editor\">" + displayEqn + "</span>" +
-                "<div class=\"remove\">X</div>" +
             "</div>"
             )
-            .append($remove)
             .appendTo($parent)
             .keydown(onKeyDown)
             .keyup(onKeyUp)
@@ -46,15 +44,6 @@ G.makeEqnView = function () {
             .mathquill("editable")
             .mousedown(selectFunction);
             //.find("span").addClass("scrubbable");
-
-
-        var $remove = $content.find(".remove")
-            .hide()
-            .click(removeFunction)
-            .mousedown(function (e) { e.stopPropagation(); });
-
-        $content.hover(function (e) { $remove.show(); },
-                       function (e) { $remove.hide(); });
 
         refresh();
 

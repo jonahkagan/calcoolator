@@ -17,7 +17,7 @@ G.makeEqnDudeView = function () {
         });
 
         if (G.opts.tblVert) {
-            var tableHeight = 225;
+            var tableHeight = 225+41;
             $(document).find("#eqns").css("height", $(document).height() - tableHeight);
         }
         else {
