@@ -1,15 +1,6 @@
 // graph
 G.makeGraphDude = function(p) {    
     var graphDude = G.makeDudeView();
-    
-    var newGraph = document.getElementById("graphPlus");
-    newGraph.onclick = function() {
-        graphDude.broadcast("newFunction");
-    };
-    
-    function drawGrid() {
-        p.redraw();
-    }
 
     p.draw = function () {
         //console.log("drawing");
@@ -99,7 +90,7 @@ G.makeGraphDude = function(p) {
     }
 
     graphDude.display = function(functions) {
-        drawGrid();
+        p.redraw();
     };
     
     graphDude.snapToGridOn = function() {

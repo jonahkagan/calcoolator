@@ -6,7 +6,7 @@ G.makeGraphController = function(model, p) {
     var functions;
     var anchorSelected = false;
     
-    dude.subscribe("newFunction", controller.onNewFunction);
+    //dude.subscribe("newFunction", controller.onNewFunction);
     
     controller.onRepChanged = function(data) {
         // Update the function coefs here TODO

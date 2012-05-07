@@ -46,14 +46,6 @@
     display: inline-block;
 }
 
-#tbls.vert .plus {
-    font-size: 100px;
-    text-align: center;
-    line-height: 0px;
-    position: relative;
-    top: 100px;
-}
-
 #tbls .vert.tbl {
     width: 120px;
 }
@@ -99,11 +91,6 @@
     top: 40px !important;
 }
 
-#tbls.horz .plus {
-    font-size: 70px;
-    text-align: center;
-}
-
 #tbls .horz.tbl {
     width: 100%;
     height: 50px;
@@ -136,10 +123,4 @@
 #tbls .horz.tbl td {
     min-width: 35px;
     max-width: 35px;
-}
-
-.horz #new-table {
-    width: 250px;
-    height: 50px;
-    border: none;
 }

@@ -6,7 +6,7 @@ G.makeTableController = function (model) {
     var tableDude = G.makeTableDudeView(NUM_PTS);
 
     tableDude.subscribe("tableChanged", onTableChange);
-    tableDude.subscribe("newFunction", me.onNewFunction);
+    //tableDude.subscribe("newFunction", me.onNewFunction);
     tableDude.subscribe("tableSelected", me.onSelectFunction);
     tableDude.subscribe("tableRemoved", me.onRemoveFunction);
     tableDude.display();
