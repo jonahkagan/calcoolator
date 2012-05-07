@@ -12,25 +12,23 @@
     
     
 background: #f4f4f4; /* Old browsers */
-background: -moz-linear-gradient(top,  #f4f4f4 0%, #b2b2b2 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f4f4f4), color-stop(100%,#b2b2b2)); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  #f4f4f4 0%,#b2b2b2 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  #f4f4f4 0%,#b2b2b2 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  #f4f4f4 0%,#b2b2b2 100%); /* IE10+ */
-background: linear-gradient(top,  #f4f4f4 0%,#b2b2b2 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#b2b2b2',GradientType=0 ); /* IE6-9 */
+background: -moz-linear-gradient(top,  #f4f4f4 0%, #dbdad4 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f4f4f4), color-stop(100%,#dbdad4)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* IE10+ */
+background: linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#dbdad4',GradientType=0 ); /* IE6-9 */
 
 }
 
 #topfuns {
     position: fixed;
-    left: 300px;
+    left: 259px;
     top: 0px;
 }
 
 .topfun {
-    width: 30px;
-    height: 30px;
     display: inline-block;
     margin-right: 30px;
 }
@@ -39,17 +37,48 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', end
     border: 1px solid #eee;
     border-radius: 20px;
     padding-left: 8px;
-    margin-top: 4px;
-    width: 22px;
-    height: 30px;
+    margin-top: 7px;
+    width: 21px;
+    height: 27px;
+    -moz-box-shadow:    0px -1px 0px 0px #ccc;
+    -webkit-box-shadow: 0px -1px 0px 0px #ccc;
+    box-shadow:         0px -1px 0px 0px #ccc;
+    cursor: pointer;
+}
+
+/* Remove button */
+div.remove {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-family: 'Helvetica', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fafafa;
+    background: #ccc;
+    padding: 1px 4px 1px;
+    margin: 10px 2px 0px 0px;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 15px
+}
+
+div.remove:hover {
+    background: #F2AEA0;
 }
 
 #logo {
-    font-family: 'Helvetica', sans-serif;
-    padding-top: 2px;
-    padding-left: 20px;
+    font-family: 'Dosis', sans-serif;
+    padding-top: 0px;
+    padding-left: 10px;
     font-weight: bold;
     font-size: 30px;
+    color: #fefefe;
+    text-shadow: #bbb 0px -1px 0px;
+}
+
+#cool {
     color: #ff2d5e;
 }
 

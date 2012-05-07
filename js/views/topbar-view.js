@@ -22,7 +22,7 @@ G.makeTopbarView = function(fun) {
             }
             else {
                 $content.find(".fun-name").mathquill()
-                    .css("background", "#f6f8ec")
+                    .css("background", "#f4f4f4")
                     .css("color", fun.color.toCSS())
                     .css("border", "1px solid #eee");
             }

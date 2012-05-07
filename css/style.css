@@ -45,28 +45,6 @@ body {
     text-shadow: none;
 }
 
-/* Remove button */
-div.remove {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    font-family: 'Helvetica', sans-serif;
-    font-size: 13px;
-    font-weight: bold;
-    color: #fafafa;
-    background: #ccc;
-    padding: 1px 4px 1px;
-    margin: 10px 2px 0px 0px;
-    cursor: pointer;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 15px
-}
-
-div.remove:hover {
-    background: #F2AEA0;
-}
-
 /* Fun Name */
 span.fun-name {
     margin-right: -2px;
