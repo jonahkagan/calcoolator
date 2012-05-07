@@ -5,6 +5,9 @@
 To use the Calcoolator, go to
 <http://cs.brown.edu/people/jmkagan/calc/calc.html>.
 
+To download this document as a PDF, go to
+<http://cs.brown.edu/people/jmkagan/calc/calcoolator-paper.pdf>.
+
 # Introduction
 
 Functions play a key role in mathematics learning, as children
