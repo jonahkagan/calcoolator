@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="lib/processing-1.3.6.min.js"></script>
+    <script src="lib/sylvester.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/mathquill/mathquill.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="lib/mathquill/mathquill.css">
+
+    <script src="js/eventmanager.js"></script>
+    <script src="js/util.js"></script>
+    
+    <script src="js/models/function.js"></script>
+    <script src="js/models/model.js"></script>
+
+    <script src="js/controllers/controller.js"></script>
+    <script src="js/controllers/topbar-controller.js"></script>
+    <script src="js/controllers/graph-controller.js"></script>
+    <script src="js/controllers/eqn-controller.js"></script>
+    <script src="js/controllers/table-controller.js"></script>
+
+    <script src="js/views/view.js"></script>
+    <script src="js/views/topbar-view.js"></script>
+        
+    <script src="js/views/graph-globals.js"></script>
+    <script src="js/views/graph-dude-view.js"></script>
+    <script src="js/views/graph-view.js"></script>
+
+    <script src="js/views/eqn-dude-view.js"></script>
+    <script src="js/views/eqn-view.js"></script>
+    <script src="js/views/table-dude-view.js"></script>
+    <script src="js/views/table-view.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/parser.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            var canvas = document.getElementById('graphCanvas');
+            var p = new Processing(canvas, G.init);
+        };
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/topbar-style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/graph-style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/eqn-style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/table-style.css"/>
+    
+</head>
+<body>
+
+    <canvas id="graphCanvas"></canvas>
+
+    <div id="eqns"></div>
+    
+    <div id="tbls"></div>
+
+    <div id="topbar">
+        <div id="logo">cal<span id="cool">cool</span>ator</div>
+        <div id="topfuns">
+        </div>
+
+        <div id="opts">
+            <!--<input type="checkbox" id="debug" checked="true"/>
+            <label for="debug">Debug</label>-->
+    
+            <input type="checkbox" id="snapToGrid" checked="true"/>
+            <label for="snapToGrid">Snap to grid</label>
+    
+            <input type="checkbox" id="tblVert" checked="true"/>
+            <label for="tlbVert">Toggle layout</label>
+        </div>
+        
+    
+    </div>
+
+
+</body>
+</html>
+
