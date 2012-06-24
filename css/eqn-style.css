@@ -1,0 +1,55 @@
+#eqns-bg {
+    width: 250px;
+}
+
+#eqns {
+    position: fixed;
+    width: 250px;
+    height: inherit;
+    top: 40px;
+    border: 1px solid darkGray;
+    background: rgba(250, 250, 250, .8);
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow:         1px 1px 5px 4px #ccc;
+}
+
+#eqns .eqn {
+    border-bottom: 1px solid darkGray;
+    position: relative;
+    width: 228px;
+    /*white-space: nowrap;*/
+    overflow: none;
+}
+
+#eqns .eqn {
+    padding: 10px 10px 10px 12px;
+    height: 30px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* Equation Editor */
+#eqns .eqn .eqn-editor {
+    /*width: 160px;*/
+}
+
+#eqns .eqn-editor {
+    overflow: hidden;
+}
+
+/* Scrubbing */
+.scrubbable, .scrubbing,
+.scrubbing .eqn *,
+.scrubbing .eqn * span,
+.scrubbing .eqn * var {
+    cursor: pointer;
+    cursor: move;
+    cursor: col-resize;
+}
+
+/* Special classes */
+#eqns .eqn .parse-error.eqn-editor {
+    /*color: red;*/
+    border-bottom: 1px dashed red;
+}

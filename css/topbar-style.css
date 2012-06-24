@@ -1,0 +1,116 @@
+#topbar {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: 40px;
+    background: #fefefe;
+    border-bottom: 1px solid #aaa;
+    -moz-box-shadow:    1px 1px 1px 1px #ddd;
+    -webkit-box-shadow: 1px 1px 1px 1px #ddd;
+    box-shadow:         1px 1px 1px 1px #ddd;
+    
+    
+    
+background: #f4f4f4; /* Old browsers */
+background: -moz-linear-gradient(top,  #f4f4f4 0%, #dbdad4 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f4f4f4), color-stop(100%,#dbdad4)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* IE10+ */
+background: linear-gradient(top,  #f4f4f4 0%,#dbdad4 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#dbdad4',GradientType=0 ); /* IE6-9 */
+
+}
+
+#topfuns {
+    position: fixed;
+    left: 259px;
+    top: 0px;
+}
+
+.topfun {
+    display: inline-block;
+    width: 60px;
+}
+
+.topfun .fun-name, #newfun {
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding-left: 8px;
+    margin-top: 7px;
+    width: 21px;
+    height: 27px;
+    -moz-box-shadow:    0px -1px 0px 0px #ccc;
+    -webkit-box-shadow: 0px -1px 0px 0px #ccc;
+    box-shadow:         0px -1px 0px 0px #ccc;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.topfun .fun-name.mathquill-rendered-math * {
+    white-space: nowrap;
+}
+
+#newfun {
+    position: absolute;
+    top: -1px;
+    display: inline;
+    padding: 1px 3px 1px 6px;
+    font-size: 30px;
+    height: 27px;
+    width: 20px;
+    line-height: 21px;
+    color: #AAA;
+}
+
+#newfun:hover {
+    color: #888;
+}
+
+#newfun:active {
+    background: #f4f4f4;
+    color: #aaa;
+}
+
+/* Remove button */
+div.remove {
+    position: relative;
+    left: -4px;
+    top: -11px;
+    font-family: 'Helvetica', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #FAFAFA;
+    background: #CCC;
+    padding: 1px 4px 1px;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 15px;
+    width: 9px;
+    display: inline;
+    cursor: pointer;
+}
+
+#logo {
+    font-family: 'Dosis', sans-serif;
+    padding-top: 0px;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 30px;
+    color: #fefefe;
+    text-shadow: #aaa 0px -1px 0px;
+}
+
+#cool {
+    color: #ff2d5e;
+}
+
+#opts {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    font-family: 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: #ff2d5e;
+}

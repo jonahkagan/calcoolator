@@ -1,0 +1,71 @@
+body {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+}
+
+#container {
+    margin-top: 40px;
+}
+
+.bg {
+    position: absolute;
+    height: 100%;
+
+}
+
+.selected {
+    //box-shadow: #B4F285 0px 0px 2px 1px;
+    box-shadow: #ccc 1px 1px 2px 1px;
+    background: #fefefe;
+}
+
+.unselectable {
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   cursor: default;
+}
+
+.plus {
+    color: #ddd;
+    opacity: .8;
+}
+
+.plus:hover {
+    color: #B4F285;
+    text-shadow: #ccc 1px 1px 2px;
+    cursor: pointer;
+}
+
+.plus:active {
+    text-shadow: none;
+}
+
+/* Fun Name */
+span.fun-name {
+    margin-right: -2px;
+}
+
+#eqns span.fun-name {
+    margin-right: -5px;
+}
+
+span.fun-name sub {
+    font-size: 80%;
+}
+
+/* Anti-mathquill */
+span.mathquill-rendered-math textarea,
+span.mathquill-rendered-math textarea:active {
+    resize: none;
+}
+
+/*span.mathquill-rendered-math,*/
+/*span.mathquill-rendered-math:focus {*/
+/*    border: none !important;*/
+/*    box-shadow: none !important;*/
+/*}*/

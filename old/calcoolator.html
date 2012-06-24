@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <script src="processing-1.3.6.min.js"></script>
+    <script src="sylvester.js"></script>
+    <script src="graph.js"></script>
+    <script src="function.js"></script>
+
+    <script src="main.js"></script>
+    <script src="parser.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            var canvas = document.getElementById('graphCanvas');
+            var p = new Processing(canvas, G.init);
+        };
+    </script>
+</head>
+<body>
+    <canvas id="graphCanvas"></canvas>
+    <div>
+        f(x) = <input type="text" id="eqn"/>
+    </div>
+    <!--
+    <input type="text" id="two" value="1"/> x^2
+
+    + <input type="text" id="one" value="0"/> x
+    + <input type="text" id="zero" value="0"/>
+    -->
+</body>
+</html>
+
